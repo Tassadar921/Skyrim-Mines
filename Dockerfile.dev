@@ -1,0 +1,19 @@
+FROM node:24
+
+ARG PORT
+
+RUN npm install -g pnpm@latest
+
+WORKDIR /app
+RUN chown node:node /app
+
+COPY --chown=node:node package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+USER node
+
+RUN pnpm install
+
+COPY --chown=node:node . /app
+
+EXPOSE ${PORT}
+
+CMD ["node", "ace", "serve", "--hmr"]

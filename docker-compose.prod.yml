@@ -1,0 +1,21 @@
+services:
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile.prod
+        restart: always
+        environment:
+            PORT: 8080
+        volumes:
+            - uploads:/app/public/uploads
+            - language_flags:/app/public/language-flag
+        networks:
+            - dokploy-network
+
+volumes:
+    uploads:
+    language_flags:
+
+networks:
+    dokploy-network:
+        external: true

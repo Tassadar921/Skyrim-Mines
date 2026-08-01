@@ -1,0 +1,53 @@
+# =============================================================================
+# Base
+# =============================================================================
+FROM node:24-alpine AS base
+RUN npm install -g pnpm@latest
+WORKDIR /app
+
+
+# =============================================================================
+# Stage 1a — Deps (toutes les dépendances, pour le build)
+# =============================================================================
+FROM base AS deps
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+RUN pnpm install
+
+
+# =============================================================================
+# Stage 1b — Deps de production uniquement (pour l'image finale)
+# =============================================================================
+FROM base AS production-deps
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+RUN pnpm install --prod
+
+
+# =============================================================================
+# Stage 2 — Build
+# Compile TypeScript + Vite via node ace build
+# =============================================================================
+FROM base AS build
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+RUN node ace build --ignore-ts-errors
+
+
+# =============================================================================
+# Stage 3 — Production
+# Image finale légère : build + deps de prod uniquement
+# =============================================================================
+FROM base AS runner
+
+RUN addgroup -S app && adduser -S app -G app
+
+ENV NODE_ENV=production
+
+COPY --from=production-deps /app/node_modules ./node_modules
+COPY --from=build /app/build .
+
+RUN mkdir -p public/uploads public/language-flag && chown -R app:app /app
+USER app
+
+EXPOSE 8080
+
+CMD ["sh", "-c", "node ace cache:clear --force && node bin/server.js"]

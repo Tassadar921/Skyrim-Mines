@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="{{ request.param('language') || 'fr' }}">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title inertia></title>
+
+    <script>
+      (function() {
+        const t = localStorage.getItem('theme');
+        if (t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.classList.add('dark');
+        }
+        if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+      })();
+    </script>
+    @vite(['inertia/app.ts'])
+    @inertiaHead()
+    @stack('dumper')
+  </head>
+
+  <body>
+    @inertia()
+    <script>
+      (function() {
+        const key = '_sy_' + location.pathname;
+        const nav = performance.getEntriesByType('navigation')[0];
+        if (nav && nav.type === 'reload') {
+          const y = +sessionStorage.getItem(key) || 0;
+          if (y) window.scrollTo(0, y);
+        }
+        let t;
+        addEventListener('scroll', function() {
+          clearTimeout(t);
+          t = setTimeout(function() {
+            sessionStorage.setItem(key, String(scrollY));
+          }, 150);
+        }, { passive: true });
+      })();
+    </script>
+  </body>
+</html>

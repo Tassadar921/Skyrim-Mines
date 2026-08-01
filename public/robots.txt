@@ -1,0 +1,11 @@
+User-agent: *
+Disallow: /*/admin/
+Disallow: /*/login
+Disallow: /*/register
+Disallow: /*/forgot-password
+Disallow: /*/password-reset
+Disallow: /*/profile
+Disallow: /*/email-verify
+Disallow: /*/logout
+
+Sitemap: https://consilium.fr/sitemap.xml

@@ -1,0 +1,88 @@
+{
+    "title": "Consilium",
+    "tooManyRequests": "Trop de tentatives. Veuillez patienter quelques minutes avant de réessayer.",
+    "admin": {
+        "terms": {
+            "invalidated": "CGU invalidées — tous les utilisateurs devront les réaccepter."
+        },
+        "users": {
+            "update": {
+                "success": "Utilisateur mis à jour avec succès",
+                "error": "Erreur lors de la mise à jour de l'utilisateur"
+            }
+        }
+    },
+    "mail": {
+        "footerPrivacy": "Mentions légales & données personnelles",
+        "passwordReset": {
+            "subject": "Réinitialisation de votre mot de passe",
+            "greeting": "Bonjour {username},",
+            "body1": "Vous avez demandé la réinitialisation de votre mot de passe sur consilium.fr.",
+            "body2": "Cliquez sur le bouton ci-dessous pour choisir un nouveau mot de passe. Ce lien est valable 1 heure.",
+            "cta": "Réinitialiser mon mot de passe",
+            "ignore": "Si vous n'êtes pas à l'origine de cette demande, ignorez simplement cet email.",
+            "footer": "Cet email a été envoyé automatiquement par Consilium (consilium.fr). Merci de ne pas y répondre directement."
+        },
+        "emailVerification": {
+            "subject": "Activez votre compte",
+            "greeting": "Bonjour {username},",
+            "body1": "Merci de vous être inscrit sur consilium.fr. Cliquez sur le bouton ci-dessous pour activer votre compte. Ce lien est valable 24 heures.",
+            "cta": "Activer mon compte",
+            "ignore": "Si vous n'êtes pas à l'origine de cette inscription, ignorez simplement cet email.",
+            "footer": "Cet email a été envoyé automatiquement par Consilium (consilium.fr). Merci de ne pas y répondre directement."
+        },
+        "inactivityWarning": {
+            "subject": "Votre compte sera supprimé dans 30 jours",
+            "greeting": "Bonjour {username},",
+            "body1": "Votre compte sur consilium.fr n'a enregistré aucune connexion depuis 3 ans.",
+            "body2": "Sans action de votre part, il sera définitivement supprimé dans 30 jours ainsi que toutes vos données associées.",
+            "cta": "Me connecter pour conserver mon compte",
+            "ignore": "Si vous ne souhaitez pas conserver votre compte, vous n'avez rien à faire.",
+            "footer": "Cet email a été envoyé automatiquement par Consilium (consilium.fr). Merci de ne pas y répondre directement."
+        }
+    },
+    "passwordReset": {
+        "invalidToken": "Ce lien de réinitialisation est invalide ou a expiré.",
+        "passwordMismatch": "Les mots de passe ne correspondent pas.",
+        "success": "Mot de passe mis à jour avec succès. Vous pouvez vous connecter.",
+        "error": "Une erreur est survenue lors de la mise à jour du mot de passe, veuillez réessayer."
+    },
+    "profile": {
+        "update": {
+            "success": "Profil mis à jour avec succès"
+        },
+        "passwordReset": {
+            "sent": "Un email de réinitialisation a été envoyé à votre adresse",
+            "error": "Erreur lors de l'envoi de l'email, veuillez réessayer"
+        },
+        "destroy": {
+            "success": "Votre compte a été supprimé.",
+            "error": "Une erreur est survenue lors de la suppression du compte."
+        }
+    },
+    "forgotPassword": {
+        "sent": "Si cette adresse est associée à un compte, vous recevrez un email de réinitialisation."
+    },
+    "register": {
+        "passwordMismatch": "Les mots de passe ne correspondent pas.",
+        "emailTaken": "Cette adresse email est déjà utilisée.",
+        "termsRequired": "Vous devez accepter les CGU pour créer un compte.",
+        "success": "Compte créé ! Vérifiez votre boîte mail pour activer votre compte.",
+        "error": "Une erreur est survenue lors de la création du compte, veuillez réessayer."
+    },
+    "emailVerification": {
+        "invalidToken": "Ce lien de vérification est invalide ou a expiré.",
+        "success": "Votre compte est activé. Bienvenue !",
+        "error": "Une erreur est survenue lors de l'activation du compte."
+    },
+    "auth": {
+        "login": {
+            "success": "Connexion réussie",
+            "error": "Échec de la connexion, veuillez vérifier vos identifiants",
+            "notEnabled": "Votre compte n'est pas encore activé. Vérifiez votre boîte mail."
+        },
+        "logout": {
+            "success": "Vous avez été déconnecté"
+        }
+    }
+}
