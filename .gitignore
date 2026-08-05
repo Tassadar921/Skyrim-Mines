@@ -17,6 +17,9 @@ complet.pdf
 # Frontend assets & compiled code
 public/assets
 public/uploads/paragraphs
+public/uploads/avatars
+public/uploads/devis
+public/uploads/commandes
 
 # Build tools specific
 npm-debug.log

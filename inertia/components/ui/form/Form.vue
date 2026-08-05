@@ -52,7 +52,7 @@ const handleSubmit = (e: Event) => {
                             cn(
                                 'inline-flex h-10 w-full items-center justify-center gap-2 rounded-md px-8 text-sm font-medium transition-colors',
                                 'bg-primary text-primary-foreground hover:bg-primary/90',
-                                'disabled:pointer-events-none disabled:opacity-50'
+                                'disabled:pointer-events-none disabled:opacity-50',
                             )
                         "
                     >

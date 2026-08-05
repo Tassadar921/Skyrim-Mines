@@ -5,6 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ### Development
+
 ```bash
 npm run dev          # AdonisJS server + Vite HMR (port 5173, HMR port 24678)
 npm run build        # Production build
@@ -17,6 +18,7 @@ node ace test --files tests/unit/foo.spec.ts  # Run a single test file
 ```
 
 ### Make targets (Docker-based workflow)
+
 ```bash
 make start     # Full local setup: install, rm containers, up, fresh DB
 make up        # Stop, clear cache, install hooks, build Docker services
@@ -30,6 +32,7 @@ make deploy    # Full production deployment
 ```
 
 ### Ace CLI (AdonisJS)
+
 ```bash
 node ace make:controller Foo
 node ace make:model Foo
@@ -43,6 +46,7 @@ node ace migration:rollback
 **Stack:** AdonisJS 7 (backend) + Vue 3 + Inertia.js (frontend) + PostgreSQL + Redis
 
 ### Request flow
+
 ```
 HTTP request → start/routes.ts → middleware (start/kernel.ts) → controller → model/repository → transformer → Inertia renders Vue page
 ```
@@ -62,17 +66,20 @@ HTTP request → start/routes.ts → middleware (start/kernel.ts) → controller
 **i18n:** Default locale is French (`fr`). Translation files live in `resources/lang/{en,fr}/`. The `LanguageMiddleware` detects the request locale. Use `@adonisjs/i18n` ICU formatter.
 
 ### Frontend (`inertia/`)
+
 - `inertia/pages/` — Page components (mapped 1:1 to controller render calls)
 - `inertia/components/ui/` — Shadcn/ui components (Tailwind CSS v4)
 - `inertia/layouts/default.vue` — Root layout wrapping all pages
 - `inertia/app.ts` — Inertia initialization; `inertia/ssr.ts` — SSR entry
 
 ### Auth
+
 - Uses `@adonisjs/auth` with session-based auth
 - `app/middleware/guest_middleware.ts` — Redirect authenticated users
 - User roles defined in `app/types/enum/user_role_enum.ts`
 
 ### Code style
+
 - 4-space indentation, 200-char line width, trailing commas, semicolons (see `.prettierrc`)
 - Pre-commit hook runs `lint-staged` (prettier on staged files)
 

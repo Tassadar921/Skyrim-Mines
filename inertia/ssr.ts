@@ -13,12 +13,9 @@ import { createI18nInstance } from '~/i18n';
 export default function render(page: any) {
     const i18n = createI18nInstance('fr');
 
-    const appName = 'Consilium';
-
     return createInertiaApp({
         page,
         render: renderToString,
-        title: (title: string): string => (!title || title === appName ? appName : `${title} - ${appName}`),
 
         resolve: (name: string): Promise<DefineComponent> => {
             return resolvePageComponent(`./pages/${name}.vue`, import.meta.glob<DefineComponent>('./pages/**/*.vue', { eager: true }), Layout);

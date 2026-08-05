@@ -36,8 +36,10 @@ const touched = ref(false);
 const showPassword = ref(false);
 
 const isPassword = computed(() => props.type === 'password');
+const isNumber = computed(() => props.type === 'number');
 const actualType = computed(() => {
     if (isPassword.value) return showPassword.value ? 'text' : 'password';
+    if (isNumber.value) return 'text';
     return props.type;
 });
 
@@ -52,6 +54,19 @@ const handleFocus = () => {
 const handleBlur = () => {
     isFocused.value = false;
     touched.value = true;
+};
+
+const numberControlKeys = ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'];
+
+const handleKeydown = (e: KeyboardEvent) => {
+    if (props.type !== 'number' || e.ctrlKey || e.metaKey || e.altKey || numberControlKeys.includes(e.key)) return;
+
+    const isDigit = /^[0-9]$/.test(e.key);
+    const isDecimalPoint = e.key === '.' && !(e.target as HTMLInputElement).value.includes('.');
+
+    if (!isDigit && !isDecimalPoint) {
+        e.preventDefault();
+    }
 };
 
 const handleInput = (e: Event) => {
@@ -85,14 +100,14 @@ const togglePassword = () => {
 </script>
 
 <template>
-    <div class="w-full">
+    <div class="w-full" :class="label ? 'pt-4' : ''">
         <div class="relative">
             <label
                 :for="inputId"
                 :class="
                     cn(
                         'absolute pointer-events-none z-10 font-medium transition-all duration-200 ease-in-out',
-                        isFocused || hasValue ? 'bottom-9 left-1 text-xs text-foreground' : 'bottom-1.5 left-3 text-base text-muted-foreground'
+                        isFocused || hasValue ? 'bottom-9 left-1 text-xs text-foreground' : 'bottom-1.5 left-3 text-base text-muted-foreground',
                     )
                 "
             >
@@ -103,6 +118,7 @@ const togglePassword = () => {
             <input
                 :id="inputId"
                 :type="actualType"
+                :inputmode="isNumber ? 'decimal' : undefined"
                 :name="name"
                 :placeholder="isFocused ? placeholder : ''"
                 :readonly="readonly"
@@ -118,11 +134,12 @@ const togglePassword = () => {
                         'disabled:cursor-not-allowed disabled:opacity-50 read-only:cursor-not-allowed read-only:opacity-50',
                         isPassword ? 'pr-10' : '',
                         showError ? 'border-destructive focus-visible:ring-destructive/50' : '',
-                        props.class
+                        props.class,
                     )
                 "
                 @focus="handleFocus"
                 @blur="handleBlur"
+                @keydown="handleKeydown"
                 @input="handleInput"
             />
 

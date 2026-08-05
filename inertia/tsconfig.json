@@ -10,5 +10,5 @@
             "@generated/*": ["../.adonisjs/client/*"]
         }
     },
-    "include": ["./**/*.ts", "./**/*.vue", "../.adonisjs/client/**/*.ts", "../.adonisjs/server/**/*.ts"]
+    "include": ["./**/*.ts", "./**/*.vue", "../.adonisjs/client/**/*.ts", "../.adonisjs/server/**/*.ts", "../config/**/*.ts"]
 }

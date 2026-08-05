@@ -7,9 +7,7 @@ const { t } = useI18n();
 </script>
 
 <template>
-    <Head title="404">
-        <meta name="robots" content="noindex" />
-    </Head>
+    <Head title="404" />
     <div class="min-h-screen flex flex-col items-center justify-center gap-6 text-center">
         <p class="text-[11px] tracking-widest uppercase text-slate-500 dark:text-slate-400">404</p>
         <h1 class="font-serif text-4xl font-semibold text-slate-900 dark:text-slate-100">{{ t('errors.notFound.title') }}</h1>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useTheme } from '~/lib/useTheme';
+import { useTheme } from '~/lib/use_theme';
 import { useI18n } from 'vue-i18n';
 import { Moon, Sun } from '@lucide/vue';
 

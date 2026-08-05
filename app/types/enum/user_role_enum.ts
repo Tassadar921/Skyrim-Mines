@@ -1,6 +1,9 @@
 export enum UserRoleEnum {
     ADMIN = 'admin',
-    USER = 'user',
+    AUDITOR = 'auditor',
+    CONTRACTOR = 'contractor',
+    STAFF = 'staff',
+    CLIENT = 'client',
 }
 
 export default UserRoleEnum;

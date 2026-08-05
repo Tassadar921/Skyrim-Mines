@@ -4,66 +4,335 @@
  * Run "node ace migration:run" command to re-generate this file
  */
 
-import { BaseModel, column } from '@adonisjs/lucid/orm';
-import { DateTime } from 'luxon';
+import { BaseModel, column } from '@adonisjs/lucid/orm'
+import { DateTime } from 'luxon'
 
-export class TermsVersionSchema extends BaseModel {
-    static $columns = ['createdAt', 'gracePeriodDays', 'id', 'invalidatedAt', 'note', 'updatedAt'] as const;
-    $columns = TermsVersionSchema.$columns;
-    @column.dateTime({ autoCreate: true })
-    declare createdAt: DateTime;
-    @column()
-    declare gracePeriodDays: number;
-    @column({ isPrimary: true })
-    declare id: string;
-    @column.dateTime()
-    declare invalidatedAt: DateTime;
-    @column()
-    declare note: string | null;
-    @column.dateTime({ autoCreate: true, autoUpdate: true })
-    declare updatedAt: DateTime | null;
+export class DeliverySchema extends BaseModel {
+  static $columns = ['createdAt', 'deliveredAt', 'deliveredByUserId', 'deliveredWeekNumber', 'id', 'orderId', 'updatedAt'] as const
+  $columns = DeliverySchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column.dateTime()
+  declare deliveredAt: DateTime
+  @column()
+  declare deliveredByUserId: string | null
+  @column()
+  declare deliveredWeekNumber: number
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare orderId: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
 }
 
-export class UserTokenSchema extends BaseModel {
-    static $columns = ['createdAt', 'expiresAt', 'id', 'tokenHash', 'type', 'userId'] as const;
-    $columns = UserTokenSchema.$columns;
-    @column.dateTime({ autoCreate: true })
-    declare createdAt: DateTime;
-    @column.dateTime()
-    declare expiresAt: DateTime;
-    @column({ isPrimary: true })
-    declare id: string;
-    @column()
-    declare tokenHash: string;
-    @column()
-    declare type: string;
-    @column()
-    declare userId: string;
+export class DeliveryLineSchema extends BaseModel {
+  static $columns = ['createdAt', 'deliveryId', 'id', 'orderLineId', 'quantity', 'resourceId', 'resourceName', 'resourceType', 'unitPrice', 'updatedAt'] as const
+  $columns = DeliveryLineSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare deliveryId: string
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare orderLineId: string | null
+  @column()
+  declare quantity: number
+  @column()
+  declare resourceId: string | null
+  @column()
+  declare resourceName: string
+  @column()
+  declare resourceType: string
+  @column()
+  declare unitPrice: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
+export class FileSchema extends BaseModel {
+  static $columns = ['createdAt', 'id', 'mimeType', 'originalName', 'path', 'size', 'updatedAt'] as const
+  $columns = FileSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare mimeType: string
+  @column()
+  declare originalName: string
+  @column()
+  declare path: string
+  @column()
+  declare size: number
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
+export class MaterialStockSchema extends BaseModel {
+  static $columns = ['createdAt', 'id', 'materialId', 'quantity', 'updatedAt'] as const
+  $columns = MaterialStockSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare materialId: string
+  @column()
+  declare quantity: number
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
+export class MaterialSchema extends BaseModel {
+  static $columns = ['buyPrice', 'createdAt', 'id', 'name', 'order', 'updatedAt'] as const
+  $columns = MaterialSchema.$columns
+  @column()
+  declare buyPrice: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare name: string
+  @column()
+  declare order: number
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
+export class OrderLineSchema extends BaseModel {
+  static $columns = ['createdAt', 'id', 'orderId', 'quantity', 'resourceId', 'resourceName', 'resourceType', 'totalPrice', 'unitPrice', 'updatedAt'] as const
+  $columns = OrderLineSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare orderId: string
+  @column()
+  declare quantity: number
+  @column()
+  declare resourceId: string | null
+  @column()
+  declare resourceName: string
+  @column()
+  declare resourceType: string
+  @column()
+  declare totalPrice: string
+  @column()
+  declare unitPrice: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
+export class OrderSchema extends BaseModel {
+  static $columns = ['createdAt', 'fileId', 'id', 'number', 'organizationId', 'organizationName', 'recipientUserId', 'requesterName', 'status', 'totalAmount', 'updatedAt', 'userId'] as const
+  $columns = OrderSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare fileId: string | null
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare number: number
+  @column()
+  declare organizationId: string | null
+  @column()
+  declare organizationName: string | null
+  @column()
+  declare recipientUserId: string | null
+  @column()
+  declare requesterName: string
+  @column()
+  declare status: string
+  @column()
+  declare totalAmount: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare userId: string
+}
+
+export class OrganizationSchema extends BaseModel {
+  static $columns = ['createdAt', 'id', 'name', 'updatedAt'] as const
+  $columns = OrganizationSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare name: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
+export class QuoteLineSchema extends BaseModel {
+  static $columns = ['createdAt', 'id', 'quantity', 'quoteId', 'resourceId', 'resourceName', 'resourceType', 'totalPrice', 'unitPrice', 'updatedAt'] as const
+  $columns = QuoteLineSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare quantity: number
+  @column()
+  declare quoteId: string
+  @column()
+  declare resourceId: string | null
+  @column()
+  declare resourceName: string
+  @column()
+  declare resourceType: string
+  @column()
+  declare totalPrice: string
+  @column()
+  declare unitPrice: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
+export class QuoteSchema extends BaseModel {
+  static $columns = ['createdAt', 'fileId', 'id', 'number', 'organizationId', 'organizationName', 'recipientUserId', 'requesterName', 'totalAmount', 'updatedAt', 'userId'] as const
+  $columns = QuoteSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare fileId: string | null
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare number: number
+  @column()
+  declare organizationId: string | null
+  @column()
+  declare organizationName: string | null
+  @column()
+  declare recipientUserId: string | null
+  @column()
+  declare requesterName: string
+  @column()
+  declare totalAmount: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare userId: string
+}
+
+export class ResourceBuybackBatchSchema extends BaseModel {
+  static $columns = ['createdAt', 'id', 'updatedAt', 'weekNumber'] as const
+  $columns = ResourceBuybackBatchSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare weekNumber: number
+}
+
+export class ResourceBuybackSchema extends BaseModel {
+  static $columns = ['amount', 'batchId', 'createdAt', 'id', 'quantity', 'resourceId', 'updatedAt', 'userId'] as const
+  $columns = ResourceBuybackSchema.$columns
+  @column()
+  declare amount: string
+  @column()
+  declare batchId: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare quantity: number
+  @column()
+  declare resourceId: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare userId: string
+}
+
+export class ResourceDepositSchema extends BaseModel {
+  static $columns = ['createdAt', 'id', 'quantity', 'resourceId', 'updatedAt', 'userId'] as const
+  $columns = ResourceDepositSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare quantity: number
+  @column()
+  declare resourceId: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare userId: string
+}
+
+export class ResourceStockSchema extends BaseModel {
+  static $columns = ['createdAt', 'id', 'quantityPurchased', 'resourceId', 'updatedAt'] as const
+  $columns = ResourceStockSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare quantityPurchased: number
+  @column()
+  declare resourceId: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
+export class ResourceSchema extends BaseModel {
+  static $columns = ['buyPrice', 'createdAt', 'id', 'name', 'order', 'sellPrice', 'type', 'updatedAt'] as const
+  $columns = ResourceSchema.$columns
+  @column()
+  declare buyPrice: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare name: string
+  @column()
+  declare order: number
+  @column()
+  declare sellPrice: string
+  @column()
+  declare type: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
 }
 
 export class UserSchema extends BaseModel {
-    static $columns = ['acceptedTermsAt', 'createdAt', 'deletionWarningSentAt', 'email', 'enabled', 'id', 'lastLoginAt', 'password', 'role', 'updatedAt', 'username'] as const;
-    $columns = UserSchema.$columns;
-    @column.dateTime()
-    declare acceptedTermsAt: DateTime | null;
-    @column.dateTime({ autoCreate: true })
-    declare createdAt: DateTime;
-    @column.dateTime()
-    declare deletionWarningSentAt: DateTime | null;
-    @column()
-    declare email: string;
-    @column()
-    declare enabled: boolean | null;
-    @column({ isPrimary: true })
-    declare id: string;
-    @column.dateTime()
-    declare lastLoginAt: DateTime | null;
-    @column({ serializeAs: null })
-    declare password: string | null;
-    @column()
-    declare role: string;
-    @column.dateTime({ autoCreate: true, autoUpdate: true })
-    declare updatedAt: DateTime | null;
-    @column()
-    declare username: string;
+  static $columns = ['avatarId', 'balance', 'createdAt', 'discordId', 'enabled', 'id', 'lastLoginAt', 'organizationId', 'organizationRole', 'role', 'updatedAt', 'username'] as const
+  $columns = UserSchema.$columns
+  @column()
+  declare avatarId: string | null
+  @column()
+  declare balance: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare discordId: string
+  @column()
+  declare enabled: boolean
+  @column({ isPrimary: true })
+  declare id: string
+  @column.dateTime()
+  declare lastLoginAt: DateTime | null
+  @column()
+  declare organizationId: string | null
+  @column()
+  declare organizationRole: string | null
+  @column()
+  declare role: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare username: string
 }

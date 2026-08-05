@@ -1,85 +1,166 @@
 {
-    "title": "Consilium",
+    "title": "Compagnie Minière de la Crevasse",
     "tooManyRequests": "Trop de tentatives. Veuillez patienter quelques minutes avant de réessayer.",
     "admin": {
-        "terms": {
-            "invalidated": "CGU invalidées — tous les utilisateurs devront les réaccepter."
-        },
         "users": {
             "update": {
                 "success": "Utilisateur mis à jour avec succès",
                 "error": "Erreur lors de la mise à jour de l'utilisateur"
+            },
+            "create": {
+                "success": "Utilisateur créé avec succès",
+                "error": "Erreur lors de la création de l'utilisateur",
+                "discordIdTaken": "Cet identifiant Discord est déjà utilisé par un autre compte",
+                "missingOrganization": "Veuillez renseigner l'organisation et le rôle du client"
+            },
+            "avatar": {
+                "success": "Avatar mis à jour avec succès",
+                "error": "Erreur lors de la mise à jour de l'avatar"
+            }
+        },
+        "resources": {
+            "create": {
+                "success": "Ressource créée avec succès",
+                "error": "Erreur lors de la création de la ressource"
+            },
+            "update": {
+                "success": "Ressource mise à jour avec succès",
+                "error": "Erreur lors de la mise à jour de la ressource"
+            },
+            "destroy": {
+                "success": "Ressource supprimée avec succès",
+                "error": "Erreur lors de la suppression de la ressource"
+            }
+        },
+        "materials": {
+            "create": {
+                "success": "Matériau créé avec succès",
+                "error": "Erreur lors de la création du matériau"
+            },
+            "update": {
+                "success": "Matériau mis à jour avec succès",
+                "error": "Erreur lors de la mise à jour du matériau"
+            },
+            "destroy": {
+                "success": "Matériau supprimé avec succès",
+                "error": "Erreur lors de la suppression du matériau"
+            }
+        },
+        "organizations": {
+            "create": {
+                "success": "Organisation créée avec succès",
+                "error": "Erreur lors de la création de l'organisation"
+            },
+            "update": {
+                "success": "Organisation mise à jour avec succès",
+                "error": "Erreur lors de la mise à jour de l'organisation"
+            },
+            "destroy": {
+                "success": "Organisation supprimée avec succès",
+                "error": "Erreur lors de la suppression de l'organisation"
+            },
+            "members": {
+                "create": {
+                    "success": "Membre ajouté avec succès",
+                    "error": "Erreur lors de l'ajout du membre",
+                    "discordIdTaken": "Cet identifiant Discord est déjà utilisé par un autre compte",
+                    "missingUser": "Veuillez sélectionner un client",
+                    "missingFields": "Veuillez renseigner l'identifiant Discord et le nom d'utilisateur",
+                    "userNotEligible": "Ce client n'est plus disponible (déjà rattaché à une organisation, ou compte interne)"
+                },
+                "destroy": {
+                    "success": "Membre retiré de l'organisation",
+                    "error": "Erreur lors du retrait du membre"
+                },
+                "updateRole": {
+                    "success": "Rôle mis à jour avec succès",
+                    "error": "Erreur lors de la mise à jour du rôle"
+                }
             }
         }
     },
-    "mail": {
-        "footerPrivacy": "Mentions légales & données personnelles",
-        "passwordReset": {
-            "subject": "Réinitialisation de votre mot de passe",
-            "greeting": "Bonjour {username},",
-            "body1": "Vous avez demandé la réinitialisation de votre mot de passe sur consilium.fr.",
-            "body2": "Cliquez sur le bouton ci-dessous pour choisir un nouveau mot de passe. Ce lien est valable 1 heure.",
-            "cta": "Réinitialiser mon mot de passe",
-            "ignore": "Si vous n'êtes pas à l'origine de cette demande, ignorez simplement cet email.",
-            "footer": "Cet email a été envoyé automatiquement par Consilium (consilium.fr). Merci de ne pas y répondre directement."
-        },
-        "emailVerification": {
-            "subject": "Activez votre compte",
-            "greeting": "Bonjour {username},",
-            "body1": "Merci de vous être inscrit sur consilium.fr. Cliquez sur le bouton ci-dessous pour activer votre compte. Ce lien est valable 24 heures.",
-            "cta": "Activer mon compte",
-            "ignore": "Si vous n'êtes pas à l'origine de cette inscription, ignorez simplement cet email.",
-            "footer": "Cet email a été envoyé automatiquement par Consilium (consilium.fr). Merci de ne pas y répondre directement."
-        },
-        "inactivityWarning": {
-            "subject": "Votre compte sera supprimé dans 30 jours",
-            "greeting": "Bonjour {username},",
-            "body1": "Votre compte sur consilium.fr n'a enregistré aucune connexion depuis 3 ans.",
-            "body2": "Sans action de votre part, il sera définitivement supprimé dans 30 jours ainsi que toutes vos données associées.",
-            "cta": "Me connecter pour conserver mon compte",
-            "ignore": "Si vous ne souhaitez pas conserver votre compte, vous n'avez rien à faire.",
-            "footer": "Cet email a été envoyé automatiquement par Consilium (consilium.fr). Merci de ne pas y répondre directement."
-        }
-    },
-    "passwordReset": {
-        "invalidToken": "Ce lien de réinitialisation est invalide ou a expiré.",
-        "passwordMismatch": "Les mots de passe ne correspondent pas.",
-        "success": "Mot de passe mis à jour avec succès. Vous pouvez vous connecter.",
-        "error": "Une erreur est survenue lors de la mise à jour du mot de passe, veuillez réessayer."
-    },
-    "profile": {
+    "stocks": {
         "update": {
-            "success": "Profil mis à jour avec succès"
-        },
-        "passwordReset": {
-            "sent": "Un email de réinitialisation a été envoyé à votre adresse",
-            "error": "Erreur lors de l'envoi de l'email, veuillez réessayer"
-        },
-        "destroy": {
-            "success": "Votre compte a été supprimé.",
-            "error": "Une erreur est survenue lors de la suppression du compte."
+            "error": "Erreur lors de la mise à jour de la quantité en stock"
         }
     },
-    "forgotPassword": {
-        "sent": "Si cette adresse est associée à un compte, vous recevrez un email de réinitialisation."
+    "deposits": {
+        "create": {
+            "success": "Dépôt enregistré avec succès",
+            "error": "Erreur lors de l'enregistrement du dépôt"
+        }
     },
-    "register": {
-        "passwordMismatch": "Les mots de passe ne correspondent pas.",
-        "emailTaken": "Cette adresse email est déjà utilisée.",
-        "termsRequired": "Vous devez accepter les CGU pour créer un compte.",
-        "success": "Compte créé ! Vérifiez votre boîte mail pour activer votre compte.",
-        "error": "Une erreur est survenue lors de la création du compte, veuillez réessayer."
+    "buybacks": {
+        "create": {
+            "success": "Rachat effectué avec succès",
+            "error": "Erreur lors du rachat"
+        }
     },
-    "emailVerification": {
-        "invalidToken": "Ce lien de vérification est invalide ou a expiré.",
-        "success": "Votre compte est activé. Bienvenue !",
-        "error": "Une erreur est survenue lors de l'activation du compte."
+    "devis": {
+        "create": {
+            "success": "Devis généré avec succès",
+            "error": "Erreur lors de la génération du devis"
+        },
+        "show": {
+            "forbidden": "L'accès à ce devis vous est interdit"
+        }
+    },
+    "commandes": {
+        "create": {
+            "success": "Commande enregistrée avec succès",
+            "error": "Erreur lors de l'enregistrement de la commande"
+        },
+        "show": {
+            "forbidden": "L'accès à cette commande vous est interdit"
+        },
+        "cancel": {
+            "success": "Commande annulée avec succès",
+            "error": "Cette commande ne peut plus être annulée"
+        },
+        "validate": {
+            "success": "Commande validée avec succès",
+            "error": "Cette commande ne peut pas être validée"
+        }
+    },
+    "livraisons": {
+        "create": {
+            "success": "Livraison enregistrée avec succès",
+            "error": "Erreur lors de l'enregistrement de la livraison"
+        },
+        "delete": {
+            "success": "Livraison supprimée avec succès",
+            "error": "Erreur lors de la suppression de la livraison"
+        }
+    },
+    "organization": {
+        "members": {
+            "create": {
+                "success": "Membre ajouté avec succès",
+                "error": "Erreur lors de l'ajout du membre",
+                "forbiddenRole": "Vous n'êtes pas autorisé à attribuer ce rôle",
+                "discordIdTaken": "Cet identifiant Discord est déjà utilisé par un autre compte",
+                "missingUser": "Veuillez sélectionner un client",
+                "missingFields": "Veuillez renseigner l'identifiant Discord et le nom d'utilisateur",
+                "userNotEligible": "Ce client n'est plus disponible (déjà rattaché à une organisation, ou compte interne)"
+            },
+            "destroy": {
+                "success": "Membre retiré de l'organisation",
+                "error": "Erreur lors du retrait du membre",
+                "forbiddenRole": "Vous n'êtes pas autorisé à retirer ce membre",
+                "cannotTargetSelf": "Vous ne pouvez pas effectuer cette action sur votre propre compte"
+            },
+            "updateRole": {
+                "success": "Rôle mis à jour avec succès",
+                "error": "Erreur lors de la mise à jour du rôle",
+                "cannotTargetSelf": "Vous ne pouvez pas effectuer cette action sur votre propre compte"
+            }
+        }
     },
     "auth": {
         "login": {
-            "success": "Connexion réussie",
-            "error": "Échec de la connexion, veuillez vérifier vos identifiants",
-            "notEnabled": "Votre compte n'est pas encore activé. Vérifiez votre boîte mail."
+            "error": "Échec de la connexion avec Discord, veuillez réessayer",
+            "notEnabled": "Votre compte a été désactivé.",
+            "unknownAccount": "Aucun compte n'est associé à ce Discord. Contactez un administrateur."
         },
         "logout": {
             "success": "Vous avez été déconnecté"

@@ -1,5 +1,4 @@
 import { BaseSchema } from '@adonisjs/lucid/schema';
-import UserRoleEnum from '#types/enum/user_role_enum';
 
 export default class extends BaseSchema {
     protected tableName: string = 'users';
@@ -8,12 +7,12 @@ export default class extends BaseSchema {
         this.schema.createTable(this.tableName, (table) => {
             table.uuid('id').primary().defaultTo(this.raw('uuidv7()'));
 
+            table.string('discord_id', 32).notNullable().unique();
             table.string('username', 50).notNullable();
-            table.string('email', 100).notNullable().unique();
-            table.string('password').nullable();
-            table.string('role').notNullable().defaultTo(UserRoleEnum.USER);
-            table.boolean('enabled').defaultTo(false);
-            table.boolean('accepted_terms_and_conditions').defaultTo(false);
+            table.string('role').notNullable();
+            table.boolean('enabled').notNullable().defaultTo(true);
+            table.decimal('balance', 10, 2).notNullable().defaultTo(0);
+            table.timestamp('last_login_at').nullable();
 
             table.timestamp('created_at').notNullable();
             table.timestamp('updated_at').nullable();

@@ -1,14 +1,24 @@
-import { HttpContext } from '@adonisjs/core/http';
+import { type HttpContext } from '@adonisjs/core/http';
 import logger from '@adonisjs/core/services/logger';
 import UserRepository from '#repositories/user_repository';
+import OrganizationRepository from '#repositories/organization_repository';
+import FileRepository from '#repositories/file_repository';
 import UserTransformer from '#transformers/user_transformer';
-import { indexUserValidator, updateUserValidator } from '#validators/admin/users';
+import OrganizationTransformer from '#transformers/organization_transformer';
+import UserRoleEnum from '#types/enum/user_role_enum';
+import type OrganizationRoleEnum from '#types/enum/organization_role_enum';
+import { storeUploadedFile, deleteStoredFile } from '#helpers/file_storage_helper';
+import { indexUserValidator, updateUserValidator, createUserValidator, updateUserAvatarValidator } from '#validators/admin/users';
 
 export default class UsersController {
-    constructor(private readonly userRepository: UserRepository = new UserRepository()) {}
+    constructor(
+        private readonly userRepository: UserRepository = new UserRepository(),
+        private readonly organizationRepository: OrganizationRepository = new OrganizationRepository(),
+        private readonly fileRepository: FileRepository = new FileRepository(),
+    ) {}
 
     public async index({ inertia, request }: HttpContext) {
-        const { page, sort, dir, search } = await request.validateUsing(indexUserValidator);
+        const { page, sort, dir, search, withoutAvatar } = await request.validateUsing(indexUserValidator);
 
         const currentSort = sort ?? 'createdAt';
         const currentDir = dir ?? 'desc';
@@ -20,46 +30,59 @@ export default class UsersController {
             sort: currentSort,
             dir: currentDir,
             search,
+            withoutAvatar,
         });
 
         return inertia.render('admin/users/index', {
-            users: users.all().map((u) => new UserTransformer(u).toObject()),
+            users: users.all().map((u) => ({ ...new UserTransformer(u).toObject(), avatarUrl: u.avatar?.path ?? null })),
             meta: {
                 total: users.total,
                 currentPage: users.currentPage,
                 lastPage: users.lastPage,
                 perPage: users.perPage,
             },
-            filters: { search: search ?? '', sort: currentSort, dir: currentDir },
+            filters: { search: search ?? '', sort: currentSort, dir: currentDir, withoutAvatar: withoutAvatar ?? false },
         });
     }
 
     public async show({ inertia, params }: HttpContext) {
-        const user = await this.userRepository.findOrFail(params.id);
+        const user = await this.userRepository.findWithAvatar(params.id);
 
         return inertia.render('admin/users/show', {
-            user: new UserTransformer(user).toObject(),
+            targetUser: { ...new UserTransformer(user).toObject(), avatarUrl: user.avatar?.path ?? null },
         });
     }
 
-    public async exportData({ params, response }: HttpContext) {
-        const user = await this.userRepository.findOrFail(params.id);
+    public async updateAvatar({ request, params, response, session, i18n }: HttpContext) {
+        const { avatar } = await request.validateUsing(updateUserAvatarValidator);
 
-        const data = {
-            export_date: new Date().toISOString(),
-            account: {
-                id: user.id,
-                username: user.username,
-                email: user.email,
-                created_at: user.createdAt.toISO(),
-                updated_at: user.updatedAt?.toISO() ?? null,
-            },
-        };
+        try {
+            const user = await this.userRepository.findOrFail(params.id);
+            const previousAvatarId = user.avatarId;
 
-        const filename = `export-${user.username}-${new Date().toISOString().slice(0, 10)}.json`;
-        response.header('Content-Disposition', `attachment; filename="${filename}"`);
-        response.header('Content-Type', 'application/json');
-        return response.send(JSON.stringify(data, null, 2));
+            const path = await storeUploadedFile(avatar, 'uploads/avatars');
+            const file = await this.fileRepository.create({
+                path,
+                originalName: avatar.clientName,
+                mimeType: `${avatar.type}/${avatar.subtype}`,
+                size: avatar.size,
+            });
+
+            await this.userRepository.setAvatar(params.id, file.id);
+
+            if (previousAvatarId) {
+                const previousFile = await this.fileRepository.findOrFail(previousAvatarId);
+                await deleteStoredFile(previousFile.path);
+                await this.fileRepository.delete(previousAvatarId);
+            }
+
+            session.flash('success', i18n.t('messages.admin.users.avatar.success'));
+        } catch (e) {
+            logger.error({ err: e }, 'users.updateAvatar failed');
+            session.flash('error', i18n.t('messages.admin.users.avatar.error'));
+        }
+
+        return response.redirect().back();
     }
 
     public async update({ request, params, response, session, i18n }: HttpContext) {
@@ -74,5 +97,68 @@ export default class UsersController {
         }
 
         return response.redirect().back();
+    }
+
+    public async create({ inertia }: HttpContext) {
+        const organizations = await this.organizationRepository.all();
+
+        return inertia.render('admin/users/create', {
+            organizations: organizations.map((o) => new OrganizationTransformer(o).toObject()),
+        });
+    }
+
+    public async store({ request, response, session, i18n }: HttpContext) {
+        const data = await request.validateUsing(createUserValidator);
+
+        try {
+            if (await this.userRepository.findByDiscordId(data.discordId)) {
+                session.flash('error', i18n.t('messages.admin.users.create.discordIdTaken'));
+                return response.redirect().back();
+            }
+
+            let organizationId: string | null = null;
+            let organizationRole: OrganizationRoleEnum | null = null;
+
+            if (data.role === UserRoleEnum.CLIENT && data.organizationMode) {
+                organizationRole = (data.organizationRole as OrganizationRoleEnum) ?? null;
+
+                if (!organizationRole) {
+                    session.flash('error', i18n.t('messages.admin.users.create.missingOrganization'));
+                    return response.redirect().back();
+                }
+
+                if (data.organizationMode === 'existing') {
+                    if (!data.organizationId) {
+                        session.flash('error', i18n.t('messages.admin.users.create.missingOrganization'));
+                        return response.redirect().back();
+                    }
+
+                    organizationId = data.organizationId;
+                } else {
+                    if (!data.organizationName) {
+                        session.flash('error', i18n.t('messages.admin.users.create.missingOrganization'));
+                        return response.redirect().back();
+                    }
+
+                    const organization = await this.organizationRepository.create({ name: data.organizationName });
+                    organizationId = organization.id;
+                }
+            }
+
+            await this.userRepository.create({
+                discordId: data.discordId,
+                username: data.username,
+                role: data.role,
+                organizationId,
+                organizationRole,
+            });
+
+            session.flash('success', i18n.t('messages.admin.users.create.success'));
+            return response.redirect().toRoute('admin.users.index');
+        } catch (e) {
+            logger.error({ err: e }, 'users.store failed');
+            session.flash('error', i18n.t('messages.admin.users.create.error'));
+            return response.redirect().back();
+        }
     }
 }

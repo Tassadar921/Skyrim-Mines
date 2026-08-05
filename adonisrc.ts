@@ -25,13 +25,7 @@ export default defineConfig({
 | will be scanned automatically from the "./commands" directory.
 |
 */
-    commands: [
-        () => import('@adonisjs/core/commands'),
-        () => import('@adonisjs/lucid/commands'),
-        () => import('@adonisjs/session/commands'),
-        () => import('@adonisjs/inertia/commands'),
-        () => import('@adonisjs/cache/commands'),
-    ],
+    commands: [() => import('@adonisjs/core/commands'), () => import('@adonisjs/lucid/commands'), () => import('@adonisjs/session/commands'), () => import('@adonisjs/inertia/commands')],
 
     /*
 |--------------------------------------------------------------------------
@@ -59,13 +53,11 @@ export default defineConfig({
         () => import('@adonisjs/cors/cors_provider'),
         () => import('@adonisjs/inertia/inertia_provider'),
         () => import('@adonisjs/auth/auth_provider'),
+        () => import('@adonisjs/ally/ally_provider'),
         () => import('#providers/api_provider'),
         () => import('@adonisjs/i18n/i18n_provider'),
-        () => import('@adonisjs/cache/cache_provider'),
-        () => import('@adonisjs/redis/redis_provider'),
         () => import('@adonisjs/limiter/limiter_provider'),
-        () => import('@adonisjs/mail/mail_provider'),
-        () => import('#providers/cron_provider'),
+        () => import('@adonisjs/transmit/transmit_provider'),
     ],
 
     /*

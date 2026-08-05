@@ -1,46 +1,99 @@
 import router from '@adonisjs/core/services/router';
+import transmit from '@adonisjs/transmit/services/main';
 import { middleware } from '#start/kernel';
 import { controllers } from '#generated/controllers';
-import { loginThrottle, loginEmailThrottle, registerThrottle, forgotPasswordThrottle, passwordResetThrottle } from '#start/limiter';
+import { discordAuthThrottle } from '#start/limiter';
+import UserRoleEnum from '#types/enum/user_role_enum';
+import OrganizationRoleEnum from '#types/enum/organization_role_enum';
 
-router.on('/').renderInertia('home', {}).as('home');
+transmit.registerRoutes((route) => {
+    if (route.getPattern() === '__transmit/events') {
+        route.middleware(middleware.auth());
+    }
+});
 
-router.get('/password-reset', [controllers.PasswordReset, 'show']).as('password.reset.show');
-router.post('/password-reset', [controllers.PasswordReset, 'update']).as('password.reset.update').use(passwordResetThrottle);
+router.get('/', [controllers.Home, 'index']).as('home').use(middleware.auth());
+router.get('/tarifs', [controllers.Tarifs, 'index']).as('tarifs').use(middleware.auth());
+const companyOnly = middleware.admin({ roles: [UserRoleEnum.ADMIN, UserRoleEnum.AUDITOR, UserRoleEnum.STAFF] });
+router.get('/stocks', [controllers.Stocks, 'index']).as('stocks').use(middleware.auth()).use(companyOnly);
+router.get('/organigramme', [controllers.Organigramme, 'index']).as('organigramme').use(middleware.auth());
+router.get('/devis', [controllers.Devis, 'create']).as('devis.create').use(middleware.auth());
+router.post('/devis', [controllers.Devis, 'store']).as('devis.store').use(middleware.auth());
+router.get('/mes-devis', [controllers.Devis, 'index']).as('devis.index').use(middleware.auth());
+router.get('/devis/:id', [controllers.Devis, 'show']).as('devis.show').use(middleware.auth());
+router.get('/commandes', [controllers.Commandes, 'create']).as('commandes.create').use(middleware.auth());
+router.post('/commandes', [controllers.Commandes, 'store']).as('commandes.store').use(middleware.auth());
+router.get('/mes-commandes', [controllers.Commandes, 'index']).as('commandes.index').use(middleware.auth());
+router.get('/commandes/:id', [controllers.Commandes, 'show']).as('commandes.show').use(middleware.auth());
+router.patch('/commandes/:id/cancel', [controllers.Commandes, 'cancel']).as('commandes.cancel').use(middleware.auth());
+router.post('/commandes/:orderId/livraisons', [controllers.Livraisons, 'store']).as('livraisons.store').use(middleware.auth());
+router.patch('/stocks/resources/:id', [controllers.Stocks, 'updateResourceQuantity']).as('stocks.resources.updateQuantity').use(middleware.auth()).use(middleware.admin());
+router.patch('/stocks/materials/:id', [controllers.Stocks, 'updateMaterialQuantity']).as('stocks.materials.updateQuantity').use(middleware.auth()).use(middleware.admin());
+router.post('/deposits', [controllers.Deposits, 'store']).as('deposits.store').use(middleware.auth());
+router.post('/buybacks', [controllers.Buybacks, 'store']).as('buybacks.store').use(middleware.auth()).use(middleware.admin());
 
-router.get('/profile', [controllers.Profile, 'show']).as('profile.show').use([middleware.auth(), middleware.terms()]);
-router.get('/profile/export', [controllers.Profile, 'exportData']).as('profile.export').use([middleware.auth(), middleware.terms()]);
-router.put('/profile', [controllers.Profile, 'update']).as('profile.update').use([middleware.auth(), middleware.terms()]);
-router.post('/profile/password-reset', [controllers.Profile, 'sendPasswordReset']).as('profile.passwordReset').use([middleware.auth(), middleware.terms()]);
-router.delete('/profile', [controllers.Profile, 'destroy']).as('profile.destroy').use(middleware.auth());
+const organizationManage = middleware.organization({ roles: [OrganizationRoleEnum.OWNER, OrganizationRoleEnum.ADMIN] });
+const organizationOwnerOnly = middleware.organization({ roles: [OrganizationRoleEnum.OWNER] });
+
+router.get('/organization', [controllers.Organization, 'show']).as('organization.show').use(middleware.auth()).use(organizationManage);
+router.post('/organization/members', [controllers.Organization, 'storeMember']).as('organization.members.store').use(middleware.auth()).use(organizationManage);
+router.delete('/organization/members/:id', [controllers.Organization, 'destroyMember']).as('organization.members.destroy').use(middleware.auth()).use(organizationManage);
+router.patch('/organization/members/:id/role', [controllers.Organization, 'updateMemberRole']).as('organization.members.updateRole').use(middleware.auth()).use(organizationOwnerOnly);
 
 router.on('/login').renderInertia('auth/login', {}).as('login').use(middleware.guest());
-router.post('/login', [controllers.Auth, 'login']).as('auth.login.store').use(loginThrottle).use(loginEmailThrottle);
-router.get('/forgot-password', [controllers.ForgotPassword, 'show']).as('forgot.password').use(middleware.guest());
-router.post('/forgot-password', [controllers.ForgotPassword, 'store']).as('forgot.password.store').use(middleware.guest()).use(forgotPasswordThrottle);
-router.get('/register', [controllers.Register, 'show']).as('register').use(middleware.guest());
-router
-    .post('/register', [controllers.Register, 'store'])
-    .as('register.store')
-    .use(middleware.guest())
-    .use(registerThrottle)
-    .use(middleware.honeypot({ flashKey: 'messages.register.success' }));
-router.get('/email-verify', [controllers.EmailVerification, 'show']).as('email.verify');
+router.get('/auth/discord/redirect', [controllers.Auth, 'discordRedirect']).as('auth.discord.redirect').use(middleware.guest()).use(discordAuthThrottle);
+router.get('/auth/discord/callback', [controllers.Auth, 'discordCallback']).as('auth.discord.callback').use(discordAuthThrottle);
 router.delete('/logout', [controllers.Auth, 'logout']).as('auth.logout').use(middleware.auth());
+
+const readOnly = middleware.admin({ roles: [UserRoleEnum.ADMIN, UserRoleEnum.AUDITOR] });
 
 router
     .group((): void => {
-        router.get('/', [controllers.admin.Dashboard, 'index']).as('admin.dashboard');
-        router.post('/terms/invalidate', [controllers.admin.Dashboard, 'invalidateTerms']).as('admin.terms.invalidate');
+        router.get('/', [controllers.admin.Dashboard, 'index']).as('admin.dashboard').use(readOnly);
 
-        router.get('/users', [controllers.admin.Users, 'index']).as('admin.users.index');
-        router.get('/users/:id', [controllers.admin.Users, 'show']).as('admin.users.show');
-        router.get('/users/:id/export', [controllers.admin.Users, 'exportData']).as('admin.users.export');
-        router.put('/users/:id', [controllers.admin.Users, 'update']).as('admin.users.update');
+        router.get('/users', [controllers.admin.Users, 'index']).as('admin.users.index').use(readOnly);
+        router.get('/users/create', [controllers.admin.Users, 'create']).as('admin.users.create').use(middleware.admin());
+        router.post('/users', [controllers.admin.Users, 'store']).as('admin.users.store').use(middleware.admin());
+        router.get('/users/:id', [controllers.admin.Users, 'show']).as('admin.users.show').use(readOnly);
+        router.put('/users/:id', [controllers.admin.Users, 'update']).as('admin.users.update').use(middleware.admin());
+        router.post('/users/:id/avatar', [controllers.admin.Users, 'updateAvatar']).as('admin.users.updateAvatar').use(middleware.admin());
+
+        router.get('/resources', [controllers.admin.Resources, 'index']).as('admin.resources.index').use(readOnly);
+        router.get('/resources/create', [controllers.admin.Resources, 'create']).as('admin.resources.create').use(middleware.admin());
+        router.post('/resources', [controllers.admin.Resources, 'store']).as('admin.resources.store').use(middleware.admin());
+        router.patch('/resources/reorder', [controllers.admin.Resources, 'reorder']).as('admin.resources.reorder').use(middleware.admin());
+        router.get('/resources/:id', [controllers.admin.Resources, 'show']).as('admin.resources.show').use(readOnly);
+        router.put('/resources/:id', [controllers.admin.Resources, 'update']).as('admin.resources.update').use(middleware.admin());
+        router.delete('/resources/:id', [controllers.admin.Resources, 'destroy']).as('admin.resources.destroy').use(middleware.admin());
+
+        router.get('/materials', [controllers.admin.Materials, 'index']).as('admin.materials.index').use(readOnly);
+        router.get('/materials/create', [controllers.admin.Materials, 'create']).as('admin.materials.create').use(middleware.admin());
+        router.post('/materials', [controllers.admin.Materials, 'store']).as('admin.materials.store').use(middleware.admin());
+        router.patch('/materials/reorder', [controllers.admin.Materials, 'reorder']).as('admin.materials.reorder').use(middleware.admin());
+        router.get('/materials/:id', [controllers.admin.Materials, 'show']).as('admin.materials.show').use(readOnly);
+        router.put('/materials/:id', [controllers.admin.Materials, 'update']).as('admin.materials.update').use(middleware.admin());
+        router.delete('/materials/:id', [controllers.admin.Materials, 'destroy']).as('admin.materials.destroy').use(middleware.admin());
+
+        router.get('/buybacks', [controllers.admin.Buybacks, 'index']).as('admin.buybacks.index').use(readOnly);
+
+        router.get('/devis', [controllers.admin.Devis, 'index']).as('admin.devis.index').use(readOnly);
+
+        router.get('/commandes', [controllers.admin.Commandes, 'index']).as('admin.commandes.index').use(readOnly);
+        router.patch('/commandes/:id/validate', [controllers.admin.Commandes, 'validate']).as('admin.commandes.validate').use(middleware.admin());
+        router.patch('/commandes/:id/cancel', [controllers.admin.Commandes, 'cancel']).as('admin.commandes.cancel').use(middleware.admin());
+
+        router.get('/livraisons', [controllers.admin.Livraisons, 'index']).as('admin.livraisons.index').use(readOnly);
+        router.delete('/livraisons/:id', [controllers.admin.Livraisons, 'destroy']).as('admin.livraisons.destroy').use(middleware.admin());
+
+        router.get('/organizations', [controllers.admin.Organizations, 'index']).as('admin.organizations.index').use(readOnly);
+        router.get('/organizations/create', [controllers.admin.Organizations, 'create']).as('admin.organizations.create').use(middleware.admin());
+        router.post('/organizations', [controllers.admin.Organizations, 'store']).as('admin.organizations.store').use(middleware.admin());
+        router.get('/organizations/:id', [controllers.admin.Organizations, 'show']).as('admin.organizations.show').use(readOnly);
+        router.put('/organizations/:id', [controllers.admin.Organizations, 'update']).as('admin.organizations.update').use(middleware.admin());
+        router.delete('/organizations/:id', [controllers.admin.Organizations, 'destroy']).as('admin.organizations.destroy').use(middleware.admin());
+        router.post('/organizations/:id/members', [controllers.admin.Organizations, 'storeMember']).as('admin.organizations.members.store').use(middleware.admin());
+        router.delete('/organizations/:id/members/:memberId', [controllers.admin.Organizations, 'destroyMember']).as('admin.organizations.members.destroy').use(middleware.admin());
+        router.patch('/organizations/:id/members/:memberId/role', [controllers.admin.Organizations, 'updateMemberRole']).as('admin.organizations.members.updateRole').use(middleware.admin());
     })
     .prefix('/admin')
-    .use([middleware.auth(), middleware.admin()]);
-
-router.get('/legal', [controllers.Legal, 'show']).as('legal.show');
-router.get('/terms', [controllers.Terms, 'show']).as('terms.show');
-router.post('/terms/accept', [controllers.Terms, 'accept']).as('terms.accept').use(middleware.auth());
+    .use(middleware.auth());

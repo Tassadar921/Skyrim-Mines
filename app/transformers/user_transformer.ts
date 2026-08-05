@@ -5,11 +5,12 @@ export default class UserTransformer extends BaseTransformer<User> {
     toObject() {
         return {
             id: this.resource.id,
-            email: this.resource.email,
             username: this.resource.username,
             role: this.resource.role,
             enabled: this.resource.enabled ?? false,
-            acceptedTermsAt: this.resource.acceptedTermsAt?.toISO() ?? null,
+            balance: Number(this.resource.balance),
+            organizationId: this.resource.organizationId,
+            organizationRole: this.resource.organizationRole,
             createdAt: this.resource.createdAt.toISO()!,
             updatedAt: this.resource.updatedAt?.toISO() ?? null,
         };

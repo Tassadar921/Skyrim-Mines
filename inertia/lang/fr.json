@@ -1,139 +1,226 @@
 {
-    "title": "Consilium",
+    "title": "Compagnie Minière de la Crevasse",
     "home": {
-        "title": "Consilium",
-        "subtitle": "Le projet est en cours de reconstruction.",
-        "profile": "Mon profil",
-        "login": "Se connecter",
-        "register": "Créer un compte"
+        "title": "Compagnie Minière de la Crevasse",
+        "balance": "Dû par la Compagnie Minière : {amount} s",
+        "barrel": {
+            "title": "Dans le tonneau",
+            "totalValue": "Valeur totale dans le tonneau :"
+        },
+        "toDeliver": {
+            "title": "Commandes à livrer",
+            "count": "commande à livrer | commande à livrer | commandes à livrer",
+            "remaining": "Restant à livrer",
+            "quantityToDeliver": "Quantité à livrer",
+            "deliverButton": "Enregistrer la livraison",
+            "deliverConfirm": {
+                "title": "Confirmer cette livraison ?",
+                "description": "Les quantités indiquées seront enregistrées comme livrées pour la commande n° {number}.",
+                "cancel": "Retour",
+                "confirm": "Confirmer la livraison"
+            }
+        }
+    },
+    "tarifs": {
+        "title": "Tarifs"
+    },
+    "deposit": {
+        "trigger": "Réaliser un dépôt",
+        "title": "Réaliser un dépôt",
+        "quantity": "Quantité",
+        "submit": "Valider"
+    },
+    "buyback": {
+        "trigger": "Racheter",
+        "title": "Racheter des ressources",
+        "buyAll": "Tout racheter",
+        "submit": "Racheter"
+    },
+    "stocks": {
+        "title": "Gestion des stocks",
+        "totalValue": "Valeur totale du stock :",
+        "table": {
+            "name": "Nom",
+            "buyPrice": "Prix d'achat",
+            "sellPrice": "Prix de vente",
+            "quantityBarrel": "Dans le tonneau",
+            "quantityPurchased": "Acheté",
+            "inStock": "En stock",
+            "stockValue": "Valeur du stock",
+            "empty": "Aucun élément trouvé"
+        }
+    },
+    "devis": {
+        "title": "Demande de devis",
+        "description": "Choisissez les ressources et quantités souhaitées, un devis au format PDF sera généré automatiquement.",
+        "totalValue": "Total estimé :",
+        "submit": "Générer le devis",
+        "sections": {
+            "minerais": "Minerais",
+            "lingots": "Lingots"
+        },
+        "recipient": {
+            "title": "Devis destiné à",
+            "myOrganization": "Pour mon organisation ({name})",
+            "myself": "Pour moi",
+            "thirdParty": "Pour un tiers",
+            "thirdPartySelect": "Client ou organisation",
+            "thirdPartyPlaceholder": "Rechercher un client ou une organisation…",
+            "clients": "Clients",
+            "clientsPersonal": "Clients à titre personnel",
+            "organizations": "Organisations",
+            "scope": "Destinataire du devis",
+            "scopeOrganization": "Pour son organisation ({name})",
+            "scopePersonal": "À titre personnel"
+        },
+        "show": {
+            "title": "Devis généré",
+            "number": "Devis n° {number}",
+            "ready": "Votre devis est prêt.",
+            "download": "Télécharger le PDF",
+            "total": "Total",
+            "newQuote": "Faire une nouvelle demande de devis"
+        },
+        "index": {
+            "navLink": "Mes devis",
+            "title": "Mes devis",
+            "table": {
+                "count": "devis | devis | devis",
+                "number": "N°",
+                "date": "Date",
+                "requester": "Demandé par",
+                "amount": "Montant",
+                "actions": "Actions",
+                "download": "Télécharger",
+                "empty": "Aucun devis trouvé"
+            }
+        }
+    },
+    "commande": {
+        "title": "Passer commande",
+        "description": "Choisissez les ressources et quantités souhaitées, une commande au format PDF sera générée automatiquement.",
+        "totalValue": "Total estimé :",
+        "submit": "Valider la commande",
+        "sections": {
+            "minerais": "Minerais",
+            "lingots": "Lingots"
+        },
+        "status": {
+            "pending": "En attente",
+            "toDeliver": "À livrer",
+            "delivered": "Livrée",
+            "cancelled": "Annulée"
+        },
+        "cancel": {
+            "trigger": "Annuler la commande",
+            "title": "Annuler cette commande ?",
+            "description": "La commande n° {number} sera marquée comme annulée. Seules les quantités restant à livrer seront annulées : les livraisons déjà effectuées ne sont pas remises en cause. Cette action est irréversible.",
+            "cancel": "Retour",
+            "confirm": "Annuler la commande"
+        },
+        "recipient": {
+            "title": "Commande destinée à",
+            "myOrganization": "Pour mon organisation ({name})",
+            "myself": "Pour moi",
+            "thirdParty": "Pour un tiers",
+            "thirdPartySelect": "Client ou organisation",
+            "thirdPartyPlaceholder": "Rechercher un client ou une organisation…",
+            "clients": "Clients",
+            "clientsPersonal": "Clients à titre personnel",
+            "organizations": "Organisations",
+            "scope": "Destinataire de la commande",
+            "scopeOrganization": "Pour son organisation ({name})",
+            "scopePersonal": "À titre personnel"
+        },
+        "show": {
+            "title": "Commande enregistrée",
+            "number": "Commande n° {number}",
+            "ready": "Votre commande est enregistrée.",
+            "download": "Télécharger le PDF",
+            "total": "Total",
+            "newOrder": "Passer une nouvelle commande",
+            "delivery": "Livraison",
+            "deliveredOfOrdered": "{delivered} / {ordered} livrées",
+            "notDelivered": "Non livrée",
+            "fullyDelivered": "Livrée"
+        },
+        "index": {
+            "navLink": "Mes commandes",
+            "title": "Mes commandes",
+            "table": {
+                "count": "commande | commande | commandes",
+                "number": "N°",
+                "date": "Date",
+                "requester": "Demandé par",
+                "status": "Statut",
+                "amount": "Montant",
+                "actions": "Actions",
+                "download": "Télécharger",
+                "empty": "Aucune commande trouvée"
+            }
+        }
+    },
+    "organigramme": {
+        "title": "Organigramme",
+        "owners": "Propriétaires",
+        "employees": "Employés",
+        "extras": "Extras"
+    },
+    "organization": {
+        "title": "Mon organisation",
+        "navLink": "Mon organisation",
+        "roles": {
+            "owner": "Propriétaire",
+            "admin": "Administrateur",
+            "staff": "Staff"
+        },
+        "members": {
+            "count": "membre | membre | membres",
+            "add": "Ajouter un membre",
+            "submit": "Créer",
+            "promote": "Promouvoir",
+            "demote": "Rétrograder",
+            "remove": "Retirer",
+            "empty": "Aucun membre dans l'organisation",
+            "mode": "Type de membre",
+            "modeNew": "Créer un nouveau compte",
+            "modeExisting": "Rattacher un client existant",
+            "existingUser": "Client",
+            "existingUserPlaceholder": "Sélectionner un client indépendant",
+            "table": {
+                "username": "Nom d'utilisateur",
+                "role": "Rôle",
+                "actions": "Actions"
+            },
+            "removeConfirm": {
+                "title": "Retirer ce membre ?",
+                "description": "{username} sera retiré de l'organisation et deviendra un client indépendant. Son compte ne sera pas supprimé.",
+                "cancel": "Annuler",
+                "confirm": "Retirer"
+            }
+        }
     },
     "layout": {
         "nav": {
             "label": "Navigation principale",
-            "home": "Accueil – Consilium",
+            "home": "Accueil – Compagnie Minière de la Crevasse",
             "menu": "Menu de navigation",
-            "login": "Se connecter",
-            "account": "Mon compte"
+            "account": "Mon compte",
+            "tarifs": "Tarifs",
+            "stocks": "Stocks",
+            "devis": "Devis",
+            "commandes": "Commander",
+            "organigramme": "Organigramme"
         },
         "theme": {
             "enableDark": "Activer le mode sombre",
             "enableLight": "Activer le mode clair"
-        },
-        "footer": {
-            "rm-language": "MR . FR",
-            "legal": "Mentions légales",
-            "terms": "CGU"
-        }
-    },
-    "terms": {
-        "title": "Conditions générales d'utilisation",
-        "lastUpdated": "Dernière mise à jour : juin 2025",
-        "outdatedBanner": "Les conditions générales d'utilisation ont été mises à jour. Veuillez les relire et les accepter pour continuer à utiliser votre compte.",
-        "deactivatedBanner": "Votre compte a été désactivé car vous n'avez pas accepté les nouvelles CGU dans le délai imparti. Acceptez-les ci-dessous pour réactiver votre accès.",
-        "reaccept": "J'accepte les nouvelles CGU",
-        "acceptSuccess": "CGU acceptées, merci !",
-        "object": {
-            "title": "Objet",
-            "content": "Le présent site propose un service accessible aux membres inscrits. L'accès au service nécessite la création d'un compte."
-        },
-        "access": {
-            "title": "Accès et inscription",
-            "content": "L'inscription est ouverte à toute personne majeure. Elle requiert une adresse email valide et un nom d'utilisateur. En créant un compte, vous acceptez les présentes CGU."
-        },
-        "data": {
-            "title": "Données personnelles",
-            "content": "L'adresse email et le nom d'utilisateur sont utilisés uniquement pour la connexion à votre compte. Ils ne sont jamais partagés avec des tiers. Vous pouvez demander la suppression de votre compte et de vos données à tout moment depuis votre profil."
-        },
-        "account": {
-            "title": "Suppression du compte",
-            "content": "Vous pouvez supprimer votre compte à tout moment depuis votre espace profil. La suppression est immédiate et définitive : toutes vos données personnelles sont effacées."
-        },
-        "responsibility": {
-            "title": "Responsabilité",
-            "content": "L'éditeur s'efforce d'assurer la disponibilité du service mais ne peut garantir une disponibilité permanente."
-        },
-        "changes": {
-            "title": "Modification des CGU",
-            "content": "Les présentes CGU peuvent être modifiées à tout moment. Les membres inscrits seront informés de toute modification substantielle. La poursuite de l'utilisation du service après notification vaut acceptation des nouvelles CGU."
-        },
-        "law": {
-            "title": "Droit applicable",
-            "content": "Les présentes CGU sont soumises au droit français. En cas de litige, les tribunaux français seront seuls compétents."
         }
     },
     "auth": {
         "login": {
             "title": "Connexion",
-            "subtitle": "Entrez vos identifiants pour accéder à votre compte",
-            "email": "Email",
-            "password": "Mot de passe",
-            "submit": "Se connecter",
-            "noAccount": "Pas encore de compte ?",
-            "register": "S'inscrire",
-            "forgotPassword": "Mot de passe oublié ?",
-            "acceptTerms": "J'ai lu et j'accepte les",
-            "termsLink": "conditions générales d'utilisation"
-        },
-        "forgotPassword": {
-            "title": "Mot de passe oublié",
-            "subtitle": "Renseignez votre adresse email pour recevoir un lien de réinitialisation",
-            "email": "Email",
-            "submit": "Envoyer le lien",
-            "backToLogin": "Retour à la connexion"
-        },
-        "register": {
-            "title": "Créer un compte",
-            "subtitle": "Renseignez vos informations pour rejoindre le projet",
-            "username": "Nom d'utilisateur",
-            "email": "Email",
-            "password": "Mot de passe",
-            "confirmation": "Confirmer le mot de passe",
-            "mismatch": "Les mots de passe ne correspondent pas",
-            "submit": "Créer mon compte",
-            "hasAccount": "Déjà un compte ?",
-            "login": "Se connecter",
-            "acceptTerms": "J'ai lu et j'accepte les",
-            "termsLink": "conditions générales d'utilisation",
-            "rules": {
-                "length": "8 caractères minimum",
-                "upper": "Une lettre majuscule",
-                "lower": "Une lettre minuscule",
-                "digit": "Un chiffre",
-                "special": "Un caractère spécial"
-            }
-        }
-    },
-    "passwordReset": {
-        "title": "Nouveau mot de passe",
-        "password": "Mot de passe",
-        "confirmation": "Confirmer le mot de passe",
-        "mismatch": "Les mots de passe ne correspondent pas",
-        "submit": "Enregistrer le nouveau mot de passe",
-        "rules": {
-            "length": "8 caractères minimum",
-            "upper": "Une lettre majuscule",
-            "lower": "Une lettre minuscule",
-            "digit": "Un chiffre",
-            "special": "Un caractère spécial"
-        }
-    },
-    "profile": {
-        "title": "Mon profil",
-        "username": "Nom d'utilisateur",
-        "email": "Adresse email",
-        "memberSince": "Membre depuis",
-        "lastUpdate": "Profil modifié le",
-        "save": "Enregistrer",
-        "resetPassword": "Recevoir un email de réinitialisation",
-        "resetPasswordSending": "Envoi en cours…",
-        "dropdown": "Mon profil",
-        "exportData": "Exporter mes données",
-        "deleteAccount": "Supprimer mon compte",
-        "deleteAccountConfirm": {
-            "title": "Supprimer le compte",
-            "description": "Cette action est irréversible. Votre compte et toutes vos données seront définitivement supprimés.",
-            "cancel": "Annuler",
-            "confirm": "Supprimer"
+            "discord": "Se connecter avec Discord"
         }
     },
     "errors": {
@@ -150,91 +237,303 @@
             "menu": {
                 "home": "Page d'accueil",
                 "dashboard": "Tableau de bord",
-                "users": "Utilisateurs"
+                "users": "Utilisateurs",
+                "organizations": "Organisations",
+                "resources": "Ressources",
+                "materials": "Matériaux",
+                "buybacks": "Historique des rachats",
+                "devis": "Devis",
+                "commandes": "Commandes",
+                "livraisons": "Livraisons"
             }
         },
         "dashboard": {
-            "title": "Tableau de bord",
-            "invalidateTerms": "Invalider les CGU",
-            "invalidateTermsConfirm": {
-                "title": "Invalider les CGU ?",
-                "description": "Tous les utilisateurs (hors admins) devront relire et réaccepter les CGU. Cette action est irréversible.",
-                "gracePeriodDays": "Délai de grâce (jours)",
-                "gracePeriodDaysHint": "Les utilisateurs ont ce délai pour accepter avant désactivation du compte.",
-                "note": "Note (optionnelle)",
-                "notePlaceholder": "Ex : mise à jour RGPD juin 2025",
-                "cancel": "Annuler",
-                "confirm": "Invalider"
-            }
+            "title": "Tableau de bord"
         },
         "users": {
             "title": "Utilisateurs",
+            "new": "Créer un utilisateur",
             "table": {
+                "avatar": "Avatar",
                 "username": "Nom d'utilisateur",
-                "email": "Email",
                 "role": "Rôle",
                 "enabled": "Actif",
-                "acceptedTerms": "CGU acceptées",
+                "balance": "Solde dû",
                 "createdAt": "Inscrit le",
                 "actions": "Actions",
                 "view": "Voir",
                 "userCount": "utilisateur | utilisateur | utilisateurs",
-                "empty": "Aucun utilisateur trouvé"
+                "empty": "Aucun utilisateur trouvé",
+                "withoutAvatar": "Sans avatar uniquement"
             },
             "show": {
                 "title": "Utilisateur",
                 "back": "Retour à la liste",
                 "save": "Enregistrer les modifications",
-                "export": "Exporter les données",
-                "resetPassword": "Envoyer un email de réinitialisation",
                 "fields": {
                     "username": "Nom d'utilisateur",
-                    "email": "Email",
                     "role": "Rôle",
                     "enabled": "Compte actif",
-                    "acceptedTerms": "CGU acceptées",
+                    "balance": "Solde dû",
                     "id": "Identifiant",
                     "createdAt": "Inscrit le",
                     "updatedAt": "Modifié le",
                     "roles": {
                         "admin": "Administrateur",
-                        "user": "Utilisateur"
+                        "auditor": "Auditeur",
+                        "staff": "Staff",
+                        "contractor": "Contractor",
+                        "client": "Client"
                     }
+                },
+                "avatar": {
+                    "title": "Avatar",
+                    "upload": "Changer l'avatar",
+                    "hint": "JPG, JPEG, PNG ou WEBP, 5 Mo maximum",
+                    "empty": "Aucun avatar"
+                }
+            },
+            "create": {
+                "title": "Créer un utilisateur",
+                "back": "Retour à la liste",
+                "submit": "Créer",
+                "fields": {
+                    "discordId": "Identifiant Discord",
+                    "username": "Nom d'utilisateur",
+                    "role": "Rôle",
+                    "rolePlaceholder": "Sélectionner un rôle",
+                    "organizationMode": "Organisation",
+                    "organizationModeExisting": "Rattacher à une organisation existante",
+                    "organizationModeNew": "Créer une nouvelle organisation",
+                    "organization": "Organisation",
+                    "organizationPlaceholder": "Sélectionner une organisation",
+                    "organizationName": "Nom de la nouvelle organisation",
+                    "organizationRole": "Rôle dans l'organisation",
+                    "organizationRolePlaceholder": "Sélectionner un rôle"
                 }
             }
-        }
-    },
-    "legal": {
-        "title": "Mentions légales",
-        "editor": {
-            "title": "Éditeur du site",
-            "label": "site édité à titre personnel",
-            "contact": "Contact"
         },
-        "hosting": {
-            "title": "Hébergement",
-            "description": "Ce site est hébergé par OVH SAS — 2 rue Kellermann, 59100 Roubaix, France — RCS Roubaix-Tourcoing 424 761 419. Datacenter : Gravelines (59820), France."
+        "organizations": {
+            "title": "Organisations",
+            "new": "Créer une organisation",
+            "table": {
+                "count": "organisation | organisation | organisations",
+                "name": "Nom",
+                "members": "Membres",
+                "owner": "Propriétaire",
+                "noOwner": "Aucun",
+                "actions": "Actions",
+                "view": "Voir",
+                "empty": "Aucune organisation trouvée"
+            },
+            "create": {
+                "title": "Créer une organisation",
+                "back": "Retour à la liste",
+                "submit": "Créer",
+                "fields": {
+                    "name": "Nom de l'organisation"
+                }
+            },
+            "show": {
+                "title": "Organisation",
+                "back": "Retour à la liste",
+                "save": "Enregistrer les modifications",
+                "delete": "Supprimer l'organisation",
+                "deleteConfirm": {
+                    "title": "Supprimer cette organisation ?",
+                    "description": "{name} sera supprimée définitivement. Ses membres deviendront des clients indépendants, leurs comptes ne seront pas supprimés.",
+                    "cancel": "Annuler",
+                    "confirm": "Supprimer"
+                }
+            }
         },
-        "cookies": {
-            "title": "Cookies",
-            "intro": "Ce site utilise uniquement des cookies strictement nécessaires à son fonctionnement. Aucun cookie publicitaire ni de suivi individuel n'est déposé.",
+        "resources": {
+            "title": "Ressources",
+            "new": "Ajouter une ressource",
+            "types": {
+                "minerai": "Minerai",
+                "lingot": "Lingot"
+            },
             "table": {
                 "name": "Nom",
-                "purpose": "Finalité",
-                "duration": "Durée"
+                "buyPrice": "Prix d'achat",
+                "sellPrice": "Prix de vente",
+                "actions": "Actions",
+                "edit": "Modifier",
+                "view": "Voir",
+                "empty": "Aucune ressource trouvée"
             },
-            "session": "Maintien de la session utilisateur (connexion).",
-            "csrf": "Protection contre les attaques CSRF (sécurité des formulaires).",
-            "sessionDuration": "Durée de la session"
+            "delete": {
+                "label": "Supprimer",
+                "title": "Supprimer cette ressource ?",
+                "description": "Cette action est irréversible et supprimera définitivement « {name} ».",
+                "cancel": "Annuler",
+                "confirm": "Supprimer"
+            },
+            "create": {
+                "title": "Ajouter une ressource",
+                "back": "Retour à la liste",
+                "submit": "Ajouter",
+                "fields": {
+                    "name": "Nom",
+                    "type": "Type",
+                    "typePlaceholder": "Choisir un type",
+                    "buyPrice": "Prix d'achat",
+                    "sellPrice": "Prix de vente"
+                }
+            },
+            "show": {
+                "title": "Ressource",
+                "back": "Retour à la liste",
+                "save": "Enregistrer les modifications"
+            }
         },
-        "data": {
-            "title": "Données personnelles",
-            "visitors": "Les visiteurs non connectés ne font l'objet d'aucune collecte de données personnelles.",
-            "members": "Les membres inscrits fournissent une adresse e-mail et un nom d'utilisateur, utilisés uniquement pour la connexion à leur compte. Ces données ne sont pas partagées avec des tiers.",
-            "basis": "Base légale du traitement : exécution du contrat (art. 6(1)(b) RGPD) pour la fourniture du service.",
-            "retention": "Les données sont conservées jusqu'à la suppression du compte. Les comptes inactifs depuis 3 ans (aucune connexion) font l'objet d'un email de prévention, puis sont supprimés 30 jours après si aucune connexion n'a eu lieu entre-temps.",
-            "rights": "Conformément au RGPD, vous disposez d'un droit d'accès, de rectification, de suppression, de portabilité, d'opposition et de limitation du traitement de vos données. Pour exercer ces droits, contactez-nous à l'adresse : ",
-            "cnil": "Si vous estimez que vos droits ne sont pas respectés, vous pouvez introduire une réclamation auprès de la CNIL (www.cnil.fr)."
+        "materials": {
+            "title": "Matériaux",
+            "new": "Ajouter un matériau",
+            "table": {
+                "name": "Nom",
+                "buyPrice": "Prix d'achat",
+                "actions": "Actions",
+                "edit": "Modifier",
+                "view": "Voir",
+                "empty": "Aucun matériau trouvé"
+            },
+            "delete": {
+                "label": "Supprimer",
+                "title": "Supprimer ce matériau ?",
+                "description": "Cette action est irréversible et supprimera définitivement « {name} ».",
+                "cancel": "Annuler",
+                "confirm": "Supprimer"
+            },
+            "create": {
+                "title": "Ajouter un matériau",
+                "back": "Retour à la liste",
+                "submit": "Ajouter",
+                "fields": {
+                    "name": "Nom",
+                    "buyPrice": "Prix d'achat"
+                }
+            },
+            "show": {
+                "title": "Matériau",
+                "back": "Retour à la liste",
+                "save": "Enregistrer les modifications"
+            }
+        },
+        "buybacks": {
+            "title": "Historique des rachats",
+            "table": {
+                "count": "rachat | rachat | rachats",
+                "search": "Rechercher une ressource…",
+                "date": "Date",
+                "week": "Semaine",
+                "weekBadge": "Semaine {week}",
+                "allWeeks": "Toutes les semaines",
+                "resource": "Ressources",
+                "quantity": "Quantité",
+                "amount": "Montant",
+                "empty": "Aucun rachat trouvé"
+            },
+            "weekly": {
+                "title": "Totaux par semaine",
+                "current": "Actuelle",
+                "units": "unités"
+            },
+            "detail": {
+                "resource": "Ressource",
+                "user": "Utilisateur",
+                "quantity": "Quantité",
+                "unitPrice": "Prix de rachat unitaire",
+                "amount": "Montant"
+            }
+        },
+        "devis": {
+            "title": "Devis",
+            "table": {
+                "count": "devis | devis | devis",
+                "search": "Rechercher un client ou une organisation…",
+                "number": "N°",
+                "date": "Date",
+                "requester": "Demandé par",
+                "organization": "Organisation",
+                "noOrganization": "Aucune",
+                "amount": "Montant",
+                "actions": "Actions",
+                "download": "Télécharger",
+                "empty": "Aucun devis trouvé"
+            },
+            "detail": {
+                "resource": "Ressource",
+                "quantity": "Quantité",
+                "unitPrice": "Prix unitaire",
+                "total": "Total"
+            }
+        },
+        "commandes": {
+            "title": "Commandes",
+            "table": {
+                "count": "commande | commande | commandes",
+                "search": "Rechercher un client ou une organisation…",
+                "number": "N°",
+                "date": "Date",
+                "requester": "Demandé par",
+                "organization": "Organisation",
+                "noOrganization": "Aucune",
+                "status": "Statut",
+                "amount": "Montant",
+                "actions": "Actions",
+                "download": "Télécharger",
+                "empty": "Aucune commande trouvée"
+            },
+            "detail": {
+                "resource": "Ressource",
+                "quantity": "Quantité",
+                "unitPrice": "Prix unitaire",
+                "total": "Total",
+                "delivery": "Livraison"
+            },
+            "actions": {
+                "validate": "Valider"
+            }
+        },
+        "livraisons": {
+            "title": "Livraisons",
+            "table": {
+                "count": "livraison | livraison | livraisons",
+                "search": "Rechercher un client ou une organisation…",
+                "date": "Date",
+                "order": "Commande",
+                "requester": "Demandé par",
+                "organization": "Organisation",
+                "noOrganization": "Aucune",
+                "week": "Semaine",
+                "weekBadge": "Semaine {week}",
+                "allWeeks": "Toutes les semaines",
+                "resource": "Ressources",
+                "quantity": "Quantité",
+                "amount": "Montant",
+                "actions": "Actions",
+                "empty": "Aucune livraison trouvée"
+            },
+            "weekly": {
+                "title": "Totaux par semaine",
+                "current": "Actuelle",
+                "deliveries": "livraison | livraison | livraisons"
+            },
+            "detail": {
+                "resource": "Ressource",
+                "quantity": "Quantité",
+                "unitPrice": "Prix unitaire",
+                "total": "Total"
+            },
+            "delete": {
+                "label": "Supprimer",
+                "title": "Supprimer cette livraison ?",
+                "description": "La commande n° {number} redeviendra « À livrer » si elle était marquée comme entièrement livrée. Cette action est irréversible.",
+                "cancel": "Annuler",
+                "confirm": "Supprimer"
+            }
         }
     }
 }

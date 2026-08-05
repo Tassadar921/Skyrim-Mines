@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-.PHONY: format format-check install upgrade db-fresh db-migrate db-seed db stop up rm prune build-prod migrate-prod start-prod deploy
+.PHONY: format format-check install upgrade db-fresh db-migrate db-seed db restart stop up rm prune build-prod migrate-prod start-prod deploy
 
 format:
 	node ./format/command.js
@@ -16,8 +16,7 @@ upgrade:
 	npx ncu -u
 	${MAKE} install
 
-cache:
-	docker exec redis redis-cli FLUSHALL
+restart:
 	docker restart app
 
 db-fresh:
@@ -30,7 +29,7 @@ db-migrate:
 db-seed:
 	docker compose exec -T app node ace db:seed
 
-db: db-fresh db-seed cache format
+db: db-fresh db-seed restart format
 
 stop:
 	docker compose down --remove-orphans

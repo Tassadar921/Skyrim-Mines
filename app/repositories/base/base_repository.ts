@@ -22,7 +22,7 @@ export default class BaseRepository<T extends LucidModel> {
     public async findOneBy(
         conditions: Partial<ModelAttributes<InstanceType<T>>>,
         preload: ExtractModelRelations<InstanceType<T>>[] = [],
-        trx?: TransactionClientContract
+        trx?: TransactionClientContract,
     ): Promise<InstanceType<T> | null> {
         const query = trx ? this.Model.query({ client: trx }) : this.Model.query();
         this.applyConditions(query, conditions);
@@ -48,7 +48,7 @@ export default class BaseRepository<T extends LucidModel> {
     public async firstOrCreate(
         searchPayload: Partial<ModelAttributes<InstanceType<T>>>,
         savePayload?: Partial<ModelAttributes<InstanceType<T>>>,
-        trx?: TransactionClientContract
+        trx?: TransactionClientContract,
     ): Promise<InstanceType<T>> {
         const finalSavePayload = savePayload ?? searchPayload;
 
@@ -60,20 +60,20 @@ export default class BaseRepository<T extends LucidModel> {
             searchPayload: Partial<ModelAttributes<InstanceType<T>>>;
             savePayload?: Partial<ModelAttributes<InstanceType<T>>>;
         }[],
-        trx?: TransactionClientContract
+        trx?: TransactionClientContract,
     ): Promise<InstanceType<T>[]> {
         return await Promise.all(
             payloads.map(({ searchPayload, savePayload }) => {
                 const finalSavePayload = savePayload ?? searchPayload;
                 return trx ? this.Model.firstOrCreate(searchPayload, finalSavePayload, { client: trx }) : this.Model.firstOrCreate(searchPayload, finalSavePayload);
-            })
+            }),
         );
     }
 
     public async firstOrNew(
         searchPayload: Partial<ModelAttributes<InstanceType<T>>>,
         savePayload?: Partial<ModelAttributes<InstanceType<T>>>,
-        trx?: TransactionClientContract
+        trx?: TransactionClientContract,
     ): Promise<InstanceType<T>> {
         const finalSavePayload = savePayload ?? searchPayload;
 
@@ -83,7 +83,7 @@ export default class BaseRepository<T extends LucidModel> {
     public async firstOrFail(
         conditions: Partial<ModelAttributes<InstanceType<T>>> = {},
         preload: ExtractModelRelations<InstanceType<T>>[] = [],
-        trx?: TransactionClientContract
+        trx?: TransactionClientContract,
     ): Promise<InstanceType<T>> {
         const query = trx ? this.Model.query({ client: trx }) : this.Model.query();
 

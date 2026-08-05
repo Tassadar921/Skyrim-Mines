@@ -10,7 +10,3 @@ export function createI18nInstance(locale: string) {
         messages: { fr },
     });
 }
-
-export function makeTitle(pageTitle: string | null, appName: string): string {
-    return pageTitle ? `${pageTitle} - ${appName}` : appName;
-}

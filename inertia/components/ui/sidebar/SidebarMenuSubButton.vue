@@ -15,7 +15,7 @@ const props = withDefaults(
     {
         as: 'a',
         size: 'md',
-    }
+    },
 );
 </script>
 
@@ -34,7 +34,7 @@ const props = withDefaults(
                 size === 'sm' && 'text-xs',
                 size === 'md' && 'text-sm',
                 'group-data-[collapsible=icon]:hidden',
-                props.class
+                props.class,
             )
         "
     >

@@ -1,0 +1,94 @@
+import db from '@adonisjs/lucid/services/db';
+import BaseRepository from '#repositories/base/base_repository';
+import Quote from '#models/quote';
+import QuoteLine from '#models/quote_line';
+
+export type QuoteLineInput = {
+    resourceId: string;
+    resourceName: string;
+    resourceType: string;
+    quantity: number;
+    unitPrice: number;
+    totalPrice: number;
+};
+
+export default class QuoteRepository extends BaseRepository<typeof Quote> {
+    constructor() {
+        super(Quote);
+    }
+
+    public async findOrFail(id: string): Promise<Quote> {
+        return Quote.query().where('id', id).preload('file').preload('lines').firstOrFail();
+    }
+
+    public async paginate(params: { page: number; perPage: number; sort: string; dir: 'asc' | 'desc'; search?: string }) {
+        const { page, perPage, sort, dir, search } = params;
+        const allowedSorts: Record<string, string> = {
+            number: 'number',
+            createdAt: 'created_at',
+            requesterName: 'requester_name',
+            totalAmount: 'total_amount',
+        };
+        const sortColumn = allowedSorts[sort] ?? 'created_at';
+
+        const q = Quote.query().preload('file').preload('lines').orderBy(sortColumn, dir);
+        if (search) {
+            q.where((builder) => {
+                builder.whereILike('requesterName', `%${search}%`).orWhereILike('organizationName', `%${search}%`);
+            });
+        }
+        return q.paginate(page, perPage);
+    }
+
+    public async createWithLines(data: {
+        userId: string;
+        organizationId: string | null;
+        organizationName: string | null;
+        recipientUserId: string | null;
+        requesterName: string;
+        totalAmount: number;
+        lines: QuoteLineInput[];
+    }): Promise<Quote> {
+        return db.transaction(async (trx) => {
+            const quote = await Quote.create(
+                {
+                    userId: data.userId,
+                    organizationId: data.organizationId,
+                    organizationName: data.organizationName,
+                    recipientUserId: data.recipientUserId,
+                    requesterName: data.requesterName,
+                    totalAmount: String(data.totalAmount),
+                },
+                { client: trx },
+            );
+
+            for (const line of data.lines) {
+                await QuoteLine.create(
+                    {
+                        quoteId: quote.id,
+                        resourceId: line.resourceId,
+                        resourceName: line.resourceName,
+                        resourceType: line.resourceType,
+                        quantity: line.quantity,
+                        unitPrice: String(line.unitPrice),
+                        totalPrice: String(line.totalPrice),
+                    },
+                    { client: trx },
+                );
+            }
+
+            // `number` is assigned by a database sequence and isn't hydrated back onto the
+            // in-memory instance returned by create(), so it must be re-fetched explicitly.
+            return Quote.query({ client: trx }).where('id', quote.id).firstOrFail();
+        });
+    }
+
+    public async paginateForRecipient(recipientUserId: string, params: { page: number; perPage: number }) {
+        const { page, perPage } = params;
+        return Quote.query().where('recipientUserId', recipientUserId).whereNull('organizationId').preload('file').preload('lines').orderBy('created_at', 'desc').paginate(page, perPage);
+    }
+
+    public async setFile(id: string, fileId: string): Promise<void> {
+        await Quote.query().where('id', id).update({ fileId });
+    }
+}

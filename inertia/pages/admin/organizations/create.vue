@@ -1,0 +1,46 @@
+<script setup lang="ts">
+import AdminLayout from '~/layouts/admin.vue';
+import { useAdminLayout } from '~/composables/use_admin_layout';
+import { useI18n } from 'vue-i18n';
+import { useForm } from '@inertiajs/vue3';
+import { urlFor } from '~/client';
+import { Button } from '~/components/ui/button';
+import { Input } from '~/components/ui/input';
+import { Link } from '@adonisjs/inertia/vue';
+import { ArrowLeft } from '@lucide/vue';
+
+defineOptions({ layout: AdminLayout });
+
+const { t } = useI18n();
+const { pageTitle } = useAdminLayout();
+pageTitle.value = t('admin.organizations.create.title');
+
+const form = useForm({
+    name: '',
+});
+
+function submit() {
+    form.post(urlFor('admin.organizations.store'), {
+        onSuccess: () => form.reset(),
+    });
+}
+</script>
+
+<template>
+    <div class="space-y-4 max-w-lg">
+        <Button variant="outline" class="gap-2" as-child>
+            <Link :href="urlFor('admin.organizations.index')">
+                <ArrowLeft class="size-4" />
+                {{ t('admin.organizations.create.back') }}
+            </Link>
+        </Button>
+
+        <div class="rounded-md border p-5 space-y-4">
+            <Input v-model="form.name" :label="t('admin.organizations.create.fields.name')" :error="form.errors.name" maxlength="100" required />
+
+            <Button :loading="form.processing" :disabled="form.processing" @click="submit">
+                {{ t('admin.organizations.create.submit') }}
+            </Button>
+        </div>
+    </div>
+</template>

@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { usePage, router } from '@inertiajs/vue3';
+import { Link } from '@adonisjs/inertia/vue';
 import { urlFor } from '~/client';
 import Theme from '~/partials/layout/theme.vue';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '~/components/ui/dropdown-menu';
-import { UserCheck, LogOut, UserCog } from '@lucide/vue';
-import { Link } from '@adonisjs/inertia/vue';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '~/components/ui/dropdown-menu';
+import { UserCheck, FileText, ShoppingCart, LogOut } from '@lucide/vue';
 import type { Data } from '@generated/data';
 
 const page = usePage<Data.SharedProps>();
@@ -24,17 +24,20 @@ const logout = () => {
             <DropdownMenuContent class="w-56" align="end">
                 <DropdownMenuLabel class="font-normal">
                     <div class="font-medium">{{ page.props.user.username }}</div>
-                    <div class="text-xs text-muted-foreground">{{ page.props.user.email }}</div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuGroup>
-                    <DropdownMenuItem as-child class="cursor-pointer">
-                        <Link :route="'profile.show'" class="gap-2">
-                            <UserCog class="size-4" aria-hidden="true" />
-                            {{ $t('profile.dropdown') }}
-                        </Link>
-                    </DropdownMenuItem>
-                </DropdownMenuGroup>
+                <DropdownMenuItem class="gap-2 cursor-pointer" as-child>
+                    <Link :href="urlFor('devis.index')">
+                        <FileText class="size-4" aria-hidden="true" />
+                        {{ $t('devis.index.navLink') }}
+                    </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem class="gap-2 cursor-pointer" as-child>
+                    <Link :href="urlFor('commandes.index')">
+                        <ShoppingCart class="size-4" aria-hidden="true" />
+                        {{ $t('commande.index.navLink') }}
+                    </Link>
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem class="gap-2 cursor-pointer" @click="logout">
                     <LogOut class="size-4" aria-hidden="true" />

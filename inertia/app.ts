@@ -8,10 +8,7 @@ import { createSSRApp, type DefineComponent, h } from 'vue';
 import { resolvePageComponent } from '@adonisjs/inertia/helpers';
 import { createI18nInstance } from '~/i18n';
 
-const appName: string = 'Consilium';
-
 createInertiaApp({
-    title: (title: string): string => (!title || title === appName ? appName : `${title} - ${appName}`),
     resolve: (name: string) => {
         return resolvePageComponent(`./pages/${name}.vue`, import.meta.glob<DefineComponent>('./pages/**/*.vue'), Layout);
     },

@@ -1,6 +1,9 @@
 import { UserSchema } from '#database/schema';
-import hash from '@adonisjs/core/services/hash';
-import { compose } from '@adonisjs/core/helpers';
-import { withAuthFinder } from '@adonisjs/auth/mixins/lucid';
+import { belongsTo } from '@adonisjs/lucid/orm';
+import type { BelongsTo } from '@adonisjs/lucid/types/relations';
+import File from '#models/file';
 
-export default class User extends compose(UserSchema, withAuthFinder(hash)) {}
+export default class User extends UserSchema {
+    @belongsTo(() => File, { foreignKey: 'avatarId' })
+    declare avatar: BelongsTo<typeof File>;
+}

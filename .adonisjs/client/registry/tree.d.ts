@@ -2,68 +2,113 @@
 import type { routes } from './index.ts'
 
 export interface ApiDefinition {
+  eventStream: typeof routes['event_stream']
+  subscribe: typeof routes['subscribe']
+  unsubscribe: typeof routes['unsubscribe']
   home: typeof routes['home']
-  simulator: {
-    index: typeof routes['simulator.index']
-    store: typeof routes['simulator.store']
-    show: typeof routes['simulator.show']
-    announce: typeof routes['simulator.announce']
-    uploadAnnouncement: typeof routes['simulator.uploadAnnouncement']
-    updateAnnouncement: typeof routes['simulator.updateAnnouncement']
-    destroyAnnouncement: typeof routes['simulator.destroyAnnouncement']
-    nextMonth: typeof routes['simulator.nextMonth']
-    respondEvent: typeof routes['simulator.respondEvent']
-    advisor: typeof routes['simulator.advisor']
-    destroy: typeof routes['simulator.destroy']
-  }
-  password: {
-    reset: {
-      show: typeof routes['password.reset.show']
-      update: typeof routes['password.reset.update']
+  tarifs: typeof routes['tarifs']
+  stocks: typeof routes['stocks'] & {
+    resources: {
+      updateQuantity: typeof routes['stocks.resources.updateQuantity']
+    }
+    materials: {
+      updateQuantity: typeof routes['stocks.materials.updateQuantity']
     }
   }
-  profile: {
-    show: typeof routes['profile.show']
-    export: typeof routes['profile.export']
-    update: typeof routes['profile.update']
-    passwordReset: typeof routes['profile.passwordReset']
-    destroy: typeof routes['profile.destroy']
+  organigramme: typeof routes['organigramme']
+  devis: {
+    create: typeof routes['devis.create']
+    store: typeof routes['devis.store']
+    index: typeof routes['devis.index']
+    show: typeof routes['devis.show']
+  }
+  commandes: {
+    create: typeof routes['commandes.create']
+    store: typeof routes['commandes.store']
+    index: typeof routes['commandes.index']
+    show: typeof routes['commandes.show']
+    cancel: typeof routes['commandes.cancel']
+  }
+  livraisons: {
+    store: typeof routes['livraisons.store']
+  }
+  deposits: {
+    store: typeof routes['deposits.store']
+  }
+  buybacks: {
+    store: typeof routes['buybacks.store']
+  }
+  organization: {
+    show: typeof routes['organization.show']
+    members: {
+      store: typeof routes['organization.members.store']
+      destroy: typeof routes['organization.members.destroy']
+      updateRole: typeof routes['organization.members.updateRole']
+    }
   }
   login: typeof routes['login']
   auth: {
-    login: {
-      store: typeof routes['auth.login.store']
+    discord: {
+      redirect: typeof routes['auth.discord.redirect']
+      callback: typeof routes['auth.discord.callback']
     }
     logout: typeof routes['auth.logout']
   }
-  forgot: {
-    password: typeof routes['forgot.password'] & {
-      store: typeof routes['forgot.password.store']
-    }
-  }
-  register: typeof routes['register'] & {
-    store: typeof routes['register.store']
-  }
-  email: {
-    verify: typeof routes['email.verify']
-  }
   admin: {
     dashboard: typeof routes['admin.dashboard']
-    terms: {
-      invalidate: typeof routes['admin.terms.invalidate']
-    }
     users: {
       index: typeof routes['admin.users.index']
+      create: typeof routes['admin.users.create']
+      store: typeof routes['admin.users.store']
       show: typeof routes['admin.users.show']
-      export: typeof routes['admin.users.export']
       update: typeof routes['admin.users.update']
+      updateAvatar: typeof routes['admin.users.updateAvatar']
     }
-  }
-  legal: {
-    show: typeof routes['legal.show']
-  }
-  terms: {
-    show: typeof routes['terms.show']
-    accept: typeof routes['terms.accept']
+    resources: {
+      index: typeof routes['admin.resources.index']
+      create: typeof routes['admin.resources.create']
+      store: typeof routes['admin.resources.store']
+      reorder: typeof routes['admin.resources.reorder']
+      show: typeof routes['admin.resources.show']
+      update: typeof routes['admin.resources.update']
+      destroy: typeof routes['admin.resources.destroy']
+    }
+    materials: {
+      index: typeof routes['admin.materials.index']
+      create: typeof routes['admin.materials.create']
+      store: typeof routes['admin.materials.store']
+      reorder: typeof routes['admin.materials.reorder']
+      show: typeof routes['admin.materials.show']
+      update: typeof routes['admin.materials.update']
+      destroy: typeof routes['admin.materials.destroy']
+    }
+    buybacks: {
+      index: typeof routes['admin.buybacks.index']
+    }
+    devis: {
+      index: typeof routes['admin.devis.index']
+    }
+    commandes: {
+      index: typeof routes['admin.commandes.index']
+      validate: typeof routes['admin.commandes.validate']
+      cancel: typeof routes['admin.commandes.cancel']
+    }
+    livraisons: {
+      index: typeof routes['admin.livraisons.index']
+      destroy: typeof routes['admin.livraisons.destroy']
+    }
+    organizations: {
+      index: typeof routes['admin.organizations.index']
+      create: typeof routes['admin.organizations.create']
+      store: typeof routes['admin.organizations.store']
+      show: typeof routes['admin.organizations.show']
+      update: typeof routes['admin.organizations.update']
+      destroy: typeof routes['admin.organizations.destroy']
+      members: {
+        store: typeof routes['admin.organizations.members.store']
+        destroy: typeof routes['admin.organizations.members.destroy']
+        updateRole: typeof routes['admin.organizations.members.updateRole']
+      }
+    }
   }
 }

@@ -19,10 +19,10 @@ import {
     SidebarProvider,
     SidebarTrigger,
 } from '~/components/ui/sidebar';
-import { getItems, getFooterItems, type MenuItem } from '~/lib/admin-menu';
+import { getItems, getFooterItems, type MenuItem } from '~/lib/admin_menu';
 import { urlFor } from '~/client';
 import { useI18n } from 'vue-i18n';
-import { useTheme } from '~/lib/useTheme';
+import { useTheme } from '~/lib/use_theme';
 
 const isActive = (item: MenuItem) => {
     const target = urlFor(item.route);
@@ -44,21 +44,19 @@ watch(
         if (flash?.success) toast.success(flash.success);
         if (flash?.error) toast.error(flash.error);
     },
-    { immediate: true, deep: true }
+    { immediate: true, deep: true },
 );
 </script>
 
 <template>
-    <Head :title="pageTitle || t('admin.title')">
-        <meta name="robots" content="noindex, nofollow" />
-    </Head>
+    <Head :title="pageTitle || t('admin.title')" />
     <main>
         <div class="font-sans antialiased overflow-x-hidden">
             <SidebarProvider>
                 <Sidebar>
                     <SidebarContent>
                         <SidebarGroup>
-                            <SidebarGroupLabel>{{ page.props.user?.email }}</SidebarGroupLabel>
+                            <SidebarGroupLabel>{{ page.props.user?.username }}</SidebarGroupLabel>
                             <SidebarGroupContent>
                                 <SidebarMenu>
                                     <SidebarMenuItem v-for="item in items" :key="item.route">
@@ -91,7 +89,7 @@ watch(
                         <div class="flex items-center px-5">
                             <SidebarTrigger :size="32" class="p-4" />
                             <Link route="home">
-                                <img :src="'/logo.svg'" alt="Logo" class="size-12" />
+                                <img :src="'/logo.png'" alt="Logo" class="size-12" />
                             </Link>
                         </div>
 

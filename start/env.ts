@@ -22,7 +22,6 @@ export default await Env.create(new URL('../', import.meta.url), {
     LOG_LEVEL: Env.schema.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']),
     APP_KEY: Env.schema.secret(),
     APP_URL: Env.schema.string(),
-    SITE_EDITOR_NAME: Env.schema.string(),
 
     // Session
     SESSION_DRIVER: Env.schema.enum(['cookie', 'memory', 'database'] as const),
@@ -47,28 +46,18 @@ export default await Env.create(new URL('../', import.meta.url), {
 
     /*
 |----------------------------------------------------------
-| Variables for configuring redis package
+| Variables for Discord OAuth
 |----------------------------------------------------------
 */
-    REDIS_HOST: Env.schema.string({ format: 'host' }),
-    REDIS_PORT: Env.schema.number(),
-    REDIS_PASSWORD: Env.schema.string.optional(),
+    DISCORD_CLIENT_ID: Env.schema.string(),
+    DISCORD_CLIENT_SECRET: Env.schema.string(),
+    DISCORD_CALLBACK_URL: Env.schema.string(),
 
     /*
 |----------------------------------------------------------
-| Variables for API keys
+| Variables for seeding the admin account
 |----------------------------------------------------------
 */
-    BREVO_API_KEY: Env.schema.string(),
-
-    ADMIN_SENDER_EMAIL: Env.schema.string(),
-    NOREPLY_SENDER_EMAIL: Env.schema.string(),
-    ADMIN_EMAIL: Env.schema.string(),
-
-    /*
-  |----------------------------------------------------------
-  | Variables for configuring the limiter package
-  |----------------------------------------------------------
-  */
-    LIMITER_STORE: Env.schema.enum(['redis', 'memory'] as const),
+    ADMIN_DISCORD_ID: Env.schema.string(),
+    ADMIN_USERNAME: Env.schema.string(),
 });
