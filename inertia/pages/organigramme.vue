@@ -33,7 +33,7 @@ const groups = computed(() => [
                 <h2 class="font-serif text-2xl font-light text-slate-800 dark:text-slate-100 text-center">{{ group.title }}</h2>
                 <div class="flex flex-wrap justify-center gap-8">
                     <div v-for="member in group.members" :key="member.id" class="flex flex-col items-center gap-2 w-28">
-                        <img v-if="member.avatarUrl" :src="member.avatarUrl" :alt="member.username" class="size-24 rounded-full object-cover border border-amber-400/30" />
+                        <img v-if="member.avatarUrl" :src="member.avatarUrl" :alt="member.username" class="size-24 rounded-full object-cover" />
                         <div v-else class="flex size-24 items-center justify-center rounded-full bg-muted border border-amber-400/30">
                             <UserCircle class="size-10 text-slate-400" />
                         </div>
