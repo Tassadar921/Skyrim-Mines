@@ -13,6 +13,8 @@ declare module '@adonisjs/inertia/types' {
     'admin/commandes/index': ExtractProps<(typeof import('../../inertia/pages/admin/commandes/index.vue'))['default']>
     'admin/dashboard': ExtractProps<(typeof import('../../inertia/pages/admin/dashboard.vue'))['default']>
     'admin/devis/index': ExtractProps<(typeof import('../../inertia/pages/admin/devis/index.vue'))['default']>
+    'admin/licenses/index': ExtractProps<(typeof import('../../inertia/pages/admin/licenses/index.vue'))['default']>
+    'admin/licenses/show': ExtractProps<(typeof import('../../inertia/pages/admin/licenses/show.vue'))['default']>
     'admin/livraisons/index': ExtractProps<(typeof import('../../inertia/pages/admin/livraisons/index.vue'))['default']>
     'admin/materials/create': ExtractProps<(typeof import('../../inertia/pages/admin/materials/create.vue'))['default']>
     'admin/materials/index': ExtractProps<(typeof import('../../inertia/pages/admin/materials/index.vue'))['default']>

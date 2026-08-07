@@ -2,15 +2,21 @@ import { type HttpContext } from '@adonisjs/core/http';
 import logger from '@adonisjs/core/services/logger';
 import OrganizationRepository from '#repositories/organization_repository';
 import UserRepository from '#repositories/user_repository';
+import ResourceRepository from '#repositories/resource_repository';
+import OrganizationResourcePriceRepository from '#repositories/organization_resource_price_repository';
 import UserTransformer from '#transformers/user_transformer';
 import OrganizationTransformer from '#transformers/organization_transformer';
+import ResourceTransformer from '#transformers/resource_transformer';
 import UserRoleEnum from '#types/enum/user_role_enum';
 import { createOrganizationValidator, updateOrganizationValidator, storeOrganizationMemberValidator, updateOrganizationMemberRoleValidator } from '#validators/admin/organizations';
+import { upsertOrganizationResourcePriceValidator } from '#validators/admin/organization_resource_prices';
 
 export default class OrganizationsController {
     constructor(
         private readonly organizationRepository: OrganizationRepository = new OrganizationRepository(),
         private readonly userRepository: UserRepository = new UserRepository(),
+        private readonly resourceRepository: ResourceRepository = new ResourceRepository(),
+        private readonly organizationResourcePriceRepository: OrganizationResourcePriceRepository = new OrganizationResourcePriceRepository(),
     ) {}
 
     public async index({ inertia }: HttpContext) {
@@ -41,11 +47,16 @@ export default class OrganizationsController {
         const organization = await this.organizationRepository.findOrFail(params.id);
         const members = await this.userRepository.findMembersForOrganization(params.id);
         const eligibleUsers = await this.userRepository.findEligibleIndependentClients();
+        const resources = await this.resourceRepository.all();
+        const resourcePrices = await this.organizationResourcePriceRepository.findForOrganization(params.id);
+        const customSellPrices = Object.fromEntries(resourcePrices.map((price) => [price.resourceId, Number(price.sellPrice)]));
 
         return inertia.render('admin/organizations/show', {
             organization: new OrganizationTransformer(organization).toObject(),
             members: members.map((member) => new UserTransformer(member).toObject()),
             eligibleUsers: eligibleUsers.map((user) => ({ id: user.id, username: user.username })),
+            resources: resources.map((resource) => new ResourceTransformer(resource).toObject()),
+            customSellPrices,
         });
     }
 
@@ -156,6 +167,32 @@ export default class OrganizationsController {
         } catch (e) {
             logger.error({ err: e }, 'organizations.updateMemberRole failed');
             session.flash('error', i18n.t('messages.admin.organizations.members.updateRole.error'));
+        }
+
+        return response.redirect().back();
+    }
+
+    public async updateResourcePrice({ request, params, response, session, i18n }: HttpContext) {
+        const data = await request.validateUsing(upsertOrganizationResourcePriceValidator);
+
+        try {
+            await this.organizationResourcePriceRepository.upsert(params.id, params.resourceId, data.sellPrice);
+            session.flash('success', i18n.t('messages.admin.organizations.resourcePrices.update.success'));
+        } catch (e) {
+            logger.error({ err: e }, 'organizations.updateResourcePrice failed');
+            session.flash('error', i18n.t('messages.admin.organizations.resourcePrices.update.error'));
+        }
+
+        return response.redirect().back();
+    }
+
+    public async destroyResourcePrice({ params, response, session, i18n }: HttpContext) {
+        try {
+            await this.organizationResourcePriceRepository.delete(params.id, params.resourceId);
+            session.flash('success', i18n.t('messages.admin.organizations.resourcePrices.destroy.success'));
+        } catch (e) {
+            logger.error({ err: e }, 'organizations.destroyResourcePrice failed');
+            session.flash('error', i18n.t('messages.admin.organizations.resourcePrices.destroy.error'));
         }
 
         return response.redirect().back();

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import AdminLayout from '~/layouts/admin.vue';
 import { useAdminLayout } from '~/composables/use_admin_layout';
+import { useAuth } from '~/composables/use_auth';
 import { useI18n } from 'vue-i18n';
 import { ref } from 'vue';
 import { router } from '@inertiajs/vue3';
@@ -19,6 +20,7 @@ defineOptions({ layout: AdminLayout });
 
 const { t } = useI18n();
 const { pageTitle } = useAdminLayout();
+const { isAdmin } = useAuth();
 pageTitle.value = t('admin.users.title');
 
 type UserLine = Data.User & { avatarUrl: string | null };
@@ -78,7 +80,7 @@ function sortIcon(column: string) {
     <div class="space-y-4">
         <div class="flex items-center justify-between">
             <Badge variant="outline">{{ meta.total }} {{ $t('admin.users.table.userCount', meta.total) }}</Badge>
-            <Button as-child class="gap-2">
+            <Button v-if="isAdmin" as-child class="gap-2">
                 <Link :href="urlFor('admin.users.create')">
                     <Plus class="size-4" />
                     {{ t('admin.users.new') }}

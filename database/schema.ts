@@ -70,6 +70,53 @@ export class FileSchema extends BaseModel {
   declare updatedAt: DateTime | null
 }
 
+export class LicensePaymentSchema extends BaseModel {
+  static $columns = ['amountPaid', 'createdAt', 'id', 'isCitizen', 'subscriberId', 'updatedAt', 'weekNumber'] as const
+  $columns = LicensePaymentSchema.$columns
+  @column()
+  declare amountPaid: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare isCitizen: boolean
+  @column()
+  declare subscriberId: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare weekNumber: number
+}
+
+export class LicensePriceSchema extends BaseModel {
+  static $columns = ['citizenPrice', 'createdAt', 'id', 'nonCitizenPrice', 'updatedAt'] as const
+  $columns = LicensePriceSchema.$columns
+  @column()
+  declare citizenPrice: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare nonCitizenPrice: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
+export class LicenseSubscriberSchema extends BaseModel {
+  static $columns = ['createdAt', 'id', 'updatedAt', 'userId'] as const
+  $columns = LicenseSubscriberSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare userId: string
+}
+
 export class MaterialStockSchema extends BaseModel {
   static $columns = ['createdAt', 'id', 'materialId', 'quantity', 'updatedAt'] as const
   $columns = MaterialStockSchema.$columns
@@ -154,6 +201,23 @@ export class OrderSchema extends BaseModel {
   declare updatedAt: DateTime | null
   @column()
   declare userId: string
+}
+
+export class OrganizationResourcePriceSchema extends BaseModel {
+  static $columns = ['createdAt', 'id', 'organizationId', 'resourceId', 'sellPrice', 'updatedAt'] as const
+  $columns = OrganizationResourcePriceSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare organizationId: string
+  @column()
+  declare resourceId: string
+  @column()
+  declare sellPrice: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
 }
 
 export class OrganizationSchema extends BaseModel {

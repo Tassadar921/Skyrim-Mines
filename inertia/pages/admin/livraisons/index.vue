@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import AdminLayout from '~/layouts/admin.vue';
 import { useAdminLayout } from '~/composables/use_admin_layout';
+import { useAuth } from '~/composables/use_auth';
 import { useI18n } from 'vue-i18n';
 import { ref } from 'vue';
 import { router } from '@inertiajs/vue3';
@@ -37,6 +38,7 @@ type WeeklyTotal = {
 
 const { t } = useI18n();
 const { pageTitle } = useAdminLayout();
+const { isAdmin } = useAuth();
 pageTitle.value = t('admin.livraisons.title');
 
 const props = defineProps<{
@@ -141,7 +143,7 @@ function deleteDelivery(delivery: DeliveryRow) {
                 >
                     <div class="flex items-center justify-between gap-2">
                         <span class="text-sm font-medium">{{ t('admin.livraisons.table.weekBadge', { week: weeklyTotal.weekNumber }) }}</span>
-                        <Badge v-if="index === 0" variant="outline" class="text-xs">{{ t('admin.livraisons.weekly.current') }}</Badge>
+                        <Badge v-if="index === 0" variant="outline" class="text-xs">{{ t('admin.common.weekly.current') }}</Badge>
                     </div>
                     <div class="text-xs text-muted-foreground">{{ formatWeekRange(weeklyTotal) }}</div>
                     <div class="mt-1 text-sm font-medium">{{ weeklyTotal.totalAmount.toFixed(2) }} s</div>
@@ -212,6 +214,7 @@ function deleteDelivery(delivery: DeliveryRow) {
                                 <TableCell class="text-sm font-medium">{{ deliveryTotal(delivery).toFixed(2) }} s</TableCell>
                                 <TableCell @click.stop>
                                     <DeleteButton
+                                        v-if="isAdmin"
                                         :label="t('admin.livraisons.delete.label')"
                                         :title="t('admin.livraisons.delete.title')"
                                         :description="t('admin.livraisons.delete.description', { number: formatOrderNumber(delivery.orderNumber) })"

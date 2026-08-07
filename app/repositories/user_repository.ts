@@ -1,6 +1,7 @@
 import type { TransactionClientContract } from '@adonisjs/lucid/types/database';
 import BaseRepository from '#repositories/base/base_repository';
 import User from '#models/user';
+import LicenseSubscriber from '#models/license_subscriber';
 import UserRoleEnum from '#types/enum/user_role_enum';
 import type OrganizationRoleEnum from '#types/enum/organization_role_enum';
 
@@ -110,5 +111,12 @@ export default class UserRepository extends BaseRepository<typeof User> {
         const user = await User.findOrFail(id);
         user.organizationRole = organizationRole;
         await user.save();
+    }
+
+    /**
+     * Contractors and clients not already enrolled in the license tracking roster.
+     */
+    public async findEligibleForLicenseSubscription(): Promise<User[]> {
+        return User.query().whereIn('role', [UserRoleEnum.CONTRACTOR, UserRoleEnum.CLIENT]).whereNotIn('id', LicenseSubscriber.query().select('userId')).orderBy('username', 'asc');
     }
 }

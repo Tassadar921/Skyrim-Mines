@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 import QuantityStepper from '~/partials/stocks/QuantityStepper.vue';
 import type { Data } from '@generated/data';
 
-type ClientOption = { id: string; username: string; organizationName: string | null };
+type ClientOption = { id: string; username: string; organizationId: string | null; organizationName: string | null };
 type OrganizationOption = { id: string; name: string };
 type RecipientMode = 'myOrganization' | 'myself' | 'thirdParty';
 
@@ -18,10 +18,12 @@ const { t } = useI18n();
 
 const props = defineProps<{
     resources: Data.Resource[];
+    organizationId: string | null;
     organizationName: string | null;
     canRequestForThirdParty: boolean;
     clients: ClientOption[];
     organizations: OrganizationOption[];
+    organizationResourcePrices: Record<string, Record<string, number>>;
 }>();
 
 const minerais = computed(() => props.resources.filter((r) => r.type === 'minerai'));
@@ -41,7 +43,7 @@ function setQuantity(id: string, value: number) {
     quantities[id] = value;
 }
 
-const totalAmount = computed(() => props.resources.reduce((sum, resource) => sum + resource.sellPrice * (quantities[resource.id] ?? 0), 0));
+const totalAmount = computed(() => props.resources.reduce((sum, resource) => sum + priceFor(resource) * (quantities[resource.id] ?? 0), 0));
 const hasSelection = computed(() => Object.values(quantities).some((quantity) => quantity > 0));
 
 const recipientMode = ref<RecipientMode>(props.organizationName ? 'myOrganization' : 'myself');
@@ -52,6 +54,23 @@ const selectedThirdPartyType = computed(() => thirdPartySelection.value.split(':
 const selectedThirdPartyId = computed(() => thirdPartySelection.value.split(':')[1] ?? '');
 const selectedClient = computed<ClientOption | undefined>(() => (selectedThirdPartyType.value === 'client' ? props.clients.find((client) => client.id === selectedThirdPartyId.value) : undefined));
 const showScopeChoice = computed(() => !!selectedClient.value?.organizationName);
+
+const effectiveOrganizationId = computed<string | null>(() => {
+    if (recipientMode.value === 'myOrganization') return props.organizationId;
+    if (recipientMode.value === 'myself') return null;
+    if (selectedThirdPartyType.value === 'organization') return selectedThirdPartyId.value || null;
+    if (selectedThirdPartyType.value === 'client') {
+        if (showScopeChoice.value && thirdPartyScope.value === 'personal') return null;
+        return selectedClient.value?.organizationId ?? null;
+    }
+    return null;
+});
+
+function priceFor(resource: Data.Resource): number {
+    const organizationId = effectiveOrganizationId.value;
+    if (!organizationId) return resource.sellPrice;
+    return props.organizationResourcePrices[organizationId]?.[resource.id] ?? resource.sellPrice;
+}
 
 const canSubmit = computed(() => {
     if (!hasSelection.value) return false;
@@ -168,7 +187,7 @@ function submitQuote() {
                         <TableBody>
                             <TableRow v-for="resource in minerais" :key="resource.id">
                                 <TableCell class="text-sm font-medium">{{ resource.name }}</TableCell>
-                                <TableCell class="text-sm text-muted-foreground">{{ resource.sellPrice.toFixed(2) }} s</TableCell>
+                                <TableCell class="text-sm text-muted-foreground">{{ priceFor(resource).toFixed(2) }} s</TableCell>
                                 <TableCell>
                                     <QuantityStepper :model-value="quantities[resource.id] ?? 0" @update:model-value="(value) => setQuantity(resource.id, value)" />
                                 </TableCell>
@@ -192,7 +211,7 @@ function submitQuote() {
                         <TableBody>
                             <TableRow v-for="resource in lingots" :key="resource.id">
                                 <TableCell class="text-sm font-medium">{{ resource.name }}</TableCell>
-                                <TableCell class="text-sm text-muted-foreground">{{ resource.sellPrice.toFixed(2) }} s</TableCell>
+                                <TableCell class="text-sm text-muted-foreground">{{ priceFor(resource).toFixed(2) }} s</TableCell>
                                 <TableCell>
                                     <QuantityStepper :model-value="quantities[resource.id] ?? 0" @update:model-value="(value) => setQuantity(resource.id, value)" />
                                 </TableCell>

@@ -94,6 +94,19 @@ router
         router.post('/organizations/:id/members', [controllers.admin.Organizations, 'storeMember']).as('admin.organizations.members.store').use(middleware.admin());
         router.delete('/organizations/:id/members/:memberId', [controllers.admin.Organizations, 'destroyMember']).as('admin.organizations.members.destroy').use(middleware.admin());
         router.patch('/organizations/:id/members/:memberId/role', [controllers.admin.Organizations, 'updateMemberRole']).as('admin.organizations.members.updateRole').use(middleware.admin());
+        router.put('/organizations/:id/resource-prices/:resourceId', [controllers.admin.Organizations, 'updateResourcePrice']).as('admin.organizations.resourcePrices.update').use(middleware.admin());
+        router
+            .delete('/organizations/:id/resource-prices/:resourceId', [controllers.admin.Organizations, 'destroyResourcePrice'])
+            .as('admin.organizations.resourcePrices.destroy')
+            .use(middleware.admin());
+
+        router.get('/licenses', [controllers.admin.Licenses, 'index']).as('admin.licenses.index').use(readOnly);
+        router.put('/licenses/prices', [controllers.admin.Licenses, 'updatePrices']).as('admin.licenses.prices.update').use(middleware.admin());
+        router.post('/licenses/subscribers', [controllers.admin.Licenses, 'storeSubscriber']).as('admin.licenses.subscribers.store').use(middleware.admin());
+        router.get('/licenses/subscribers/:id', [controllers.admin.Licenses, 'showSubscriber']).as('admin.licenses.subscribers.show').use(readOnly);
+        router.delete('/licenses/subscribers/:id', [controllers.admin.Licenses, 'destroySubscriber']).as('admin.licenses.subscribers.destroy').use(middleware.admin());
+        router.post('/licenses/subscribers/:id/payments', [controllers.admin.Licenses, 'storePayment']).as('admin.licenses.payments.store').use(middleware.admin());
+        router.delete('/licenses/payments/:id', [controllers.admin.Licenses, 'destroyPayment']).as('admin.licenses.payments.destroy').use(middleware.admin());
     })
     .prefix('/admin')
     .use(middleware.auth());

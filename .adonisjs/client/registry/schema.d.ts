@@ -799,4 +799,112 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/organizations_controller').default['updateMemberRole']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'admin.organizations.resourcePrices.update': {
+    methods: ["PUT"]
+    pattern: '/admin/organizations/:id/resource-prices/:resourceId'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/admin/organization_resource_prices').upsertOrganizationResourcePriceValidator)>>
+      paramsTuple: [ParamValue, ParamValue]
+      params: { id: ParamValue; resourceId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/admin/organization_resource_prices').upsertOrganizationResourcePriceValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/organizations_controller').default['updateResourcePrice']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/organizations_controller').default['updateResourcePrice']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'admin.organizations.resourcePrices.destroy': {
+    methods: ["DELETE"]
+    pattern: '/admin/organizations/:id/resource-prices/:resourceId'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { id: ParamValue; resourceId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/organizations_controller').default['destroyResourcePrice']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/organizations_controller').default['destroyResourcePrice']>>>
+    }
+  }
+  'admin.licenses.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/admin/licenses'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/licenses_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/licenses_controller').default['index']>>>
+    }
+  }
+  'admin.licenses.prices.update': {
+    methods: ["PUT"]
+    pattern: '/admin/licenses/prices'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/admin/license_prices').updateLicensePricesValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/admin/license_prices').updateLicensePricesValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/licenses_controller').default['updatePrices']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/licenses_controller').default['updatePrices']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'admin.licenses.subscribers.store': {
+    methods: ["POST"]
+    pattern: '/admin/licenses/subscribers'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/admin/license_subscribers').storeLicenseSubscriberValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/admin/license_subscribers').storeLicenseSubscriberValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/licenses_controller').default['storeSubscriber']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/licenses_controller').default['storeSubscriber']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'admin.licenses.subscribers.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/admin/licenses/subscribers/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/licenses_controller').default['showSubscriber']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/licenses_controller').default['showSubscriber']>>>
+    }
+  }
+  'admin.licenses.subscribers.destroy': {
+    methods: ["DELETE"]
+    pattern: '/admin/licenses/subscribers/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/licenses_controller').default['destroySubscriber']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/licenses_controller').default['destroySubscriber']>>>
+    }
+  }
+  'admin.licenses.payments.store': {
+    methods: ["POST"]
+    pattern: '/admin/licenses/subscribers/:id/payments'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/admin/license_payments').storeLicensePaymentValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/admin/license_payments').storeLicensePaymentValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/licenses_controller').default['storePayment']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/licenses_controller').default['storePayment']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'admin.licenses.payments.destroy': {
+    methods: ["DELETE"]
+    pattern: '/admin/licenses/payments/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/licenses_controller').default['destroyPayment']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/licenses_controller').default['destroyPayment']>>>
+    }
+  }
 }

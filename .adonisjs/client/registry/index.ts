@@ -402,6 +402,60 @@ const routes = {
     tokens: [{"old":"/admin/organizations/:id/members/:memberId/role","type":0,"val":"admin","end":""},{"old":"/admin/organizations/:id/members/:memberId/role","type":0,"val":"organizations","end":""},{"old":"/admin/organizations/:id/members/:memberId/role","type":1,"val":"id","end":""},{"old":"/admin/organizations/:id/members/:memberId/role","type":0,"val":"members","end":""},{"old":"/admin/organizations/:id/members/:memberId/role","type":1,"val":"memberId","end":""},{"old":"/admin/organizations/:id/members/:memberId/role","type":0,"val":"role","end":""}],
     types: placeholder as Registry['admin.organizations.members.updateRole']['types'],
   },
+  'admin.organizations.resourcePrices.update': {
+    methods: ["PUT"],
+    pattern: '/admin/organizations/:id/resource-prices/:resourceId',
+    tokens: [{"old":"/admin/organizations/:id/resource-prices/:resourceId","type":0,"val":"admin","end":""},{"old":"/admin/organizations/:id/resource-prices/:resourceId","type":0,"val":"organizations","end":""},{"old":"/admin/organizations/:id/resource-prices/:resourceId","type":1,"val":"id","end":""},{"old":"/admin/organizations/:id/resource-prices/:resourceId","type":0,"val":"resource-prices","end":""},{"old":"/admin/organizations/:id/resource-prices/:resourceId","type":1,"val":"resourceId","end":""}],
+    types: placeholder as Registry['admin.organizations.resourcePrices.update']['types'],
+  },
+  'admin.organizations.resourcePrices.destroy': {
+    methods: ["DELETE"],
+    pattern: '/admin/organizations/:id/resource-prices/:resourceId',
+    tokens: [{"old":"/admin/organizations/:id/resource-prices/:resourceId","type":0,"val":"admin","end":""},{"old":"/admin/organizations/:id/resource-prices/:resourceId","type":0,"val":"organizations","end":""},{"old":"/admin/organizations/:id/resource-prices/:resourceId","type":1,"val":"id","end":""},{"old":"/admin/organizations/:id/resource-prices/:resourceId","type":0,"val":"resource-prices","end":""},{"old":"/admin/organizations/:id/resource-prices/:resourceId","type":1,"val":"resourceId","end":""}],
+    types: placeholder as Registry['admin.organizations.resourcePrices.destroy']['types'],
+  },
+  'admin.licenses.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/admin/licenses',
+    tokens: [{"old":"/admin/licenses","type":0,"val":"admin","end":""},{"old":"/admin/licenses","type":0,"val":"licenses","end":""}],
+    types: placeholder as Registry['admin.licenses.index']['types'],
+  },
+  'admin.licenses.prices.update': {
+    methods: ["PUT"],
+    pattern: '/admin/licenses/prices',
+    tokens: [{"old":"/admin/licenses/prices","type":0,"val":"admin","end":""},{"old":"/admin/licenses/prices","type":0,"val":"licenses","end":""},{"old":"/admin/licenses/prices","type":0,"val":"prices","end":""}],
+    types: placeholder as Registry['admin.licenses.prices.update']['types'],
+  },
+  'admin.licenses.subscribers.store': {
+    methods: ["POST"],
+    pattern: '/admin/licenses/subscribers',
+    tokens: [{"old":"/admin/licenses/subscribers","type":0,"val":"admin","end":""},{"old":"/admin/licenses/subscribers","type":0,"val":"licenses","end":""},{"old":"/admin/licenses/subscribers","type":0,"val":"subscribers","end":""}],
+    types: placeholder as Registry['admin.licenses.subscribers.store']['types'],
+  },
+  'admin.licenses.subscribers.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/admin/licenses/subscribers/:id',
+    tokens: [{"old":"/admin/licenses/subscribers/:id","type":0,"val":"admin","end":""},{"old":"/admin/licenses/subscribers/:id","type":0,"val":"licenses","end":""},{"old":"/admin/licenses/subscribers/:id","type":0,"val":"subscribers","end":""},{"old":"/admin/licenses/subscribers/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['admin.licenses.subscribers.show']['types'],
+  },
+  'admin.licenses.subscribers.destroy': {
+    methods: ["DELETE"],
+    pattern: '/admin/licenses/subscribers/:id',
+    tokens: [{"old":"/admin/licenses/subscribers/:id","type":0,"val":"admin","end":""},{"old":"/admin/licenses/subscribers/:id","type":0,"val":"licenses","end":""},{"old":"/admin/licenses/subscribers/:id","type":0,"val":"subscribers","end":""},{"old":"/admin/licenses/subscribers/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['admin.licenses.subscribers.destroy']['types'],
+  },
+  'admin.licenses.payments.store': {
+    methods: ["POST"],
+    pattern: '/admin/licenses/subscribers/:id/payments',
+    tokens: [{"old":"/admin/licenses/subscribers/:id/payments","type":0,"val":"admin","end":""},{"old":"/admin/licenses/subscribers/:id/payments","type":0,"val":"licenses","end":""},{"old":"/admin/licenses/subscribers/:id/payments","type":0,"val":"subscribers","end":""},{"old":"/admin/licenses/subscribers/:id/payments","type":1,"val":"id","end":""},{"old":"/admin/licenses/subscribers/:id/payments","type":0,"val":"payments","end":""}],
+    types: placeholder as Registry['admin.licenses.payments.store']['types'],
+  },
+  'admin.licenses.payments.destroy': {
+    methods: ["DELETE"],
+    pattern: '/admin/licenses/payments/:id',
+    tokens: [{"old":"/admin/licenses/payments/:id","type":0,"val":"admin","end":""},{"old":"/admin/licenses/payments/:id","type":0,"val":"licenses","end":""},{"old":"/admin/licenses/payments/:id","type":0,"val":"payments","end":""},{"old":"/admin/licenses/payments/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['admin.licenses.payments.destroy']['types'],
+  },
 } as const satisfies Record<string, AdonisEndpoint>
 
 export { routes }

@@ -3,7 +3,7 @@ import AdminLayout from '~/layouts/admin.vue';
 import { useAdminLayout } from '~/composables/use_admin_layout';
 import { useAuth } from '~/composables/use_auth';
 import { useI18n } from 'vue-i18n';
-import { ref } from 'vue';
+import { computed, reactive, ref } from 'vue';
 import { router, useForm } from '@inertiajs/vue3';
 import { urlFor } from '~/client';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '~/components/ui/table';
@@ -31,6 +31,8 @@ const props = defineProps<{
     organization: { id: string; name: string };
     members: Member[];
     eligibleUsers: EligibleUser[];
+    resources: Data.Resource[];
+    customSellPrices: Record<string, number>;
 }>();
 
 pageTitle.value = `${t('admin.organizations.show.title')} - ${props.organization.name}`;
@@ -85,6 +87,35 @@ function removeMember(memberId: string) {
 
 function changeMemberRole(memberId: string, role: string) {
     router.patch(urlFor('admin.organizations.members.updateRole', { id: props.organization.id, memberId }), { role }, { preserveScroll: true });
+}
+
+const minerais = computed(() => props.resources.filter((resource) => resource.type === 'minerai'));
+const lingots = computed(() => props.resources.filter((resource) => resource.type === 'lingot'));
+
+function buildCustomPriceInputs(resources: Data.Resource[]): Record<string, string> {
+    return Object.fromEntries(resources.map((resource) => [resource.id, props.customSellPrices[resource.id] !== undefined ? String(props.customSellPrices[resource.id]) : '']));
+}
+
+const customPriceInputs = reactive<Record<string, string>>(buildCustomPriceInputs(props.resources));
+
+function hasCustomPrice(resourceId: string): boolean {
+    return props.customSellPrices[resourceId] !== undefined;
+}
+
+function saveResourcePrice(resourceId: string) {
+    const value = customPriceInputs[resourceId];
+    if (value === '' || value === null || Number.isNaN(Number(value))) return;
+
+    router.put(urlFor('admin.organizations.resourcePrices.update', { id: props.organization.id, resourceId }), { sellPrice: Number(value) }, { preserveScroll: true });
+}
+
+function resetResourcePrice(resourceId: string) {
+    router.delete(urlFor('admin.organizations.resourcePrices.destroy', { id: props.organization.id, resourceId }), {
+        preserveScroll: true,
+        onSuccess: () => {
+            customPriceInputs[resourceId] = '';
+        },
+    });
 }
 </script>
 
@@ -235,6 +266,69 @@ function changeMemberRole(memberId: string, role: string) {
                         </TableRow>
                     </TableBody>
                 </Table>
+            </div>
+        </div>
+
+        <div class="space-y-3">
+            <div class="space-y-1">
+                <h2 class="text-lg font-medium">{{ t('admin.organizations.resourcePrices.title') }}</h2>
+                <p class="text-sm text-muted-foreground">{{ t('admin.organizations.resourcePrices.description') }}</p>
+            </div>
+
+            <div
+                v-for="group in [
+                    { label: t('admin.resources.types.minerai'), items: minerais },
+                    { label: t('admin.resources.types.lingot'), items: lingots },
+                ]"
+                :key="group.label"
+                class="space-y-2"
+            >
+                <h3 class="text-sm font-medium text-muted-foreground">{{ group.label }}</h3>
+                <div class="rounded-md border">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>{{ t('admin.organizations.resourcePrices.table.resource') }}</TableHead>
+                                <TableHead>{{ t('admin.organizations.resourcePrices.table.standardPrice') }}</TableHead>
+                                <TableHead>{{ t('admin.organizations.resourcePrices.table.customPrice') }}</TableHead>
+                                <TableHead>{{ t('admin.organizations.resourcePrices.table.actions') }}</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            <template v-if="group.items.length">
+                                <TableRow v-for="resource in group.items" :key="resource.id">
+                                    <TableCell class="text-sm font-medium">{{ resource.name }}</TableCell>
+                                    <TableCell class="text-sm text-muted-foreground">{{ resource.sellPrice.toFixed(2) }} s</TableCell>
+                                    <TableCell>
+                                        <Input v-model="customPriceInputs[resource.id]" type="number" min="0" step="0.01" class="w-28" :readonly="!isAdmin" />
+                                    </TableCell>
+                                    <TableCell>
+                                        <div v-if="isAdmin" class="flex items-center gap-2">
+                                            <Button size="sm" variant="outline" @click="saveResourcePrice(resource.id)">
+                                                {{ t('admin.organizations.resourcePrices.save') }}
+                                            </Button>
+                                            <DeleteButton
+                                                v-if="hasCustomPrice(resource.id)"
+                                                :label="t('admin.organizations.resourcePrices.reset')"
+                                                :title="t('admin.organizations.resourcePrices.resetConfirm.title')"
+                                                :description="t('admin.organizations.resourcePrices.resetConfirm.description', { name: resource.name })"
+                                                :cancel-label="t('admin.organizations.resourcePrices.resetConfirm.cancel')"
+                                                :confirm-label="t('admin.organizations.resourcePrices.resetConfirm.confirm')"
+                                                @confirm="resetResourcePrice(resource.id)"
+                                            />
+                                        </div>
+                                        <Badge v-else-if="hasCustomPrice(resource.id)" variant="secondary">{{ t('admin.organizations.resourcePrices.customApplied') }}</Badge>
+                                    </TableCell>
+                                </TableRow>
+                            </template>
+                            <TableRow v-else>
+                                <TableCell :colspan="4" class="h-24 text-center text-muted-foreground">
+                                    {{ t('admin.organizations.resourcePrices.empty') }}
+                                </TableCell>
+                            </TableRow>
+                        </TableBody>
+                    </Table>
+                </div>
             </div>
         </div>
     </div>

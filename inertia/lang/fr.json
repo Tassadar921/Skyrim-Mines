@@ -232,6 +232,11 @@
     },
     "admin": {
         "title": "Admin",
+        "common": {
+            "weekly": {
+                "current": "Actuelle"
+            }
+        },
         "layout": {
             "logout": "Se déconnecter",
             "menu": {
@@ -239,6 +244,7 @@
                 "dashboard": "Tableau de bord",
                 "users": "Utilisateurs",
                 "organizations": "Organisations",
+                "licenses": "Licences d'exploitation",
                 "resources": "Ressources",
                 "materials": "Matériaux",
                 "buybacks": "Historique des rachats",
@@ -345,6 +351,102 @@
                     "cancel": "Annuler",
                     "confirm": "Supprimer"
                 }
+            },
+            "resourcePrices": {
+                "title": "Prix de vente custom",
+                "description": "Définissez un prix de vente spécifique pour cette organisation. Les ressources sans prix custom utilisent le prix standard.",
+                "table": {
+                    "resource": "Ressource",
+                    "standardPrice": "Prix standard",
+                    "customPrice": "Prix custom",
+                    "actions": "Actions"
+                },
+                "save": "Enregistrer",
+                "reset": "Réinitialiser",
+                "customApplied": "Prix custom appliqué",
+                "resetConfirm": {
+                    "title": "Réinitialiser ce prix ?",
+                    "description": "{name} reviendra au prix de vente standard pour cette organisation.",
+                    "cancel": "Annuler",
+                    "confirm": "Réinitialiser"
+                },
+                "empty": "Aucune ressource disponible"
+            }
+        },
+        "licenses": {
+            "title": "Licences d'exploitation",
+            "roles": {
+                "contractor": "Contractor",
+                "client": "Client"
+            },
+            "prices": {
+                "title": "Tarifs hebdomadaires",
+                "citizen": "Prix citoyen",
+                "nonCitizen": "Prix non-citoyen",
+                "save": "Enregistrer"
+            },
+            "weekly": {
+                "title": "Totaux par semaine",
+                "weekBadge": "Semaine {week}",
+                "payments": "paiements"
+            },
+            "subscribers": {
+                "add": "Ajouter un contractor/client",
+                "mode": "Type d'inscription",
+                "modeNew": "Créer un nouveau compte",
+                "modeExisting": "Rattacher un compte existant",
+                "existingUser": "Contractor ou client",
+                "existingUserPlaceholder": "Sélectionner un contractor ou un client",
+                "role": "Rôle",
+                "submit": "Ajouter"
+            },
+            "table": {
+                "count": "inscrit | inscrit | inscrits",
+                "username": "Nom d'utilisateur",
+                "role": "Rôle",
+                "status": "Statut",
+                "totalPaid": "Total payé",
+                "actions": "Actions",
+                "view": "Voir",
+                "upToDate": "À jour",
+                "late": "En retard",
+                "empty": "Aucun contractor/client inscrit"
+            },
+            "show": {
+                "title": "Inscription",
+                "back": "Retour à la liste",
+                "delete": "Supprimer l'inscription",
+                "deleteConfirm": {
+                    "title": "Supprimer cette inscription ?",
+                    "description": "{username} sera retiré du suivi des licences. Ses paiements enregistrés seront également supprimés.",
+                    "cancel": "Annuler",
+                    "confirm": "Supprimer"
+                }
+            },
+            "payments": {
+                "add": "Enregistrer un paiement",
+                "week": "Semaine",
+                "alreadyPaid": "déjà payée",
+                "status": "Statut de citoyenneté",
+                "citizen": "Citoyen",
+                "nonCitizen": "Non-citoyen",
+                "amount": "Montant payé",
+                "submit": "Enregistrer",
+                "table": {
+                    "week": "Semaine",
+                    "status": "Statut",
+                    "amount": "Montant",
+                    "date": "Date d'enregistrement",
+                    "actions": "Actions",
+                    "empty": "Aucun paiement enregistré"
+                },
+                "delete": {
+                    "label": "Supprimer",
+                    "title": "Supprimer ce paiement ?",
+                    "description": "Le paiement de la semaine {week} sera supprimé définitivement.",
+                    "cancel": "Annuler",
+                    "confirm": "Supprimer"
+                }
             }
         },
         "resources": {
@@ -437,7 +539,6 @@
             },
             "weekly": {
                 "title": "Totaux par semaine",
-                "current": "Actuelle",
                 "units": "unités"
             },
             "detail": {
@@ -518,7 +619,6 @@
             },
             "weekly": {
                 "title": "Totaux par semaine",
-                "current": "Actuelle",
                 "deliveries": "livraison | livraison | livraisons"
             },
             "detail": {

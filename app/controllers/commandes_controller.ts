@@ -5,6 +5,7 @@ import ResourceRepository from '#repositories/resource_repository';
 import OrderRepository from '#repositories/order_repository';
 import DeliveryRepository from '#repositories/delivery_repository';
 import OrganizationRepository from '#repositories/organization_repository';
+import OrganizationResourcePriceRepository from '#repositories/organization_resource_price_repository';
 import UserRepository from '#repositories/user_repository';
 import FileRepository from '#repositories/file_repository';
 import type Order from '#models/order';
@@ -26,6 +27,7 @@ export default class CommandesController {
         private readonly orderRepository: OrderRepository = new OrderRepository(),
         private readonly deliveryRepository: DeliveryRepository = new DeliveryRepository(),
         private readonly organizationRepository: OrganizationRepository = new OrganizationRepository(),
+        private readonly organizationResourcePriceRepository: OrganizationResourcePriceRepository = new OrganizationResourcePriceRepository(),
         private readonly userRepository: UserRepository = new UserRepository(),
         private readonly fileRepository: FileRepository = new FileRepository(),
     ) {}
@@ -77,34 +79,48 @@ export default class CommandesController {
         const user = auth.user!;
         const resources = await this.resourceRepository.all();
 
+        let organizationId: string | null = null;
         let organizationName: string | null = null;
         if (user.organizationId && ORGANIZATION_ORDER_ROLES.includes(user.organizationRole as OrganizationRoleEnum)) {
             const organization = await this.organizationRepository.findOrFail(user.organizationId);
+            organizationId = organization.id;
             organizationName = organization.name;
         }
 
         const allowThirdParty = isStaffOrAdmin(user.role);
-        let clients: { id: string; username: string; organizationName: string | null }[] = [];
+        let clients: { id: string; username: string; organizationId: string | null; organizationName: string | null }[] = [];
         let organizations: { id: string; name: string }[] = [];
+        let organizationResourcePrices: Record<string, Record<string, number>> = {};
 
         if (allowThirdParty) {
-            const [clientUsers, allOrganizations] = await Promise.all([this.userRepository.findAllClients(), this.organizationRepository.all()]);
+            const [clientUsers, allOrganizations, allResourcePrices] = await Promise.all([
+                this.userRepository.findAllClients(),
+                this.organizationRepository.all(),
+                this.organizationResourcePriceRepository.allGroupedByOrganization(),
+            ]);
             const organizationNameById = new Map(allOrganizations.map((organization) => [organization.id, organization.name]));
 
             clients = clientUsers.map((client) => ({
                 id: client.id,
                 username: client.username,
+                organizationId: client.organizationId,
                 organizationName: client.organizationId ? (organizationNameById.get(client.organizationId) ?? null) : null,
             }));
             organizations = allOrganizations.map((organization) => ({ id: organization.id, name: organization.name }));
+            organizationResourcePrices = allResourcePrices;
+        } else if (organizationId) {
+            const ownResourcePrices = await this.organizationResourcePriceRepository.findMapForOrganization(organizationId);
+            organizationResourcePrices = { [organizationId]: Object.fromEntries(ownResourcePrices) };
         }
 
         return inertia.render('commandes/create', {
             resources: resources.map((resource) => new ResourceTransformer(resource).toObject()),
+            organizationId,
             organizationName,
             canRequestForThirdParty: allowThirdParty,
             clients,
             organizations,
+            organizationResourcePrices,
         });
     }
 
@@ -117,15 +133,28 @@ export default class CommandesController {
         }
 
         try {
+            const recipient = await resolveRecipient(
+                auth,
+                recipientData,
+                { organizationRepository: this.organizationRepository, userRepository: this.userRepository },
+                { organizationRoles: ORGANIZATION_ORDER_ROLES },
+            );
+            if (!recipient) {
+                session.flash('error', i18n.t('messages.commandes.create.error'));
+                return response.redirect().back();
+            }
+            const { organizationId, organizationName, recipientUserId, requesterName } = recipient;
+
             const resources = await this.resourceRepository.all();
             const resourceById = new Map(resources.map((resource) => [resource.id, resource]));
+            const priceOverrides = organizationId ? await this.organizationResourcePriceRepository.findMapForOrganization(organizationId) : new Map<string, number>();
 
             const lines = requestedItems
                 .map((item) => {
                     const resource = resourceById.get(item.resourceId);
                     if (!resource) return null;
 
-                    const unitPrice = Number(resource.sellPrice);
+                    const unitPrice = priceOverrides.get(resource.id) ?? Number(resource.sellPrice);
                     return {
                         resourceId: resource.id,
                         resourceName: resource.name,
@@ -143,18 +172,6 @@ export default class CommandesController {
 
             const totalAmount = lines.reduce((sum, line) => sum + line.totalPrice, 0);
             const user = auth.user!;
-
-            const recipient = await resolveRecipient(
-                auth,
-                recipientData,
-                { organizationRepository: this.organizationRepository, userRepository: this.userRepository },
-                { organizationRoles: ORGANIZATION_ORDER_ROLES },
-            );
-            if (!recipient) {
-                session.flash('error', i18n.t('messages.commandes.create.error'));
-                return response.redirect().back();
-            }
-            const { organizationId, organizationName, recipientUserId, requesterName } = recipient;
 
             const order = await this.orderRepository.createWithLines({
                 userId: user.id,

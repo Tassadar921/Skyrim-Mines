@@ -148,7 +148,7 @@ function sortIcon(column: string) {
                 >
                     <div class="flex items-center justify-between gap-2">
                         <span class="text-sm font-medium">{{ t('admin.buybacks.table.weekBadge', { week: weeklyTotal.weekNumber }) }}</span>
-                        <Badge v-if="index === 0" variant="outline" class="text-xs">{{ t('admin.buybacks.weekly.current') }}</Badge>
+                        <Badge v-if="index === 0" variant="outline" class="text-xs">{{ t('admin.common.weekly.current') }}</Badge>
                     </div>
                     <div class="text-xs text-muted-foreground">{{ formatWeekRange(weeklyTotal) }}</div>
                     <div class="mt-1 text-sm font-medium">{{ weeklyTotal.totalAmount.toFixed(2) }} s</div>

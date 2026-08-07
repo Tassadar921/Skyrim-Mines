@@ -70,6 +70,15 @@ export type ScannedRoutes = {
     'admin.organizations.members.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.organizations.members.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'memberId': ParamValue} }
     'admin.organizations.members.updateRole': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'memberId': ParamValue} }
+    'admin.organizations.resourcePrices.update': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'resourceId': ParamValue} }
+    'admin.organizations.resourcePrices.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'resourceId': ParamValue} }
+    'admin.licenses.index': { paramsTuple?: []; params?: {} }
+    'admin.licenses.prices.update': { paramsTuple?: []; params?: {} }
+    'admin.licenses.subscribers.store': { paramsTuple?: []; params?: {} }
+    'admin.licenses.subscribers.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.licenses.subscribers.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.licenses.payments.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.licenses.payments.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   GET: {
     'event_stream': { paramsTuple?: []; params?: {} }
@@ -104,6 +113,8 @@ export type ScannedRoutes = {
     'admin.organizations.index': { paramsTuple?: []; params?: {} }
     'admin.organizations.create': { paramsTuple?: []; params?: {} }
     'admin.organizations.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.licenses.index': { paramsTuple?: []; params?: {} }
+    'admin.licenses.subscribers.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   HEAD: {
     'event_stream': { paramsTuple?: []; params?: {} }
@@ -138,6 +149,8 @@ export type ScannedRoutes = {
     'admin.organizations.index': { paramsTuple?: []; params?: {} }
     'admin.organizations.create': { paramsTuple?: []; params?: {} }
     'admin.organizations.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.licenses.index': { paramsTuple?: []; params?: {} }
+    'admin.licenses.subscribers.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   POST: {
     'subscribe': { paramsTuple?: []; params?: {} }
@@ -154,6 +167,8 @@ export type ScannedRoutes = {
     'admin.materials.store': { paramsTuple?: []; params?: {} }
     'admin.organizations.store': { paramsTuple?: []; params?: {} }
     'admin.organizations.members.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.licenses.subscribers.store': { paramsTuple?: []; params?: {} }
+    'admin.licenses.payments.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   PATCH: {
     'commandes.cancel': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -174,12 +189,17 @@ export type ScannedRoutes = {
     'admin.livraisons.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.organizations.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.organizations.members.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'memberId': ParamValue} }
+    'admin.organizations.resourcePrices.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'resourceId': ParamValue} }
+    'admin.licenses.subscribers.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.licenses.payments.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   PUT: {
     'admin.users.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.resources.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.materials.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.organizations.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.organizations.resourcePrices.update': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'resourceId': ParamValue} }
+    'admin.licenses.prices.update': { paramsTuple?: []; params?: {} }
   }
 }
 declare module '@adonisjs/core/types/http' {

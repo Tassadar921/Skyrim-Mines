@@ -109,6 +109,25 @@ export interface ApiDefinition {
         destroy: typeof routes['admin.organizations.members.destroy']
         updateRole: typeof routes['admin.organizations.members.updateRole']
       }
+      resourcePrices: {
+        update: typeof routes['admin.organizations.resourcePrices.update']
+        destroy: typeof routes['admin.organizations.resourcePrices.destroy']
+      }
+    }
+    licenses: {
+      index: typeof routes['admin.licenses.index']
+      prices: {
+        update: typeof routes['admin.licenses.prices.update']
+      }
+      subscribers: {
+        store: typeof routes['admin.licenses.subscribers.store']
+        show: typeof routes['admin.licenses.subscribers.show']
+        destroy: typeof routes['admin.licenses.subscribers.destroy']
+      }
+      payments: {
+        store: typeof routes['admin.licenses.payments.store']
+        destroy: typeof routes['admin.licenses.payments.destroy']
+      }
     }
   }
 }

@@ -76,6 +76,48 @@
                     "success": "Rôle mis à jour avec succès",
                     "error": "Erreur lors de la mise à jour du rôle"
                 }
+            },
+            "resourcePrices": {
+                "update": {
+                    "success": "Prix custom mis à jour avec succès",
+                    "error": "Erreur lors de la mise à jour du prix custom"
+                },
+                "destroy": {
+                    "success": "Prix custom réinitialisé avec succès",
+                    "error": "Erreur lors de la réinitialisation du prix custom"
+                }
+            }
+        },
+        "licenses": {
+            "prices": {
+                "update": {
+                    "success": "Tarifs mis à jour avec succès",
+                    "error": "Erreur lors de la mise à jour des tarifs"
+                }
+            },
+            "subscribers": {
+                "create": {
+                    "success": "Inscription ajoutée avec succès",
+                    "error": "Erreur lors de l'ajout de l'inscription",
+                    "missingUser": "Veuillez sélectionner un contractor ou un client",
+                    "userNotEligible": "Cet utilisateur doit être contractor ou client, et ne pas déjà être inscrit",
+                    "missingFields": "Veuillez renseigner l'identifiant Discord, le nom d'utilisateur et le rôle",
+                    "discordIdTaken": "Cet identifiant Discord est déjà utilisé par un autre compte"
+                },
+                "destroy": {
+                    "success": "Inscription supprimée avec succès",
+                    "error": "Erreur lors de la suppression de l'inscription"
+                }
+            },
+            "payments": {
+                "create": {
+                    "success": "Paiement enregistré avec succès",
+                    "error": "Erreur lors de l'enregistrement du paiement"
+                },
+                "destroy": {
+                    "success": "Paiement supprimé avec succès",
+                    "error": "Erreur lors de la suppression du paiement"
+                }
             }
         }
     },

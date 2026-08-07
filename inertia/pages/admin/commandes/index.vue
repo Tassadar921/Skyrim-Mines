@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import AdminLayout from '~/layouts/admin.vue';
 import { useAdminLayout } from '~/composables/use_admin_layout';
+import { useAuth } from '~/composables/use_auth';
 import { useI18n } from 'vue-i18n';
 import { ref } from 'vue';
 import { router } from '@inertiajs/vue3';
@@ -31,6 +32,7 @@ type OrderRow = {
 
 const { t } = useI18n();
 const { pageTitle } = useAdminLayout();
+const { isAdmin } = useAuth();
 pageTitle.value = t('admin.commandes.title');
 
 const props = defineProps<{
@@ -100,11 +102,11 @@ function lineSections(order: OrderRow): { type: string; label: string; lines: Or
 }
 
 function canValidate(order: OrderRow): boolean {
-    return order.status === 'pending';
+    return isAdmin.value && order.status === 'pending';
 }
 
 function canCancel(order: OrderRow): boolean {
-    return order.status === 'pending' || order.status === 'to_deliver';
+    return isAdmin.value && (order.status === 'pending' || order.status === 'to_deliver');
 }
 
 function validateOrder(order: OrderRow) {

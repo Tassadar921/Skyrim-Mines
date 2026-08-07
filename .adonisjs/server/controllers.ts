@@ -9,6 +9,7 @@ export const controllers = {
     Commandes: () => import('#controllers/admin/commandes_controller'),
     Dashboard: () => import('#controllers/admin/dashboard_controller'),
     Devis: () => import('#controllers/admin/devis_controller'),
+    Licenses: () => import('#controllers/admin/licenses_controller'),
     Livraisons: () => import('#controllers/admin/livraisons_controller'),
     Materials: () => import('#controllers/admin/materials_controller'),
     Organizations: () => import('#controllers/admin/organizations_controller'),
