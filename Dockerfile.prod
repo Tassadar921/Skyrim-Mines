@@ -50,4 +50,4 @@ USER app
 
 EXPOSE 8080
 
-CMD ["sh", "-c", "node ace cache:clear --force && node bin/server.js"]
+CMD ["sh", "-c", "node bin/server.js"]
