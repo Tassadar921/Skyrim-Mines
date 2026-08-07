@@ -186,6 +186,12 @@ const routes = {
     tokens: [{"old":"/admin","type":0,"val":"admin","end":""}],
     types: placeholder as Registry['admin.dashboard']['types'],
   },
+  'admin.dashboard.castellanyTax.update': {
+    methods: ["PUT"],
+    pattern: '/admin/castellany-tax',
+    tokens: [{"old":"/admin/castellany-tax","type":0,"val":"admin","end":""},{"old":"/admin/castellany-tax","type":0,"val":"castellany-tax","end":""}],
+    types: placeholder as Registry['admin.dashboard.castellanyTax.update']['types'],
+  },
   'admin.users.index': {
     methods: ["GET","HEAD"],
     pattern: '/admin/users',
@@ -215,6 +221,12 @@ const routes = {
     pattern: '/admin/users/:id',
     tokens: [{"old":"/admin/users/:id","type":0,"val":"admin","end":""},{"old":"/admin/users/:id","type":0,"val":"users","end":""},{"old":"/admin/users/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['admin.users.update']['types'],
+  },
+  'admin.users.updateBalance': {
+    methods: ["PUT"],
+    pattern: '/admin/users/:id/balance',
+    tokens: [{"old":"/admin/users/:id/balance","type":0,"val":"admin","end":""},{"old":"/admin/users/:id/balance","type":0,"val":"users","end":""},{"old":"/admin/users/:id/balance","type":1,"val":"id","end":""},{"old":"/admin/users/:id/balance","type":0,"val":"balance","end":""}],
+    types: placeholder as Registry['admin.users.updateBalance']['types'],
   },
   'admin.users.updateAvatar': {
     methods: ["POST"],

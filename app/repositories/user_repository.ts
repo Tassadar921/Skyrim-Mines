@@ -81,6 +81,17 @@ export default class UserRepository extends BaseRepository<typeof User> {
         await query.where('id', id).increment('balance', amount);
     }
 
+    /**
+     * Manual override of the amount owed to a user, restricted to staff/admins by the caller
+     * (only they can ever legitimately be owed money by the company).
+     */
+    public async setBalance(id: string, balance: number): Promise<User> {
+        const user = await User.findOrFail(id);
+        user.balance = balance.toFixed(2);
+        await user.save();
+        return user;
+    }
+
     public async findMembersForOrganization(organizationId: string): Promise<User[]> {
         return User.query().where('organizationId', organizationId).orderBy('organizationRole', 'asc').orderBy('username', 'asc');
     }

@@ -367,6 +367,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/dashboard_controller').default['index']>>>
     }
   }
+  'admin.dashboard.castellanyTax.update': {
+    methods: ["PUT"]
+    pattern: '/admin/castellany-tax'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/admin/castellany_tax').updateCastellanyTaxValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/admin/castellany_tax').updateCastellanyTaxValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/dashboard_controller').default['updateCastellanyTax']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/dashboard_controller').default['updateCastellanyTax']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'admin.users.index': {
     methods: ["GET","HEAD"]
     pattern: '/admin/users'
@@ -425,6 +437,18 @@ export interface Registry {
       query: ExtractQuery<InferInput<(typeof import('#validators/admin/users').updateUserValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/users_controller').default['update']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/users_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'admin.users.updateBalance': {
+    methods: ["PUT"]
+    pattern: '/admin/users/:id/balance'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/admin/users').updateUserBalanceValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/admin/users').updateUserBalanceValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/users_controller').default['updateBalance']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/users_controller').default['updateBalance']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'admin.users.updateAvatar': {

@@ -8,7 +8,7 @@ import OrganizationTransformer from '#transformers/organization_transformer';
 import UserRoleEnum from '#types/enum/user_role_enum';
 import type OrganizationRoleEnum from '#types/enum/organization_role_enum';
 import { storeUploadedFile, deleteStoredFile } from '#helpers/file_storage_helper';
-import { indexUserValidator, updateUserValidator, createUserValidator, updateUserAvatarValidator } from '#validators/admin/users';
+import { indexUserValidator, updateUserValidator, createUserValidator, updateUserAvatarValidator, updateUserBalanceValidator } from '#validators/admin/users';
 
 export default class UsersController {
     constructor(
@@ -94,6 +94,26 @@ export default class UsersController {
         } catch (e) {
             logger.error({ err: e }, 'users.update failed');
             session.flash('error', i18n.t('messages.admin.users.update.error'));
+        }
+
+        return response.redirect().back();
+    }
+
+    public async updateBalance({ request, params, response, session, i18n }: HttpContext) {
+        const { balance } = await request.validateUsing(updateUserBalanceValidator);
+
+        try {
+            const user = await this.userRepository.findOrFail(params.id);
+            if (user.role !== UserRoleEnum.STAFF && user.role !== UserRoleEnum.ADMIN) {
+                session.flash('error', i18n.t('messages.admin.users.balance.notEligible'));
+                return response.redirect().back();
+            }
+
+            await this.userRepository.setBalance(params.id, balance);
+            session.flash('success', i18n.t('messages.admin.users.balance.success'));
+        } catch (e) {
+            logger.error({ err: e }, 'users.updateBalance failed');
+            session.flash('error', i18n.t('messages.admin.users.balance.error'));
         }
 
         return response.redirect().back();

@@ -34,11 +34,13 @@ export type ScannedRoutes = {
     'auth.discord.callback': { paramsTuple?: []; params?: {} }
     'auth.logout': { paramsTuple?: []; params?: {} }
     'admin.dashboard': { paramsTuple?: []; params?: {} }
+    'admin.dashboard.castellanyTax.update': { paramsTuple?: []; params?: {} }
     'admin.users.index': { paramsTuple?: []; params?: {} }
     'admin.users.create': { paramsTuple?: []; params?: {} }
     'admin.users.store': { paramsTuple?: []; params?: {} }
     'admin.users.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.users.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.users.updateBalance': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.users.updateAvatar': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.users.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.resources.index': { paramsTuple?: []; params?: {} }
@@ -196,7 +198,9 @@ export type ScannedRoutes = {
     'admin.licenses.payments.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   PUT: {
+    'admin.dashboard.castellanyTax.update': { paramsTuple?: []; params?: {} }
     'admin.users.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.users.updateBalance': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.resources.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.materials.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.organizations.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }

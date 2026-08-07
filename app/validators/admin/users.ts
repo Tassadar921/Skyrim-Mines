@@ -16,6 +16,10 @@ export const updateUserValidator = vine.create({
     enabled: vine.boolean(),
 });
 
+export const updateUserBalanceValidator = vine.create({
+    balance: vine.number().min(0),
+});
+
 export const updateUserAvatarValidator = vine.create({
     avatar: vine.file({ size: '5mb', extnames: ['jpg', 'jpeg', 'png', 'webp'] }),
 });

@@ -254,7 +254,26 @@
             }
         },
         "dashboard": {
-            "title": "Tableau de bord"
+            "title": "Tableau de bord",
+            "castellanyTax": {
+                "title": "Taxe de la châtellerie",
+                "rate": "Taux (%)",
+                "save": "Mettre à jour"
+            },
+            "chart": {
+                "title": "Évolution hebdomadaire"
+            },
+            "weeklyRecap": {
+                "title": "Récap financier hebdomadaire",
+                "week": "Semaine",
+                "deliveries": "Livraisons",
+                "profit": "Bénéfice",
+                "weeklyTax": "Taxe hebdo",
+                "buybacks": "Rachats",
+                "licenses": "Licences",
+                "employeeDue": "Dû aux employés",
+                "empty": "Aucune donnée pour le moment"
+            }
         },
         "users": {
             "title": "Utilisateurs",
@@ -304,6 +323,16 @@
                     "upload": "Changer l'avatar",
                     "hint": "JPG, JPEG, PNG ou WEBP, 5 Mo maximum",
                     "empty": "Aucun avatar"
+                },
+                "balance": {
+                    "save": "Mettre à jour",
+                    "pay": "Payer",
+                    "payConfirm": {
+                        "title": "Payer cet utilisateur ?",
+                        "description": "Le montant dû à {username} ({amount} s) sera remis à zéro.",
+                        "cancel": "Annuler",
+                        "confirm": "Payer"
+                    }
                 }
             },
             "create": {
@@ -621,6 +650,7 @@
                 "resource": "Ressources",
                 "quantity": "Quantité",
                 "amount": "Montant",
+                "profit": "Bénéfice",
                 "actions": "Actions",
                 "empty": "Aucune livraison trouvée"
             },
@@ -632,7 +662,9 @@
                 "resource": "Ressource",
                 "quantity": "Quantité",
                 "unitPrice": "Prix unitaire",
-                "total": "Total"
+                "total": "Total",
+                "profit": "Bénéfice",
+                "profitUnknown": "Ressource supprimée"
             },
             "delete": {
                 "label": "Supprimer",

@@ -17,7 +17,7 @@ import { ArrowUp, ArrowDown, ArrowUpDown, ChevronDown, ChevronRight } from '@luc
 
 defineOptions({ layout: AdminLayout });
 
-type DeliveryLine = { resourceName: string; resourceType: string; quantity: number; unitPrice: number; totalPrice: number };
+type DeliveryLine = { resourceName: string; resourceType: string; quantity: number; unitPrice: number; totalPrice: number; profit: number | null };
 type DeliveryRow = {
     id: string;
     deliveredAt: string;
@@ -26,6 +26,7 @@ type DeliveryRow = {
     requesterName: string;
     organizationName: string | null;
     lines: DeliveryLine[];
+    totalProfit: number;
 };
 
 type WeeklyTotal = {
@@ -189,6 +190,7 @@ function deleteDelivery(delivery: DeliveryRow) {
                         <TableHead>{{ t('admin.livraisons.table.organization') }}</TableHead>
                         <TableHead>{{ t('admin.livraisons.table.resource') }}</TableHead>
                         <TableHead>{{ t('admin.livraisons.table.amount') }}</TableHead>
+                        <TableHead>{{ t('admin.livraisons.table.profit') }}</TableHead>
                         <TableHead>{{ t('admin.livraisons.table.actions') }}</TableHead>
                     </TableRow>
                 </TableHeader>
@@ -212,6 +214,7 @@ function deleteDelivery(delivery: DeliveryRow) {
                                 </TableCell>
                                 <TableCell class="text-sm font-medium">{{ resourceSummary(delivery) }}</TableCell>
                                 <TableCell class="text-sm font-medium">{{ deliveryTotal(delivery).toFixed(2) }} s</TableCell>
+                                <TableCell class="text-sm font-medium" :class="delivery.totalProfit >= 0 ? 'text-green-600' : 'text-destructive'">{{ delivery.totalProfit.toFixed(2) }} s</TableCell>
                                 <TableCell @click.stop>
                                     <DeleteButton
                                         v-if="isAdmin"
@@ -226,7 +229,7 @@ function deleteDelivery(delivery: DeliveryRow) {
                             </TableRow>
                             <TableRow v-if="expanded.has(delivery.id)">
                                 <TableCell />
-                                <TableCell :colspan="8" class="bg-muted/30 p-3">
+                                <TableCell :colspan="9" class="bg-muted/30 p-3">
                                     <Table>
                                         <TableHeader>
                                             <TableRow>
@@ -234,6 +237,7 @@ function deleteDelivery(delivery: DeliveryRow) {
                                                 <TableHead>{{ t('admin.livraisons.detail.quantity') }}</TableHead>
                                                 <TableHead>{{ t('admin.livraisons.detail.unitPrice') }}</TableHead>
                                                 <TableHead>{{ t('admin.livraisons.detail.total') }}</TableHead>
+                                                <TableHead>{{ t('admin.livraisons.detail.profit') }}</TableHead>
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
@@ -242,6 +246,10 @@ function deleteDelivery(delivery: DeliveryRow) {
                                                 <TableCell class="text-sm text-muted-foreground">{{ line.quantity }}</TableCell>
                                                 <TableCell class="text-sm text-muted-foreground">{{ line.unitPrice.toFixed(2) }} s</TableCell>
                                                 <TableCell class="text-sm font-medium">{{ line.totalPrice.toFixed(2) }} s</TableCell>
+                                                <TableCell class="text-sm font-medium">
+                                                    <span v-if="line.profit === null" class="text-muted-foreground italic">{{ t('admin.livraisons.detail.profitUnknown') }}</span>
+                                                    <span v-else :class="line.profit >= 0 ? 'text-green-600' : 'text-destructive'">{{ line.profit.toFixed(2) }} s</span>
+                                                </TableCell>
                                             </TableRow>
                                         </TableBody>
                                     </Table>
@@ -250,7 +258,7 @@ function deleteDelivery(delivery: DeliveryRow) {
                         </template>
                     </template>
                     <TableRow v-else>
-                        <TableCell :colspan="9" class="h-24 text-center text-muted-foreground">
+                        <TableCell :colspan="10" class="h-24 text-center text-muted-foreground">
                             {{ t('admin.livraisons.table.empty') }}
                         </TableCell>
                     </TableRow>

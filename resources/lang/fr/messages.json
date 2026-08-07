@@ -2,6 +2,14 @@
     "title": "Compagnie Minière de la Crevasse",
     "tooManyRequests": "Trop de tentatives. Veuillez patienter quelques minutes avant de réessayer.",
     "admin": {
+        "dashboard": {
+            "castellanyTax": {
+                "update": {
+                    "success": "Taxe de la châtellerie mise à jour avec succès",
+                    "error": "Erreur lors de la mise à jour de la taxe de la châtellerie"
+                }
+            }
+        },
         "users": {
             "update": {
                 "success": "Utilisateur mis à jour avec succès",
@@ -16,6 +24,11 @@
             "avatar": {
                 "success": "Avatar mis à jour avec succès",
                 "error": "Erreur lors de la mise à jour de l'avatar"
+            },
+            "balance": {
+                "success": "Montant dû mis à jour avec succès",
+                "error": "Erreur lors de la mise à jour du montant dû",
+                "notEligible": "Seuls les employés et les administrateurs peuvent avoir un montant dû"
             },
             "destroy": {
                 "success": "Utilisateur supprimé avec succès",

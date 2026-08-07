@@ -55,13 +55,18 @@ export interface ApiDefinition {
     logout: typeof routes['auth.logout']
   }
   admin: {
-    dashboard: typeof routes['admin.dashboard']
+    dashboard: typeof routes['admin.dashboard'] & {
+      castellanyTax: {
+        update: typeof routes['admin.dashboard.castellanyTax.update']
+      }
+    }
     users: {
       index: typeof routes['admin.users.index']
       create: typeof routes['admin.users.create']
       store: typeof routes['admin.users.store']
       show: typeof routes['admin.users.show']
       update: typeof routes['admin.users.update']
+      updateBalance: typeof routes['admin.users.updateBalance']
       updateAvatar: typeof routes['admin.users.updateAvatar']
       destroy: typeof routes['admin.users.destroy']
     }

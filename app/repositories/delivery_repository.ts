@@ -4,6 +4,7 @@ import BaseRepository from '#repositories/base/base_repository';
 import Delivery from '#models/delivery';
 import DeliveryLine from '#models/delivery_line';
 import Order from '#models/order';
+import Resource from '#models/resource';
 import OrderStatusEnum from '#types/enum/order_status_enum';
 import { getWeekNumber } from '#helpers/game_week_helper';
 
@@ -73,6 +74,10 @@ export default class DeliveryRepository extends BaseRepository<typeof Delivery> 
 
         if (!validLines.length) return null;
 
+        const resourceIds = [...new Set(validLines.map((line) => line.resourceId).filter((id): id is string => id !== null))];
+        const resources = resourceIds.length ? await Resource.query().whereIn('id', resourceIds) : [];
+        const buyPriceById = new Map(resources.map((resource) => [resource.id, Number(resource.buyPrice)]));
+
         const deliveredAt = DateTime.now();
         const delivery = await db.transaction(async (trx) => {
             const created = await Delivery.create(
@@ -86,6 +91,9 @@ export default class DeliveryRepository extends BaseRepository<typeof Delivery> 
             );
 
             for (const line of validLines) {
+                const buyPrice = line.resourceId ? (buyPriceById.get(line.resourceId) ?? null) : null;
+                const profit = buyPrice === null ? null : (line.unitPrice - buyPrice) * line.quantity;
+
                 await DeliveryLine.create(
                     {
                         deliveryId: created.id,
@@ -95,6 +103,7 @@ export default class DeliveryRepository extends BaseRepository<typeof Delivery> 
                         resourceType: line.resourceType,
                         quantity: line.quantity,
                         unitPrice: String(line.unitPrice),
+                        profit: profit === null ? null : String(profit),
                     },
                     { client: trx },
                 );
@@ -148,19 +157,21 @@ export default class DeliveryRepository extends BaseRepository<typeof Delivery> 
         return q.paginate(page, perPage);
     }
 
-    public async getWeeklyTotals(): Promise<{ weekNumber: number; deliveryCount: number; totalAmount: number }[]> {
+    public async getWeeklyTotals(): Promise<{ weekNumber: number; deliveryCount: number; totalAmount: number; totalProfit: number }[]> {
         const rows = await db
             .from('deliveries')
             .join('delivery_lines', 'delivery_lines.delivery_id', 'deliveries.id')
             .select('deliveries.delivered_week_number as weekNumber')
             .countDistinct('deliveries.id as deliveryCount')
             .select(db.raw('SUM(delivery_lines.quantity * delivery_lines.unit_price) as "totalAmount"'))
+            .select(db.raw('SUM(delivery_lines.profit) as "totalProfit"'))
             .groupBy('deliveries.delivered_week_number');
 
         return rows.map((row) => ({
             weekNumber: row.weekNumber,
             deliveryCount: Number(row.deliveryCount),
             totalAmount: Number(row.totalAmount ?? 0),
+            totalProfit: Number(row.totalProfit ?? 0),
         }));
     }
 }

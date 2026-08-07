@@ -7,6 +7,19 @@
 import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 
+export class CastellanyTaxSchema extends BaseModel {
+  static $columns = ['createdAt', 'id', 'rate', 'updatedAt'] as const
+  $columns = CastellanyTaxSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare rate: number
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class DeliverySchema extends BaseModel {
   static $columns = ['createdAt', 'deliveredAt', 'deliveredByUserId', 'deliveredWeekNumber', 'id', 'orderId', 'updatedAt'] as const
   $columns = DeliverySchema.$columns
@@ -27,7 +40,7 @@ export class DeliverySchema extends BaseModel {
 }
 
 export class DeliveryLineSchema extends BaseModel {
-  static $columns = ['createdAt', 'deliveryId', 'id', 'orderLineId', 'quantity', 'resourceId', 'resourceName', 'resourceType', 'unitPrice', 'updatedAt'] as const
+  static $columns = ['createdAt', 'deliveryId', 'id', 'orderLineId', 'profit', 'quantity', 'resourceId', 'resourceName', 'resourceType', 'unitPrice', 'updatedAt'] as const
   $columns = DeliveryLineSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -37,6 +50,8 @@ export class DeliveryLineSchema extends BaseModel {
   declare id: string
   @column()
   declare orderLineId: string | null
+  @column()
+  declare profit: string | null
   @column()
   declare quantity: number
   @column()

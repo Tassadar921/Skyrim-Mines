@@ -4,6 +4,7 @@ import { Head, router, usePage } from '@inertiajs/vue3';
 import { useI18n } from 'vue-i18n';
 import { useAuth } from '~/composables/use_auth';
 import { getTransmit } from '~/lib/transmit';
+import { canHaveBalance } from '~/lib/user_balance';
 import { urlFor } from '~/client';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '~/components/ui/table';
 import { Button } from '~/components/ui/button';
@@ -91,14 +92,14 @@ onMounted(async () => {
     barrelSubscription = getTransmit().subscription('barrel');
     await barrelSubscription.create();
     barrelSubscription.onMessage(() => {
-        router.reload({ only: ['resources'], preserveScroll: true });
+        router.reload({ only: ['resources'] });
     });
 
     if (canSeeToDeliver) {
         toDeliverSubscription = getTransmit().subscription('to-deliver');
         await toDeliverSubscription.create();
         toDeliverSubscription.onMessage(() => {
-            router.reload({ only: ['ordersToDeliver'], preserveScroll: true });
+            router.reload({ only: ['ordersToDeliver'] });
         });
     }
 });
@@ -115,7 +116,7 @@ onUnmounted(() => {
         <div class="flex flex-col items-center text-center gap-6">
             <img :src="'/logo.png'" alt="Compagnie Minière de la Crevasse" class="size-20" />
             <h1 class="font-serif text-4xl font-light text-slate-800 dark:text-slate-100">{{ t('home.title') }}</h1>
-            <p v-if="page.props.user" class="text-sm text-slate-600 dark:text-slate-300">
+            <p v-if="page.props.user && canHaveBalance(page.props.user.role)" class="text-sm text-slate-600 dark:text-slate-300">
                 {{ t('home.balance', { amount: page.props.user.balance.toFixed(2) }) }}
             </p>
             <div class="flex items-center gap-3">

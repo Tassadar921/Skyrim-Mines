@@ -12,8 +12,20 @@ import { Label } from '~/components/ui/label';
 import { Checkbox } from '~/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select';
 import DeleteButton from '~/components/ui/DeleteButton.vue';
+import {
+    AlertDialog,
+    AlertDialogTrigger,
+    AlertDialogContent,
+    AlertDialogHeader,
+    AlertDialogFooter,
+    AlertDialogTitle,
+    AlertDialogDescription,
+    AlertDialogCancel,
+    AlertDialogAction,
+} from '~/components/ui/alert-dialog';
 import { Link } from '@adonisjs/inertia/vue';
-import { ArrowLeft, UserCircle } from '@lucide/vue';
+import { ArrowLeft, UserCircle, HandCoins } from '@lucide/vue';
+import { canHaveBalance } from '~/lib/user_balance';
 import type { Data } from '@generated/data';
 
 defineOptions({ layout: AdminLayout });
@@ -48,6 +60,40 @@ function submit() {
 
 function destroyUser() {
     router.delete(urlFor('admin.users.destroy', { id: props.targetUser.id }));
+}
+
+const balance = ref(props.targetUser.balance);
+const isSubmittingBalance = ref(false);
+
+function submitBalance() {
+    isSubmittingBalance.value = true;
+    router.put(
+        urlFor('admin.users.updateBalance', { id: props.targetUser.id }),
+        { balance: balance.value },
+        {
+            preserveScroll: true,
+            onFinish: () => {
+                isSubmittingBalance.value = false;
+            },
+        },
+    );
+}
+
+function payBalance() {
+    isSubmittingBalance.value = true;
+    router.put(
+        urlFor('admin.users.updateBalance', { id: props.targetUser.id }),
+        { balance: 0 },
+        {
+            preserveScroll: true,
+            onSuccess: () => {
+                balance.value = 0;
+            },
+            onFinish: () => {
+                isSubmittingBalance.value = false;
+            },
+        },
+    );
 }
 
 const avatarInputRef = ref<HTMLInputElement | null>(null);
@@ -139,8 +185,39 @@ function onAvatarChange(event: Event) {
             </div>
         </div>
 
+        <div v-if="canHaveBalance(targetUser.role)" class="rounded-md border p-5 space-y-1">
+            <Label for="balance">{{ $t('admin.users.show.fields.balance') }}</Label>
+            <div class="flex items-center gap-2">
+                <div class="w-40">
+                    <Input id="balance" v-model.number="balance" type="number" step="0.01" min="0" :readonly="!isAdmin" />
+                </div>
+                <Button v-if="isAdmin" size="sm" :loading="isSubmittingBalance" :disabled="isSubmittingBalance" @click="submitBalance">
+                    {{ $t('admin.users.show.balance.save') }}
+                </Button>
+                <AlertDialog v-if="isAdmin">
+                    <AlertDialogTrigger as-child>
+                        <Button variant="outline" size="sm" class="gap-1" :disabled="isSubmittingBalance || balance <= 0">
+                            <HandCoins class="size-4" />
+                            {{ t('admin.users.show.balance.pay') }}
+                        </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>{{ t('admin.users.show.balance.payConfirm.title') }}</AlertDialogTitle>
+                            <AlertDialogDescription>
+                                {{ t('admin.users.show.balance.payConfirm.description', { username: props.targetUser.username, amount: balance.toFixed(2) }) }}
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel>{{ t('admin.users.show.balance.payConfirm.cancel') }}</AlertDialogCancel>
+                            <AlertDialogAction @click="payBalance">{{ t('admin.users.show.balance.payConfirm.confirm') }}</AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
+            </div>
+        </div>
+
         <div class="text-xs text-muted-foreground space-y-0.5 px-1">
-            <div>{{ $t('admin.users.show.fields.balance') }} : {{ targetUser.balance.toFixed(2) }} s</div>
             <div>
                 {{ $t('admin.users.show.fields.id') }} :
                 <span class="font-mono">{{ targetUser.id }}</span>

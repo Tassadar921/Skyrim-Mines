@@ -14,6 +14,7 @@ import { Checkbox } from '~/components/ui/checkbox';
 import { Label } from '~/components/ui/label';
 import { Link } from '@adonisjs/inertia/vue';
 import { ArrowUp, ArrowDown, ArrowUpDown, Eye, CheckCircle, XCircle, Plus, UserCircle } from '@lucide/vue';
+import { canHaveBalance } from '~/lib/user_balance';
 import type { Data } from '@generated/data';
 
 defineOptions({ layout: AdminLayout });
@@ -134,7 +135,7 @@ function sortIcon(column: string) {
                                 <CheckCircle v-if="user.enabled" class="size-4 text-green-600" />
                                 <XCircle v-else class="size-4 text-muted-foreground" />
                             </TableCell>
-                            <TableCell class="text-sm text-muted-foreground">{{ user.balance.toFixed(2) }} s</TableCell>
+                            <TableCell class="text-sm text-muted-foreground">{{ canHaveBalance(user.role) ? `${user.balance.toFixed(2)} s` : '—' }}</TableCell>
                             <TableCell class="text-sm text-muted-foreground">{{ new Date(user.createdAt).toLocaleDateString(undefined, { timeZone: 'UTC' }) }}</TableCell>
                             <TableCell>
                                 <Link :route="'admin.users.show'" :params="{ id: user.id }">

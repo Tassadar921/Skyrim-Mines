@@ -44,21 +44,31 @@ export default class LivraisonsController {
         }
 
         return inertia.render('admin/livraisons/index', {
-            deliveries: deliveries.all().map((delivery) => ({
-                id: delivery.id,
-                deliveredAt: delivery.deliveredAt.toISO()!,
-                weekNumber: delivery.deliveredWeekNumber,
-                orderNumber: delivery.order.number,
-                requesterName: delivery.order.requesterName,
-                organizationName: delivery.order.organizationName,
-                lines: delivery.lines.map((line) => ({
-                    resourceName: line.resourceName,
-                    resourceType: line.resourceType,
-                    quantity: line.quantity,
-                    unitPrice: Number(line.unitPrice),
-                    totalPrice: line.quantity * Number(line.unitPrice),
-                })),
-            })),
+            deliveries: deliveries.all().map((delivery) => {
+                const lines = delivery.lines.map((line) => {
+                    const unitPrice = Number(line.unitPrice);
+
+                    return {
+                        resourceName: line.resourceName,
+                        resourceType: line.resourceType,
+                        quantity: line.quantity,
+                        unitPrice,
+                        totalPrice: line.quantity * unitPrice,
+                        profit: line.profit === null ? null : Number(line.profit),
+                    };
+                });
+
+                return {
+                    id: delivery.id,
+                    deliveredAt: delivery.deliveredAt.toISO()!,
+                    weekNumber: delivery.deliveredWeekNumber,
+                    orderNumber: delivery.order.number,
+                    requesterName: delivery.order.requesterName,
+                    organizationName: delivery.order.organizationName,
+                    lines,
+                    totalProfit: lines.reduce((sum, line) => sum + (line.profit ?? 0), 0),
+                };
+            }),
             meta: {
                 total: deliveries.total,
                 currentPage: deliveries.currentPage,

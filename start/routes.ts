@@ -50,12 +50,14 @@ const readOnly = middleware.admin({ roles: [UserRoleEnum.ADMIN, UserRoleEnum.AUD
 router
     .group((): void => {
         router.get('/', [controllers.admin.Dashboard, 'index']).as('admin.dashboard').use(readOnly);
+        router.put('/castellany-tax', [controllers.admin.Dashboard, 'updateCastellanyTax']).as('admin.dashboard.castellanyTax.update').use(middleware.admin());
 
         router.get('/users', [controllers.admin.Users, 'index']).as('admin.users.index').use(readOnly);
         router.get('/users/create', [controllers.admin.Users, 'create']).as('admin.users.create').use(middleware.admin());
         router.post('/users', [controllers.admin.Users, 'store']).as('admin.users.store').use(middleware.admin());
         router.get('/users/:id', [controllers.admin.Users, 'show']).as('admin.users.show').use(readOnly);
         router.put('/users/:id', [controllers.admin.Users, 'update']).as('admin.users.update').use(middleware.admin());
+        router.put('/users/:id/balance', [controllers.admin.Users, 'updateBalance']).as('admin.users.updateBalance').use(middleware.admin());
         router.post('/users/:id/avatar', [controllers.admin.Users, 'updateAvatar']).as('admin.users.updateAvatar').use(middleware.admin());
         router.delete('/users/:id', [controllers.admin.Users, 'destroy']).as('admin.users.destroy').use(middleware.admin());
 
