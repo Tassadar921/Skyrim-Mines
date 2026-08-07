@@ -42,5 +42,9 @@ declare module '@adonisjs/inertia/types' {
     'organization/show': ExtractProps<(typeof import('../../inertia/pages/organization/show.vue'))['default']>
     'stocks': ExtractProps<(typeof import('../../inertia/pages/stocks.vue'))['default']>
     'tarifs': ExtractProps<(typeof import('../../inertia/pages/tarifs.vue'))['default']>
+    'admin/commandes/archive': ExtractProps<(typeof import('../../inertia/pages/admin/commandes/archive.vue'))['default']>
+    'admin/castellanies/index': ExtractProps<(typeof import('../../inertia/pages/admin/castellanies/index.vue'))['default']>
+    'admin/castellanies/create': ExtractProps<(typeof import('../../inertia/pages/admin/castellanies/create.vue'))['default']>
+    'admin/castellanies/show': ExtractProps<(typeof import('../../inertia/pages/admin/castellanies/show.vue'))['default']>
   }
 }

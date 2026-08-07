@@ -2,11 +2,31 @@
     "title": "Compagnie Minière de la Crevasse",
     "tooManyRequests": "Trop de tentatives. Veuillez patienter quelques minutes avant de réessayer.",
     "admin": {
+        "castellanies": {
+            "create": {
+                "success": "Châtellerie créée avec succès",
+                "error": "Erreur lors de la création de la châtellerie"
+            },
+            "update": {
+                "success": "Châtellerie mise à jour avec succès",
+                "error": "Erreur lors de la mise à jour de la châtellerie"
+            },
+            "destroy": {
+                "success": "Châtellerie supprimée avec succès",
+                "error": "Erreur lors de la suppression de la châtellerie"
+            }
+        },
         "dashboard": {
             "castellanyTax": {
                 "update": {
                     "success": "Taxe de la châtellerie mise à jour avec succès",
                     "error": "Erreur lors de la mise à jour de la taxe de la châtellerie"
+                }
+            },
+            "largeOrderSetting": {
+                "update": {
+                    "success": "Seuil de grosse commande mis à jour avec succès",
+                    "error": "Erreur lors de la mise à jour du seuil de grosse commande"
                 }
             }
         },
@@ -35,6 +55,14 @@
                 "error": "Erreur lors de la suppression de l'utilisateur",
                 "linked": "Impossible de supprimer cet utilisateur : des devis, commandes ou mouvements de ressources lui sont liés. Désactivez plutôt son compte.",
                 "self": "Vous ne pouvez pas supprimer votre propre compte"
+            }
+        },
+        "orderArchives": {
+            "create": {
+                "success": "Commande archivée avec succès",
+                "error": "Erreur lors de l'archivage de la commande",
+                "invalidOrderWeek": "La semaine de la commande doit être comprise entre la semaine 1 et la semaine en cours",
+                "invalidDeliveryWeek": "La semaine de livraison doit être postérieure ou égale à la semaine de la commande, et ne peut pas dépasser la semaine en cours"
             }
         },
         "resources": {

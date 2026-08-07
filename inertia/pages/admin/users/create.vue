@@ -26,13 +26,13 @@ const form = useForm({
     discordId: '',
     username: '',
     role: '',
-    organizationMode: 'existing',
+    organizationMode: 'none',
     organizationId: '',
     organizationName: '',
     organizationRole: '',
 });
 
-const isClient = computed(() => form.role === 'client');
+const isClient = computed(() => form.role === 'client' || form.role === 'auditor');
 
 function submit() {
     form.transform((data) => ({
@@ -84,43 +84,46 @@ function submit() {
                             <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
+                            <SelectItem value="none">{{ t('admin.users.create.fields.organizationModeNone') }}</SelectItem>
                             <SelectItem value="existing">{{ t('admin.users.create.fields.organizationModeExisting') }}</SelectItem>
                             <SelectItem value="new">{{ t('admin.users.create.fields.organizationModeNew') }}</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
 
-                <div v-if="form.organizationMode === 'existing'" class="space-y-1">
-                    <Label>{{ t('admin.users.create.fields.organization') }}</Label>
-                    <Select v-model="form.organizationId">
-                        <SelectTrigger>
-                            <SelectValue :placeholder="t('admin.users.create.fields.organizationPlaceholder')" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem v-for="organization in props.organizations" :key="organization.id" :value="organization.id">
-                                {{ organization.name }}
-                            </SelectItem>
-                        </SelectContent>
-                    </Select>
-                    <p v-if="form.errors.organizationId" class="text-sm text-destructive">{{ form.errors.organizationId }}</p>
-                </div>
+                <template v-if="form.organizationMode !== 'none'">
+                    <div v-if="form.organizationMode === 'existing'" class="space-y-1">
+                        <Label>{{ t('admin.users.create.fields.organization') }}</Label>
+                        <Select v-model="form.organizationId">
+                            <SelectTrigger>
+                                <SelectValue :placeholder="t('admin.users.create.fields.organizationPlaceholder')" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem v-for="organization in props.organizations" :key="organization.id" :value="organization.id">
+                                    {{ organization.name }}
+                                </SelectItem>
+                            </SelectContent>
+                        </Select>
+                        <p v-if="form.errors.organizationId" class="text-sm text-destructive">{{ form.errors.organizationId }}</p>
+                    </div>
 
-                <Input v-else v-model="form.organizationName" :label="t('admin.users.create.fields.organizationName')" :error="form.errors.organizationName" maxlength="100" />
+                    <Input v-else v-model="form.organizationName" :label="t('admin.users.create.fields.organizationName')" :error="form.errors.organizationName" maxlength="100" />
 
-                <div class="space-y-1">
-                    <Label>{{ t('admin.users.create.fields.organizationRole') }}</Label>
-                    <Select v-model="form.organizationRole">
-                        <SelectTrigger>
-                            <SelectValue :placeholder="t('admin.users.create.fields.organizationRolePlaceholder')" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="owner">{{ t('organization.roles.owner') }}</SelectItem>
-                            <SelectItem value="admin">{{ t('organization.roles.admin') }}</SelectItem>
-                            <SelectItem value="staff">{{ t('organization.roles.staff') }}</SelectItem>
-                        </SelectContent>
-                    </Select>
-                    <p v-if="form.errors.organizationRole" class="text-sm text-destructive">{{ form.errors.organizationRole }}</p>
-                </div>
+                    <div class="space-y-1">
+                        <Label>{{ t('admin.users.create.fields.organizationRole') }}</Label>
+                        <Select v-model="form.organizationRole">
+                            <SelectTrigger>
+                                <SelectValue :placeholder="t('admin.users.create.fields.organizationRolePlaceholder')" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="owner">{{ t('organization.roles.owner') }}</SelectItem>
+                                <SelectItem value="admin">{{ t('organization.roles.admin') }}</SelectItem>
+                                <SelectItem value="staff">{{ t('organization.roles.staff') }}</SelectItem>
+                            </SelectContent>
+                        </Select>
+                        <p v-if="form.errors.organizationRole" class="text-sm text-destructive">{{ form.errors.organizationRole }}</p>
+                    </div>
+                </template>
             </template>
 
             <Button :loading="form.processing" :disabled="form.processing" @click="submit">

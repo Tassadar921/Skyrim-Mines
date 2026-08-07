@@ -9,6 +9,8 @@ import { urlFor } from '~/client';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '~/components/ui/table';
 import { Button } from '~/components/ui/button';
 import { Badge } from '~/components/ui/badge';
+import { Label } from '~/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select';
 import {
     AlertDialog,
     AlertDialogTrigger,
@@ -33,6 +35,7 @@ type OrderToDeliver = {
     number: number;
     requesterName: string;
     organizationName: string | null;
+    defaultCastellanyId: string | null;
     lines: RemainingLine[];
 };
 
@@ -43,7 +46,25 @@ const page = usePage<Data.SharedProps>();
 const props = defineProps<{
     resources: ResourceWithBarrel[];
     ordersToDeliver: OrderToDeliver[];
+    castellanies: { id: string; name: string; commissionRate: number }[];
 }>();
+
+const PICKUP = 'pickup';
+
+const deliveryCastellany = reactive<Record<string, string>>({});
+
+function syncDeliveryCastellany(orders: OrderToDeliver[]) {
+    for (const orderId of Object.keys(deliveryCastellany)) {
+        if (!orders.some((order) => order.id === orderId)) delete deliveryCastellany[orderId];
+    }
+    for (const order of orders) {
+        if (deliveryCastellany[order.id] === undefined) {
+            deliveryCastellany[order.id] = order.defaultCastellanyId ?? PICKUP;
+        }
+    }
+}
+
+watch(() => props.ordersToDeliver, syncDeliveryCastellany, { immediate: true, deep: true });
 
 function formatOrderNumber(number: number): string {
     return String(number).padStart(5, '0');
@@ -75,7 +96,8 @@ function hasSelection(order: OrderToDeliver): boolean {
 
 function confirmDelivery(order: OrderToDeliver) {
     const lines = order.lines.map((line) => ({ orderLineId: line.orderLineId, quantity: deliveryQuantities[order.id]?.[line.orderLineId] ?? 0 }));
-    router.post(urlFor('livraisons.store', { orderId: order.id }), { lines }, { preserveScroll: true });
+    const castellanyId = deliveryCastellany[order.id] === PICKUP ? null : deliveryCastellany[order.id];
+    router.post(urlFor('livraisons.store', { orderId: order.id }), { lines, castellanyId }, { preserveScroll: true });
 }
 
 const minerais = computed(() => props.resources.filter((r) => r.type === 'minerai' && r.quantityBarrel > 0));
@@ -163,10 +185,23 @@ onUnmounted(() => {
                     </Table>
                 </div>
 
-                <div class="flex justify-end">
+                <div class="flex items-end justify-between gap-4">
+                    <div class="space-y-1 max-w-xs w-full">
+                        <Label>{{ t('home.toDeliver.castellany') }}</Label>
+                        <Select v-model="deliveryCastellany[order.id]">
+                            <SelectTrigger>
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem :value="PICKUP">{{ t('home.toDeliver.castellanyPickup') }}</SelectItem>
+                                <SelectItem v-for="castellany in props.castellanies" :key="castellany.id" :value="castellany.id">{{ castellany.name }}</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+
                     <AlertDialog>
                         <AlertDialogTrigger as-child>
-                            <Button size="sm" class="gap-1" :disabled="!hasSelection(order)">
+                            <Button size="sm" class="gap-1 shrink-0" :disabled="!hasSelection(order)">
                                 <PackageCheck class="size-4" />
                                 {{ t('home.toDeliver.deliverButton') }}
                             </Button>

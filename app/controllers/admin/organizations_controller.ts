@@ -4,10 +4,13 @@ import OrganizationRepository from '#repositories/organization_repository';
 import UserRepository from '#repositories/user_repository';
 import ResourceRepository from '#repositories/resource_repository';
 import OrganizationResourcePriceRepository from '#repositories/organization_resource_price_repository';
+import CastellanyRepository from '#repositories/castellany_repository';
 import UserTransformer from '#transformers/user_transformer';
 import OrganizationTransformer from '#transformers/organization_transformer';
 import ResourceTransformer from '#transformers/resource_transformer';
+import CastellanyTransformer from '#transformers/castellany_transformer';
 import UserRoleEnum from '#types/enum/user_role_enum';
+import { isClientOrAuditor } from '#helpers/user_role_helper';
 import { createOrganizationValidator, updateOrganizationValidator, storeOrganizationMemberValidator, updateOrganizationMemberRoleValidator } from '#validators/admin/organizations';
 import { upsertOrganizationResourcePriceValidator } from '#validators/admin/organization_resource_prices';
 
@@ -17,6 +20,7 @@ export default class OrganizationsController {
         private readonly userRepository: UserRepository = new UserRepository(),
         private readonly resourceRepository: ResourceRepository = new ResourceRepository(),
         private readonly organizationResourcePriceRepository: OrganizationResourcePriceRepository = new OrganizationResourcePriceRepository(),
+        private readonly castellanyRepository: CastellanyRepository = new CastellanyRepository(),
     ) {}
 
     public async index({ inertia }: HttpContext) {
@@ -26,7 +30,11 @@ export default class OrganizationsController {
     }
 
     public async create({ inertia }: HttpContext) {
-        return inertia.render('admin/organizations/create', {});
+        const castellanies = await this.castellanyRepository.all();
+
+        return inertia.render('admin/organizations/create', {
+            castellanies: castellanies.map((castellany) => new CastellanyTransformer(castellany).toObject()),
+        });
     }
 
     public async store({ request, response, session, i18n }: HttpContext) {
@@ -50,6 +58,7 @@ export default class OrganizationsController {
         const resources = await this.resourceRepository.all();
         const resourcePrices = await this.organizationResourcePriceRepository.findForOrganization(params.id);
         const customSellPrices = Object.fromEntries(resourcePrices.map((price) => [price.resourceId, Number(price.sellPrice)]));
+        const castellanies = await this.castellanyRepository.all();
 
         return inertia.render('admin/organizations/show', {
             organization: new OrganizationTransformer(organization).toObject(),
@@ -57,6 +66,7 @@ export default class OrganizationsController {
             eligibleUsers: eligibleUsers.map((user) => ({ id: user.id, username: user.username })),
             resources: resources.map((resource) => new ResourceTransformer(resource).toObject()),
             customSellPrices,
+            castellanies: castellanies.map((castellany) => new CastellanyTransformer(castellany).toObject()),
         });
     }
 
@@ -97,7 +107,7 @@ export default class OrganizationsController {
                 }
 
                 const target = await this.userRepository.findOrFail(data.userId);
-                if (target.role !== UserRoleEnum.CLIENT || target.organizationId) {
+                if (!isClientOrAuditor(target.role) || target.organizationId) {
                     session.flash('error', i18n.t('messages.admin.organizations.members.create.userNotEligible'));
                     return response.redirect().back();
                 }

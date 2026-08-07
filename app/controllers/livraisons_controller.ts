@@ -14,10 +14,10 @@ export default class LivraisonsController {
             return response.redirect().toRoute('home');
         }
 
-        const { lines } = await request.validateUsing(createDeliveryValidator);
+        const { lines, castellanyId } = await request.validateUsing(createDeliveryValidator);
         const requestedLines = lines.filter((line) => line.quantity > 0);
 
-        const delivery = requestedLines.length ? await this.deliveryRepository.createForOrder(params.orderId, viewer.id, requestedLines) : null;
+        const delivery = requestedLines.length ? await this.deliveryRepository.createForOrder(params.orderId, viewer.id, requestedLines, { castellanyId: castellanyId ?? null }) : null;
         if (delivery) transmit.broadcast('to-deliver', {});
 
         session.flash(delivery ? 'success' : 'error', i18n.t(delivery ? 'messages.livraisons.create.success' : 'messages.livraisons.create.error'));

@@ -59,6 +59,9 @@ export interface ApiDefinition {
       castellanyTax: {
         update: typeof routes['admin.dashboard.castellanyTax.update']
       }
+      largeOrderSetting: {
+        update: typeof routes['admin.dashboard.largeOrderSetting.update']
+      }
     }
     users: {
       index: typeof routes['admin.users.index']
@@ -88,6 +91,14 @@ export interface ApiDefinition {
       update: typeof routes['admin.materials.update']
       destroy: typeof routes['admin.materials.destroy']
     }
+    castellanies: {
+      index: typeof routes['admin.castellanies.index']
+      create: typeof routes['admin.castellanies.create']
+      store: typeof routes['admin.castellanies.store']
+      show: typeof routes['admin.castellanies.show']
+      update: typeof routes['admin.castellanies.update']
+      destroy: typeof routes['admin.castellanies.destroy']
+    }
     buybacks: {
       index: typeof routes['admin.buybacks.index']
     }
@@ -98,6 +109,10 @@ export interface ApiDefinition {
       index: typeof routes['admin.commandes.index']
       validate: typeof routes['admin.commandes.validate']
       cancel: typeof routes['admin.commandes.cancel']
+    }
+    orderArchives: {
+      create: typeof routes['admin.orderArchives.create']
+      store: typeof routes['admin.orderArchives.store']
     }
     livraisons: {
       index: typeof routes['admin.livraisons.index']

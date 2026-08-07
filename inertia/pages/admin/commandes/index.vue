@@ -10,7 +10,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '~
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Badge } from '~/components/ui/badge';
-import { ArrowUp, ArrowDown, ArrowUpDown, ChevronDown, ChevronRight, Download, CircleCheck } from '@lucide/vue';
+import { ArrowUp, ArrowDown, ArrowUpDown, ChevronDown, ChevronRight, Download, CircleCheck, Archive } from '@lucide/vue';
+import { Link } from '@adonisjs/inertia/vue';
 import CancelOrderButton from '~/partials/commande/CancelOrderButton.vue';
 import { orderStatusVariant, orderStatusLabelKey } from '~/lib/order_status';
 import { deliveryProgressLabel } from '~/lib/delivery_progress';
@@ -122,6 +123,12 @@ function cancelOrder(order: OrderRow) {
     <div class="space-y-4">
         <div class="flex items-center justify-between">
             <Badge variant="outline">{{ meta.total }} {{ t('admin.commandes.table.count', meta.total) }}</Badge>
+            <Button v-if="isAdmin" variant="outline" class="gap-2" as-child>
+                <Link :href="urlFor('admin.orderArchives.create')">
+                    <Archive class="size-4" />
+                    {{ t('admin.commandes.archiveLink') }}
+                </Link>
+            </Button>
         </div>
 
         <div class="flex items-center gap-2">

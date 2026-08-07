@@ -6,6 +6,7 @@ import UserTransformer from '#transformers/user_transformer';
 import OrganizationTransformer from '#transformers/organization_transformer';
 import UserRoleEnum from '#types/enum/user_role_enum';
 import OrganizationRoleEnum from '#types/enum/organization_role_enum';
+import { isClientOrAuditor } from '#helpers/user_role_helper';
 import { storeOrganizationMemberValidator, updateOrganizationMemberRoleValidator } from '#validators/organization';
 
 export default class OrganizationController {
@@ -46,7 +47,7 @@ export default class OrganizationController {
                 }
 
                 const target = await this.userRepository.findOrFail(data.userId);
-                if (target.role !== UserRoleEnum.CLIENT || target.organizationId) {
+                if (!isClientOrAuditor(target.role) || target.organizationId) {
                     session.flash('error', i18n.t('messages.organization.members.create.userNotEligible'));
                     return response.redirect().back();
                 }

@@ -12,6 +12,8 @@ ChartJS.register(CategoryScale, LinearScale, LineElement, PointElement, Filler, 
 type WeeklyRecap = {
     weekNumber: number;
     deliveriesAmount: number;
+    commissionsAmount: number;
+    largeOrderFeesAmount: number;
     profit: number;
     weeklyTax: number;
     buybacksAmount: number;
@@ -21,6 +23,8 @@ type WeeklyRecap = {
 
 const METRICS = [
     { value: 'deliveriesAmount', labelKey: 'admin.dashboard.weeklyRecap.deliveries' },
+    { value: 'commissionsAmount', labelKey: 'admin.dashboard.weeklyRecap.commissions' },
+    { value: 'largeOrderFeesAmount', labelKey: 'admin.dashboard.weeklyRecap.largeOrderFees' },
     { value: 'profit', labelKey: 'admin.dashboard.weeklyRecap.profit' },
     { value: 'weeklyTax', labelKey: 'admin.dashboard.weeklyRecap.weeklyTax' },
     { value: 'buybacksAmount', labelKey: 'admin.dashboard.weeklyRecap.buybacks' },

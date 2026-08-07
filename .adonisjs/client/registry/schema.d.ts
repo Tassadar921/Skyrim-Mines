@@ -379,6 +379,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/dashboard_controller').default['updateCastellanyTax']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'admin.dashboard.largeOrderSetting.update': {
+    methods: ["PUT"]
+    pattern: '/admin/large-order-threshold'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/admin/large_order_setting').updateLargeOrderSettingValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/admin/large_order_setting').updateLargeOrderSettingValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/dashboard_controller').default['updateLargeOrderSetting']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/dashboard_controller').default['updateLargeOrderSetting']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'admin.users.index': {
     methods: ["GET","HEAD"]
     pattern: '/admin/users'
@@ -643,6 +655,78 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/materials_controller').default['destroy']>>>
     }
   }
+  'admin.castellanies.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/admin/castellanies'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/castellanies_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/castellanies_controller').default['index']>>>
+    }
+  }
+  'admin.castellanies.create': {
+    methods: ["GET","HEAD"]
+    pattern: '/admin/castellanies/create'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/castellanies_controller').default['create']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/castellanies_controller').default['create']>>>
+    }
+  }
+  'admin.castellanies.store': {
+    methods: ["POST"]
+    pattern: '/admin/castellanies'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/admin/castellanies').createCastellanyValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/admin/castellanies').createCastellanyValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/castellanies_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/castellanies_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'admin.castellanies.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/admin/castellanies/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/castellanies_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/castellanies_controller').default['show']>>>
+    }
+  }
+  'admin.castellanies.update': {
+    methods: ["PUT"]
+    pattern: '/admin/castellanies/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/admin/castellanies').updateCastellanyValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/admin/castellanies').updateCastellanyValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/castellanies_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/castellanies_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'admin.castellanies.destroy': {
+    methods: ["DELETE"]
+    pattern: '/admin/castellanies/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/castellanies_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/castellanies_controller').default['destroy']>>>
+    }
+  }
   'admin.buybacks.index': {
     methods: ["GET","HEAD"]
     pattern: '/admin/buybacks'
@@ -701,6 +785,30 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/commandes_controller').default['cancel']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/commandes_controller').default['cancel']>>>
+    }
+  }
+  'admin.orderArchives.create': {
+    methods: ["GET","HEAD"]
+    pattern: '/admin/commandes/archiver'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/order_archives_controller').default['create']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/order_archives_controller').default['create']>>>
+    }
+  }
+  'admin.orderArchives.store': {
+    methods: ["POST"]
+    pattern: '/admin/commandes/archiver'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/admin/order_archives').createOrderArchiveValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/admin/order_archives').createOrderArchiveValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/order_archives_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/order_archives_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'admin.livraisons.index': {

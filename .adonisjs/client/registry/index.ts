@@ -192,6 +192,12 @@ const routes = {
     tokens: [{"old":"/admin/castellany-tax","type":0,"val":"admin","end":""},{"old":"/admin/castellany-tax","type":0,"val":"castellany-tax","end":""}],
     types: placeholder as Registry['admin.dashboard.castellanyTax.update']['types'],
   },
+  'admin.dashboard.largeOrderSetting.update': {
+    methods: ["PUT"],
+    pattern: '/admin/large-order-threshold',
+    tokens: [{"old":"/admin/large-order-threshold","type":0,"val":"admin","end":""},{"old":"/admin/large-order-threshold","type":0,"val":"large-order-threshold","end":""}],
+    types: placeholder as Registry['admin.dashboard.largeOrderSetting.update']['types'],
+  },
   'admin.users.index': {
     methods: ["GET","HEAD"],
     pattern: '/admin/users',
@@ -324,6 +330,42 @@ const routes = {
     tokens: [{"old":"/admin/materials/:id","type":0,"val":"admin","end":""},{"old":"/admin/materials/:id","type":0,"val":"materials","end":""},{"old":"/admin/materials/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['admin.materials.destroy']['types'],
   },
+  'admin.castellanies.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/admin/castellanies',
+    tokens: [{"old":"/admin/castellanies","type":0,"val":"admin","end":""},{"old":"/admin/castellanies","type":0,"val":"castellanies","end":""}],
+    types: placeholder as Registry['admin.castellanies.index']['types'],
+  },
+  'admin.castellanies.create': {
+    methods: ["GET","HEAD"],
+    pattern: '/admin/castellanies/create',
+    tokens: [{"old":"/admin/castellanies/create","type":0,"val":"admin","end":""},{"old":"/admin/castellanies/create","type":0,"val":"castellanies","end":""},{"old":"/admin/castellanies/create","type":0,"val":"create","end":""}],
+    types: placeholder as Registry['admin.castellanies.create']['types'],
+  },
+  'admin.castellanies.store': {
+    methods: ["POST"],
+    pattern: '/admin/castellanies',
+    tokens: [{"old":"/admin/castellanies","type":0,"val":"admin","end":""},{"old":"/admin/castellanies","type":0,"val":"castellanies","end":""}],
+    types: placeholder as Registry['admin.castellanies.store']['types'],
+  },
+  'admin.castellanies.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/admin/castellanies/:id',
+    tokens: [{"old":"/admin/castellanies/:id","type":0,"val":"admin","end":""},{"old":"/admin/castellanies/:id","type":0,"val":"castellanies","end":""},{"old":"/admin/castellanies/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['admin.castellanies.show']['types'],
+  },
+  'admin.castellanies.update': {
+    methods: ["PUT"],
+    pattern: '/admin/castellanies/:id',
+    tokens: [{"old":"/admin/castellanies/:id","type":0,"val":"admin","end":""},{"old":"/admin/castellanies/:id","type":0,"val":"castellanies","end":""},{"old":"/admin/castellanies/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['admin.castellanies.update']['types'],
+  },
+  'admin.castellanies.destroy': {
+    methods: ["DELETE"],
+    pattern: '/admin/castellanies/:id',
+    tokens: [{"old":"/admin/castellanies/:id","type":0,"val":"admin","end":""},{"old":"/admin/castellanies/:id","type":0,"val":"castellanies","end":""},{"old":"/admin/castellanies/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['admin.castellanies.destroy']['types'],
+  },
   'admin.buybacks.index': {
     methods: ["GET","HEAD"],
     pattern: '/admin/buybacks',
@@ -353,6 +395,18 @@ const routes = {
     pattern: '/admin/commandes/:id/cancel',
     tokens: [{"old":"/admin/commandes/:id/cancel","type":0,"val":"admin","end":""},{"old":"/admin/commandes/:id/cancel","type":0,"val":"commandes","end":""},{"old":"/admin/commandes/:id/cancel","type":1,"val":"id","end":""},{"old":"/admin/commandes/:id/cancel","type":0,"val":"cancel","end":""}],
     types: placeholder as Registry['admin.commandes.cancel']['types'],
+  },
+  'admin.orderArchives.create': {
+    methods: ["GET","HEAD"],
+    pattern: '/admin/commandes/archiver',
+    tokens: [{"old":"/admin/commandes/archiver","type":0,"val":"admin","end":""},{"old":"/admin/commandes/archiver","type":0,"val":"commandes","end":""},{"old":"/admin/commandes/archiver","type":0,"val":"archiver","end":""}],
+    types: placeholder as Registry['admin.orderArchives.create']['types'],
+  },
+  'admin.orderArchives.store': {
+    methods: ["POST"],
+    pattern: '/admin/commandes/archiver',
+    tokens: [{"old":"/admin/commandes/archiver","type":0,"val":"admin","end":""},{"old":"/admin/commandes/archiver","type":0,"val":"commandes","end":""},{"old":"/admin/commandes/archiver","type":0,"val":"archiver","end":""}],
+    types: placeholder as Registry['admin.orderArchives.store']['types'],
   },
   'admin.livraisons.index': {
     methods: ["GET","HEAD"],

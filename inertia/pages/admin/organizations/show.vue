@@ -28,23 +28,27 @@ type Member = Data.User;
 type EligibleUser = { id: string; username: string };
 
 const props = defineProps<{
-    organization: { id: string; name: string };
+    organization: { id: string; name: string; castellanyId: string | null };
     members: Member[];
     eligibleUsers: EligibleUser[];
     resources: Data.Resource[];
     customSellPrices: Record<string, number>;
+    castellanies: { id: string; name: string }[];
 }>();
 
 pageTitle.value = `${t('admin.organizations.show.title')} - ${props.organization.name}`;
 
+const NO_CASTELLANY = 'none';
+
 const name = ref(props.organization.name);
+const castellanyId = ref(props.organization.castellanyId ?? NO_CASTELLANY);
 const isSubmitting = ref(false);
 
 function submit() {
     isSubmitting.value = true;
     router.put(
         urlFor('admin.organizations.update', { id: props.organization.id }),
-        { name: name.value },
+        { name: name.value, castellanyId: castellanyId.value === NO_CASTELLANY ? undefined : castellanyId.value },
         {
             onFinish: () => {
                 isSubmitting.value = false;
@@ -145,6 +149,19 @@ function resetResourcePrice(resourceId: string) {
 
         <div class="rounded-md border p-5 space-y-4 max-w-lg">
             <Input v-model="name" :label="t('admin.organizations.create.fields.name')" maxlength="100" required :readonly="!isAdmin" />
+
+            <div class="space-y-1">
+                <Label>{{ t('admin.organizations.create.fields.castellany') }}</Label>
+                <Select v-model="castellanyId" :disabled="!isAdmin">
+                    <SelectTrigger>
+                        <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem :value="NO_CASTELLANY">{{ t('admin.organizations.create.fields.castellanyNone') }}</SelectItem>
+                        <SelectItem v-for="castellany in props.castellanies" :key="castellany.id" :value="castellany.id">{{ castellany.name }}</SelectItem>
+                    </SelectContent>
+                </Select>
+            </div>
         </div>
 
         <div class="space-y-3">

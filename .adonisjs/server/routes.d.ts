@@ -35,6 +35,7 @@ export type ScannedRoutes = {
     'auth.logout': { paramsTuple?: []; params?: {} }
     'admin.dashboard': { paramsTuple?: []; params?: {} }
     'admin.dashboard.castellanyTax.update': { paramsTuple?: []; params?: {} }
+    'admin.dashboard.largeOrderSetting.update': { paramsTuple?: []; params?: {} }
     'admin.users.index': { paramsTuple?: []; params?: {} }
     'admin.users.create': { paramsTuple?: []; params?: {} }
     'admin.users.store': { paramsTuple?: []; params?: {} }
@@ -57,11 +58,19 @@ export type ScannedRoutes = {
     'admin.materials.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.materials.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.materials.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.castellanies.index': { paramsTuple?: []; params?: {} }
+    'admin.castellanies.create': { paramsTuple?: []; params?: {} }
+    'admin.castellanies.store': { paramsTuple?: []; params?: {} }
+    'admin.castellanies.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.castellanies.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.castellanies.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.buybacks.index': { paramsTuple?: []; params?: {} }
     'admin.devis.index': { paramsTuple?: []; params?: {} }
     'admin.commandes.index': { paramsTuple?: []; params?: {} }
     'admin.commandes.validate': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.commandes.cancel': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.orderArchives.create': { paramsTuple?: []; params?: {} }
+    'admin.orderArchives.store': { paramsTuple?: []; params?: {} }
     'admin.livraisons.index': { paramsTuple?: []; params?: {} }
     'admin.livraisons.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.organizations.index': { paramsTuple?: []; params?: {} }
@@ -109,9 +118,13 @@ export type ScannedRoutes = {
     'admin.materials.index': { paramsTuple?: []; params?: {} }
     'admin.materials.create': { paramsTuple?: []; params?: {} }
     'admin.materials.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.castellanies.index': { paramsTuple?: []; params?: {} }
+    'admin.castellanies.create': { paramsTuple?: []; params?: {} }
+    'admin.castellanies.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.buybacks.index': { paramsTuple?: []; params?: {} }
     'admin.devis.index': { paramsTuple?: []; params?: {} }
     'admin.commandes.index': { paramsTuple?: []; params?: {} }
+    'admin.orderArchives.create': { paramsTuple?: []; params?: {} }
     'admin.livraisons.index': { paramsTuple?: []; params?: {} }
     'admin.organizations.index': { paramsTuple?: []; params?: {} }
     'admin.organizations.create': { paramsTuple?: []; params?: {} }
@@ -145,9 +158,13 @@ export type ScannedRoutes = {
     'admin.materials.index': { paramsTuple?: []; params?: {} }
     'admin.materials.create': { paramsTuple?: []; params?: {} }
     'admin.materials.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.castellanies.index': { paramsTuple?: []; params?: {} }
+    'admin.castellanies.create': { paramsTuple?: []; params?: {} }
+    'admin.castellanies.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.buybacks.index': { paramsTuple?: []; params?: {} }
     'admin.devis.index': { paramsTuple?: []; params?: {} }
     'admin.commandes.index': { paramsTuple?: []; params?: {} }
+    'admin.orderArchives.create': { paramsTuple?: []; params?: {} }
     'admin.livraisons.index': { paramsTuple?: []; params?: {} }
     'admin.organizations.index': { paramsTuple?: []; params?: {} }
     'admin.organizations.create': { paramsTuple?: []; params?: {} }
@@ -168,6 +185,8 @@ export type ScannedRoutes = {
     'admin.users.updateAvatar': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.resources.store': { paramsTuple?: []; params?: {} }
     'admin.materials.store': { paramsTuple?: []; params?: {} }
+    'admin.castellanies.store': { paramsTuple?: []; params?: {} }
+    'admin.orderArchives.store': { paramsTuple?: []; params?: {} }
     'admin.organizations.store': { paramsTuple?: []; params?: {} }
     'admin.organizations.members.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.licenses.subscribers.store': { paramsTuple?: []; params?: {} }
@@ -190,6 +209,7 @@ export type ScannedRoutes = {
     'admin.users.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.resources.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.materials.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.castellanies.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.livraisons.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.organizations.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.organizations.members.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'memberId': ParamValue} }
@@ -199,10 +219,12 @@ export type ScannedRoutes = {
   }
   PUT: {
     'admin.dashboard.castellanyTax.update': { paramsTuple?: []; params?: {} }
+    'admin.dashboard.largeOrderSetting.update': { paramsTuple?: []; params?: {} }
     'admin.users.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.users.updateBalance': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.resources.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.materials.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.castellanies.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.organizations.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.organizations.resourcePrices.update': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'resourceId': ParamValue} }
     'admin.licenses.prices.update': { paramsTuple?: []; params?: {} }

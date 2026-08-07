@@ -1,8 +1,10 @@
+import { DateTime } from 'luxon';
 import db from '@adonisjs/lucid/services/db';
 import BaseRepository from '#repositories/base/base_repository';
 import Order from '#models/order';
 import OrderLine from '#models/order_line';
 import OrderStatusEnum from '#types/enum/order_status_enum';
+import { getWeekNumber } from '#helpers/game_week_helper';
 
 export type OrderLineInput = {
     resourceId: string;
@@ -49,6 +51,7 @@ export default class OrderRepository extends BaseRepository<typeof Order> {
         requesterName: string;
         totalAmount: number;
         lines: OrderLineInput[];
+        weekNumber?: number;
     }): Promise<Order> {
         return db.transaction(async (trx) => {
             const order = await Order.create(
@@ -59,6 +62,7 @@ export default class OrderRepository extends BaseRepository<typeof Order> {
                     recipientUserId: data.recipientUserId,
                     requesterName: data.requesterName,
                     totalAmount: String(data.totalAmount),
+                    weekNumber: data.weekNumber ?? getWeekNumber(DateTime.now()),
                 },
                 { client: trx },
             );

@@ -6,6 +6,7 @@ export default class OrganizationTransformer extends BaseTransformer<Organizatio
         return {
             id: this.resource.id,
             name: this.resource.name,
+            castellanyId: this.resource.castellanyId,
         };
     }
 }

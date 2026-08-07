@@ -34,13 +34,14 @@ export default class OrganizationRepository extends BaseRepository<typeof Organi
         return Organization.findOrFail(id);
     }
 
-    public async create(data: { name: string }): Promise<Organization> {
-        return Organization.create({ name: data.name });
+    public async create(data: { name: string; castellanyId?: string | null }): Promise<Organization> {
+        return Organization.create({ name: data.name, castellanyId: data.castellanyId ?? null });
     }
 
-    public async update(id: string, data: { name: string }): Promise<Organization> {
+    public async update(id: string, data: { name: string; castellanyId?: string | null }): Promise<Organization> {
         const organization = await Organization.findOrFail(id);
         organization.name = data.name;
+        organization.castellanyId = data.castellanyId ?? null;
         await organization.save();
         return organization;
     }

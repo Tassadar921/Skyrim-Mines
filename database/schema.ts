@@ -7,6 +7,23 @@
 import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 
+export class CastellanySchema extends BaseModel {
+  static $columns = ['commissionRate', 'createdAt', 'id', 'largeOrderFeeRate', 'name', 'updatedAt'] as const
+  $columns = CastellanySchema.$columns
+  @column()
+  declare commissionRate: number
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare largeOrderFeeRate: number
+  @column()
+  declare name: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class CastellanyTaxSchema extends BaseModel {
   static $columns = ['createdAt', 'id', 'rate', 'updatedAt'] as const
   $columns = CastellanyTaxSchema.$columns
@@ -21,8 +38,12 @@ export class CastellanyTaxSchema extends BaseModel {
 }
 
 export class DeliverySchema extends BaseModel {
-  static $columns = ['createdAt', 'deliveredAt', 'deliveredByUserId', 'deliveredWeekNumber', 'id', 'orderId', 'updatedAt'] as const
+  static $columns = ['castellanyId', 'commissionAmount', 'createdAt', 'deliveredAt', 'deliveredByUserId', 'deliveredWeekNumber', 'id', 'largeOrderFeeAmount', 'orderId', 'updatedAt'] as const
   $columns = DeliverySchema.$columns
+  @column()
+  declare castellanyId: string | null
+  @column()
+  declare commissionAmount: string
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
   @column.dateTime()
@@ -33,6 +54,8 @@ export class DeliverySchema extends BaseModel {
   declare deliveredWeekNumber: number
   @column({ isPrimary: true })
   declare id: string
+  @column()
+  declare largeOrderFeeAmount: string
   @column()
   declare orderId: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })
@@ -81,6 +104,19 @@ export class FileSchema extends BaseModel {
   declare path: string
   @column()
   declare size: number
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
+export class LargeOrderSettingSchema extends BaseModel {
+  static $columns = ['createdAt', 'id', 'thresholdQuantity', 'updatedAt'] as const
+  $columns = LargeOrderSettingSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare thresholdQuantity: number
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
 }
@@ -190,7 +226,7 @@ export class OrderLineSchema extends BaseModel {
 }
 
 export class OrderSchema extends BaseModel {
-  static $columns = ['createdAt', 'fileId', 'id', 'number', 'organizationId', 'organizationName', 'recipientUserId', 'requesterName', 'status', 'totalAmount', 'updatedAt', 'userId'] as const
+  static $columns = ['createdAt', 'fileId', 'id', 'number', 'organizationId', 'organizationName', 'recipientUserId', 'requesterName', 'status', 'totalAmount', 'updatedAt', 'userId', 'weekNumber'] as const
   $columns = OrderSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -216,6 +252,8 @@ export class OrderSchema extends BaseModel {
   declare updatedAt: DateTime | null
   @column()
   declare userId: string
+  @column()
+  declare weekNumber: number
 }
 
 export class OrganizationResourcePriceSchema extends BaseModel {
@@ -236,8 +274,10 @@ export class OrganizationResourcePriceSchema extends BaseModel {
 }
 
 export class OrganizationSchema extends BaseModel {
-  static $columns = ['createdAt', 'id', 'name', 'updatedAt'] as const
+  static $columns = ['castellanyId', 'createdAt', 'id', 'name', 'updatedAt'] as const
   $columns = OrganizationSchema.$columns
+  @column()
+  declare castellanyId: string | null
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
   @column({ isPrimary: true })

@@ -15,6 +15,8 @@ export const controllers = {
     Organizations: () => import('#controllers/admin/organizations_controller'),
     Resources: () => import('#controllers/admin/resources_controller'),
     Users: () => import('#controllers/admin/users_controller'),
+    OrderArchives: () => import('#controllers/admin/order_archives_controller'),
+    Castellanies: () => import('#controllers/admin/castellanies_controller'),
   },
   Auth: () => import('#controllers/auth_controller'),
   Buybacks: () => import('#controllers/buybacks_controller'),

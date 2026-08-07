@@ -7,6 +7,7 @@ import UserTransformer from '#transformers/user_transformer';
 import OrganizationTransformer from '#transformers/organization_transformer';
 import UserRoleEnum from '#types/enum/user_role_enum';
 import type OrganizationRoleEnum from '#types/enum/organization_role_enum';
+import { isClientOrAuditor } from '#helpers/user_role_helper';
 import { storeUploadedFile, deleteStoredFile } from '#helpers/file_storage_helper';
 import { indexUserValidator, updateUserValidator, createUserValidator, updateUserAvatarValidator, updateUserBalanceValidator } from '#validators/admin/users';
 
@@ -139,7 +140,7 @@ export default class UsersController {
             let organizationId: string | null = null;
             let organizationRole: OrganizationRoleEnum | null = null;
 
-            if (data.role === UserRoleEnum.CLIENT && data.organizationMode) {
+            if (isClientOrAuditor(data.role) && (data.organizationMode === 'existing' || data.organizationMode === 'new')) {
                 organizationRole = (data.organizationRole as OrganizationRoleEnum) ?? null;
 
                 if (!organizationRole) {

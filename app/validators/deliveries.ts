@@ -7,4 +7,5 @@ export const createDeliveryValidator = vine.create({
             quantity: vine.number().min(0),
         }),
     ),
+    castellanyId: vine.string().uuid().nullable().optional(),
 });

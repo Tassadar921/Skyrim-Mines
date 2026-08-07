@@ -51,6 +51,7 @@ router
     .group((): void => {
         router.get('/', [controllers.admin.Dashboard, 'index']).as('admin.dashboard').use(readOnly);
         router.put('/castellany-tax', [controllers.admin.Dashboard, 'updateCastellanyTax']).as('admin.dashboard.castellanyTax.update').use(middleware.admin());
+        router.put('/large-order-threshold', [controllers.admin.Dashboard, 'updateLargeOrderSetting']).as('admin.dashboard.largeOrderSetting.update').use(middleware.admin());
 
         router.get('/users', [controllers.admin.Users, 'index']).as('admin.users.index').use(readOnly);
         router.get('/users/create', [controllers.admin.Users, 'create']).as('admin.users.create').use(middleware.admin());
@@ -77,6 +78,13 @@ router
         router.put('/materials/:id', [controllers.admin.Materials, 'update']).as('admin.materials.update').use(middleware.admin());
         router.delete('/materials/:id', [controllers.admin.Materials, 'destroy']).as('admin.materials.destroy').use(middleware.admin());
 
+        router.get('/castellanies', [controllers.admin.Castellanies, 'index']).as('admin.castellanies.index').use(readOnly);
+        router.get('/castellanies/create', [controllers.admin.Castellanies, 'create']).as('admin.castellanies.create').use(middleware.admin());
+        router.post('/castellanies', [controllers.admin.Castellanies, 'store']).as('admin.castellanies.store').use(middleware.admin());
+        router.get('/castellanies/:id', [controllers.admin.Castellanies, 'show']).as('admin.castellanies.show').use(readOnly);
+        router.put('/castellanies/:id', [controllers.admin.Castellanies, 'update']).as('admin.castellanies.update').use(middleware.admin());
+        router.delete('/castellanies/:id', [controllers.admin.Castellanies, 'destroy']).as('admin.castellanies.destroy').use(middleware.admin());
+
         router.get('/buybacks', [controllers.admin.Buybacks, 'index']).as('admin.buybacks.index').use(readOnly);
 
         router.get('/devis', [controllers.admin.Devis, 'index']).as('admin.devis.index').use(readOnly);
@@ -84,6 +92,8 @@ router
         router.get('/commandes', [controllers.admin.Commandes, 'index']).as('admin.commandes.index').use(readOnly);
         router.patch('/commandes/:id/validate', [controllers.admin.Commandes, 'validate']).as('admin.commandes.validate').use(middleware.admin());
         router.patch('/commandes/:id/cancel', [controllers.admin.Commandes, 'cancel']).as('admin.commandes.cancel').use(middleware.admin());
+        router.get('/commandes/archiver', [controllers.admin.OrderArchives, 'create']).as('admin.orderArchives.create').use(middleware.admin());
+        router.post('/commandes/archiver', [controllers.admin.OrderArchives, 'store']).as('admin.orderArchives.store').use(middleware.admin());
 
         router.get('/livraisons', [controllers.admin.Livraisons, 'index']).as('admin.livraisons.index').use(readOnly);
         router.delete('/livraisons/:id', [controllers.admin.Livraisons, 'destroy']).as('admin.livraisons.destroy').use(middleware.admin());

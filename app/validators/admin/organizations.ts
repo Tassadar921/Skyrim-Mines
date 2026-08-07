@@ -3,6 +3,7 @@ import OrganizationRoleEnum from '#types/enum/organization_role_enum';
 
 export const createOrganizationValidator = vine.create({
     name: vine.string().trim().minLength(1).maxLength(100),
+    castellanyId: vine.string().uuid().optional(),
 });
 
 export const updateOrganizationValidator = createOrganizationValidator;

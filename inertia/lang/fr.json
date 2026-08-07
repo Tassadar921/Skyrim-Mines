@@ -12,6 +12,8 @@
             "count": "commande à livrer | commande à livrer | commandes à livrer",
             "remaining": "Restant à livrer",
             "quantityToDeliver": "Quantité à livrer",
+            "castellany": "Châtellerie de destination",
+            "castellanyPickup": "Retrait sur place",
             "deliverButton": "Enregistrer la livraison",
             "deliverConfirm": {
                 "title": "Confirmer cette livraison ?",
@@ -250,7 +252,8 @@
                 "buybacks": "Historique des rachats",
                 "devis": "Devis",
                 "commandes": "Commandes",
-                "livraisons": "Livraisons"
+                "livraisons": "Livraisons",
+                "castellanies": "Commission livraison"
             }
         },
         "dashboard": {
@@ -260,6 +263,11 @@
                 "rate": "Taux (%)",
                 "save": "Mettre à jour"
             },
+            "largeOrderSetting": {
+                "title": "Seuil grosse commande",
+                "threshold": "Quantité seuil",
+                "save": "Mettre à jour"
+            },
             "chart": {
                 "title": "Évolution hebdomadaire"
             },
@@ -267,6 +275,8 @@
                 "title": "Récap financier hebdomadaire",
                 "week": "Semaine",
                 "deliveries": "Livraisons",
+                "commissions": "Commissions livraison",
+                "largeOrderFees": "Frais grosse commande",
                 "profit": "Bénéfice",
                 "weeklyTax": "Taxe hebdo",
                 "buybacks": "Rachats",
@@ -345,6 +355,7 @@
                     "role": "Rôle",
                     "rolePlaceholder": "Sélectionner un rôle",
                     "organizationMode": "Organisation",
+                    "organizationModeNone": "Aucune organisation (client indépendant)",
                     "organizationModeExisting": "Rattacher à une organisation existante",
                     "organizationModeNew": "Créer une nouvelle organisation",
                     "organization": "Organisation",
@@ -352,6 +363,38 @@
                     "organizationName": "Nom de la nouvelle organisation",
                     "organizationRole": "Rôle dans l'organisation",
                     "organizationRolePlaceholder": "Sélectionner un rôle"
+                }
+            }
+        },
+        "castellanies": {
+            "title": "Commission livraison",
+            "new": "Nouvelle châtellerie",
+            "table": {
+                "name": "Châtellerie",
+                "commissionRate": "Commission",
+                "largeOrderFeeRate": "Frais grosse commande",
+                "empty": "Aucune châtellerie enregistrée"
+            },
+            "create": {
+                "title": "Nouvelle châtellerie",
+                "back": "Retour à la liste",
+                "submit": "Créer",
+                "fields": {
+                    "name": "Nom de la châtellerie",
+                    "commissionRate": "Commission (%)",
+                    "largeOrderFeeRate": "Frais grosse commande (%)"
+                }
+            },
+            "show": {
+                "title": "Châtellerie",
+                "back": "Retour à la liste",
+                "save": "Enregistrer",
+                "delete": "Supprimer",
+                "deleteConfirm": {
+                    "title": "Supprimer cette châtellerie ?",
+                    "description": "{name} sera supprimée définitivement. Les organisations et livraisons qui la référencent perdront cette information.",
+                    "cancel": "Annuler",
+                    "confirm": "Supprimer"
                 }
             }
         },
@@ -373,7 +416,9 @@
                 "back": "Retour à la liste",
                 "submit": "Créer",
                 "fields": {
-                    "name": "Nom de l'organisation"
+                    "name": "Nom de l'organisation",
+                    "castellany": "Châtellerie par défaut",
+                    "castellanyNone": "Aucune"
                 }
             },
             "show": {
@@ -632,6 +677,23 @@
             },
             "actions": {
                 "validate": "Valider"
+            },
+            "archiveLink": "Archiver une commande"
+        },
+        "orderArchives": {
+            "create": {
+                "title": "Archiver une commande",
+                "back": "Retour à la liste",
+                "description": "Enregistrez une commande et sa livraison pour une semaine passée, par exemple pour archiver une commande passée avant la mise en place de l'application. La commande est immédiatement marquée comme entièrement livrée.",
+                "submit": "Archiver",
+                "fields": {
+                    "recipient": "Client ou organisation",
+                    "recipientPlaceholder": "Sélectionner un destinataire",
+                    "orderWeek": "Semaine de la commande",
+                    "orderWeekHint": "Doit être comprise entre la semaine 1 et la semaine en cours ({current})",
+                    "deliveryWeek": "Semaine de la livraison",
+                    "deliveryWeekHint": "Doit être postérieure ou égale à la semaine de la commande ({order}) et ne peut pas dépasser la semaine en cours ({current})"
+                }
             }
         },
         "livraisons": {
@@ -644,6 +706,8 @@
                 "requester": "Demandé par",
                 "organization": "Organisation",
                 "noOrganization": "Aucune",
+                "castellany": "Châtellerie",
+                "castellanyPickup": "Retrait sur place",
                 "week": "Semaine",
                 "weekBadge": "Semaine {week}",
                 "allWeeks": "Toutes les semaines",
@@ -651,6 +715,8 @@
                 "quantity": "Quantité",
                 "amount": "Montant",
                 "profit": "Bénéfice",
+                "commission": "Commission",
+                "largeOrderFee": "Frais grosse commande",
                 "actions": "Actions",
                 "empty": "Aucune livraison trouvée"
             },

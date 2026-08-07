@@ -97,18 +97,18 @@ export default class UserRepository extends BaseRepository<typeof User> {
     }
 
     /**
-     * Independent clients: not staff/admin/auditor/contractor of the company, and not already tied to an organization.
+     * Independent clients or auditors: not staff/admin/contractor of the company, and not already tied to an organization.
      */
     public async findEligibleIndependentClients(): Promise<User[]> {
-        return User.query().where('role', UserRoleEnum.CLIENT).whereNull('organizationId').orderBy('username', 'asc');
+        return User.query().whereIn('role', [UserRoleEnum.CLIENT, UserRoleEnum.AUDITOR]).whereNull('organizationId').orderBy('username', 'asc');
     }
 
     /**
-     * All clients, whether independent or already tied to an organization. Used by staff/admins
+     * All clients and auditors, whether independent or already tied to an organization. Used by staff/admins
      * to pick a third-party recipient when requesting a quote on someone else's behalf.
      */
     public async findAllClients(): Promise<User[]> {
-        return User.query().where('role', UserRoleEnum.CLIENT).orderBy('username', 'asc');
+        return User.query().whereIn('role', [UserRoleEnum.CLIENT, UserRoleEnum.AUDITOR]).orderBy('username', 'asc');
     }
 
     public async attachToOrganization(id: string, organizationId: string, organizationRole: OrganizationRoleEnum): Promise<void> {

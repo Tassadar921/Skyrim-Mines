@@ -25,6 +25,9 @@ type DeliveryRow = {
     orderNumber: number;
     requesterName: string;
     organizationName: string | null;
+    castellanyName: string | null;
+    commissionAmount: number;
+    largeOrderFeeAmount: number;
     lines: DeliveryLine[];
     totalProfit: number;
 };
@@ -188,9 +191,12 @@ function deleteDelivery(delivery: DeliveryRow) {
                         <TableHead>{{ t('admin.livraisons.table.order') }}</TableHead>
                         <TableHead>{{ t('admin.livraisons.table.requester') }}</TableHead>
                         <TableHead>{{ t('admin.livraisons.table.organization') }}</TableHead>
+                        <TableHead>{{ t('admin.livraisons.table.castellany') }}</TableHead>
                         <TableHead>{{ t('admin.livraisons.table.resource') }}</TableHead>
                         <TableHead>{{ t('admin.livraisons.table.amount') }}</TableHead>
                         <TableHead>{{ t('admin.livraisons.table.profit') }}</TableHead>
+                        <TableHead>{{ t('admin.livraisons.table.commission') }}</TableHead>
+                        <TableHead>{{ t('admin.livraisons.table.largeOrderFee') }}</TableHead>
                         <TableHead>{{ t('admin.livraisons.table.actions') }}</TableHead>
                     </TableRow>
                 </TableHeader>
@@ -212,9 +218,15 @@ function deleteDelivery(delivery: DeliveryRow) {
                                     <span v-if="delivery.organizationName">{{ delivery.organizationName }}</span>
                                     <span v-else class="italic">{{ t('admin.livraisons.table.noOrganization') }}</span>
                                 </TableCell>
+                                <TableCell class="text-sm text-muted-foreground">
+                                    <span v-if="delivery.castellanyName">{{ delivery.castellanyName }}</span>
+                                    <span v-else class="italic">{{ t('admin.livraisons.table.castellanyPickup') }}</span>
+                                </TableCell>
                                 <TableCell class="text-sm font-medium">{{ resourceSummary(delivery) }}</TableCell>
                                 <TableCell class="text-sm font-medium">{{ deliveryTotal(delivery).toFixed(2) }} s</TableCell>
                                 <TableCell class="text-sm font-medium" :class="delivery.totalProfit >= 0 ? 'text-green-600' : 'text-destructive'">{{ delivery.totalProfit.toFixed(2) }} s</TableCell>
+                                <TableCell class="text-sm text-muted-foreground">{{ delivery.commissionAmount.toFixed(2) }} s</TableCell>
+                                <TableCell class="text-sm text-muted-foreground">{{ delivery.largeOrderFeeAmount.toFixed(2) }} s</TableCell>
                                 <TableCell @click.stop>
                                     <DeleteButton
                                         v-if="isAdmin"
@@ -229,7 +241,7 @@ function deleteDelivery(delivery: DeliveryRow) {
                             </TableRow>
                             <TableRow v-if="expanded.has(delivery.id)">
                                 <TableCell />
-                                <TableCell :colspan="9" class="bg-muted/30 p-3">
+                                <TableCell :colspan="12" class="bg-muted/30 p-3">
                                     <Table>
                                         <TableHeader>
                                             <TableRow>
@@ -258,7 +270,7 @@ function deleteDelivery(delivery: DeliveryRow) {
                         </template>
                     </template>
                     <TableRow v-else>
-                        <TableCell :colspan="10" class="h-24 text-center text-muted-foreground">
+                        <TableCell :colspan="13" class="h-24 text-center text-muted-foreground">
                             {{ t('admin.livraisons.table.empty') }}
                         </TableCell>
                     </TableRow>
