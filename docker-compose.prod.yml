@@ -7,14 +7,9 @@ services:
         environment:
             PORT: 8080
         volumes:
-            - uploads:/app/public/uploads
-            - language_flags:/app/public/language-flag
+            - /etc/dokploy/mounts/cmc-uploads:/app/public/uploads
         networks:
             - dokploy-network
-
-volumes:
-    uploads:
-    language_flags:
 
 networks:
     dokploy-network:

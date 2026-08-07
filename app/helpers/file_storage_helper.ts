@@ -9,8 +9,11 @@ type UploadableFile = {
 };
 
 export async function storeUploadedFile(file: UploadableFile, subdirectory: string): Promise<string> {
+    const directory = app.publicPath(subdirectory);
+    await mkdir(directory, { recursive: true });
+
     const filename = `${randomUUID()}.${file.extname}`;
-    await file.move(app.publicPath(subdirectory), { name: filename });
+    await file.move(directory, { name: filename });
 
     return `/${subdirectory}/${filename}`;
 }
