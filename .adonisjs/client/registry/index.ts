@@ -222,6 +222,12 @@ const routes = {
     tokens: [{"old":"/admin/users/:id/avatar","type":0,"val":"admin","end":""},{"old":"/admin/users/:id/avatar","type":0,"val":"users","end":""},{"old":"/admin/users/:id/avatar","type":1,"val":"id","end":""},{"old":"/admin/users/:id/avatar","type":0,"val":"avatar","end":""}],
     types: placeholder as Registry['admin.users.updateAvatar']['types'],
   },
+  'admin.users.destroy': {
+    methods: ["DELETE"],
+    pattern: '/admin/users/:id',
+    tokens: [{"old":"/admin/users/:id","type":0,"val":"admin","end":""},{"old":"/admin/users/:id","type":0,"val":"users","end":""},{"old":"/admin/users/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['admin.users.destroy']['types'],
+  },
   'admin.resources.index': {
     methods: ["GET","HEAD"],
     pattern: '/admin/resources',

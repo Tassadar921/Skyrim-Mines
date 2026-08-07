@@ -57,6 +57,7 @@ router
         router.get('/users/:id', [controllers.admin.Users, 'show']).as('admin.users.show').use(readOnly);
         router.put('/users/:id', [controllers.admin.Users, 'update']).as('admin.users.update').use(middleware.admin());
         router.post('/users/:id/avatar', [controllers.admin.Users, 'updateAvatar']).as('admin.users.updateAvatar').use(middleware.admin());
+        router.delete('/users/:id', [controllers.admin.Users, 'destroy']).as('admin.users.destroy').use(middleware.admin());
 
         router.get('/resources', [controllers.admin.Resources, 'index']).as('admin.resources.index').use(readOnly);
         router.get('/resources/create', [controllers.admin.Resources, 'create']).as('admin.resources.create').use(middleware.admin());

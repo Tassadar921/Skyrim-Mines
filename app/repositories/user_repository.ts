@@ -2,6 +2,10 @@ import type { TransactionClientContract } from '@adonisjs/lucid/types/database';
 import BaseRepository from '#repositories/base/base_repository';
 import User from '#models/user';
 import LicenseSubscriber from '#models/license_subscriber';
+import Quote from '#models/quote';
+import Order from '#models/order';
+import ResourceBuyback from '#models/resource_buyback';
+import ResourceDeposit from '#models/resource_deposit';
 import UserRoleEnum from '#types/enum/user_role_enum';
 import type OrganizationRoleEnum from '#types/enum/organization_role_enum';
 
@@ -118,5 +122,27 @@ export default class UserRepository extends BaseRepository<typeof User> {
      */
     public async findEligibleForLicenseSubscription(): Promise<User[]> {
         return User.query().whereIn('role', [UserRoleEnum.CONTRACTOR, UserRoleEnum.CLIENT]).whereNotIn('id', LicenseSubscriber.query().select('userId')).orderBy('username', 'asc');
+    }
+
+    /**
+     * True if deleting this user would cascade-delete business records (quotes, orders, resource
+     * buybacks/deposits, license subscription). Those relations are ON DELETE CASCADE, so deletion
+     * must be blocked whenever any of them exist to avoid silently wiping accounting history.
+     */
+    public async hasLinkedRecords(id: string): Promise<boolean> {
+        const [quote, order, buyback, deposit, licenseSubscriber] = await Promise.all([
+            Quote.query().where('userId', id).first(),
+            Order.query().where('userId', id).first(),
+            ResourceBuyback.query().where('userId', id).first(),
+            ResourceDeposit.query().where('userId', id).first(),
+            LicenseSubscriber.query().where('userId', id).first(),
+        ]);
+
+        return Boolean(quote || order || buyback || deposit || licenseSubscriber);
+    }
+
+    public async delete(id: string): Promise<void> {
+        const user = await User.findOrFail(id);
+        await user.delete();
     }
 }

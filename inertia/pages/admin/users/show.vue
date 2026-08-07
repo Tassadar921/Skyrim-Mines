@@ -11,6 +11,7 @@ import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
 import { Checkbox } from '~/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select';
+import DeleteButton from '~/components/ui/DeleteButton.vue';
 import { Link } from '@adonisjs/inertia/vue';
 import { ArrowLeft, UserCircle } from '@lucide/vue';
 import type { Data } from '@generated/data';
@@ -45,6 +46,10 @@ function submit() {
     );
 }
 
+function destroyUser() {
+    router.delete(urlFor('admin.users.destroy', { id: props.targetUser.id }));
+}
+
 const avatarInputRef = ref<HTMLInputElement | null>(null);
 const avatarForm = useForm<{ avatar: File | null }>({ avatar: null });
 
@@ -73,6 +78,14 @@ function onAvatarChange(event: Event) {
                 </Link>
             </Button>
             <div v-if="isAdmin" class="flex items-center gap-4">
+                <DeleteButton
+                    :label="t('admin.users.show.delete')"
+                    :title="t('admin.users.show.deleteConfirm.title')"
+                    :description="t('admin.users.show.deleteConfirm.description', { username: props.targetUser.username })"
+                    :cancel-label="t('admin.users.show.deleteConfirm.cancel')"
+                    :confirm-label="t('admin.users.show.deleteConfirm.confirm')"
+                    @confirm="destroyUser"
+                />
                 <Button :loading="isSubmitting" :disabled="isSubmitting" @click="submit">
                     {{ $t('admin.users.show.save') }}
                 </Button>

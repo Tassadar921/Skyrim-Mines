@@ -40,6 +40,7 @@ export type ScannedRoutes = {
     'admin.users.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.users.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.users.updateAvatar': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.users.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.resources.index': { paramsTuple?: []; params?: {} }
     'admin.resources.create': { paramsTuple?: []; params?: {} }
     'admin.resources.store': { paramsTuple?: []; params?: {} }
@@ -184,6 +185,7 @@ export type ScannedRoutes = {
   DELETE: {
     'organization.members.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'auth.logout': { paramsTuple?: []; params?: {} }
+    'admin.users.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.resources.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.materials.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.livraisons.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }

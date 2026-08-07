@@ -63,6 +63,7 @@ export interface ApiDefinition {
       show: typeof routes['admin.users.show']
       update: typeof routes['admin.users.update']
       updateAvatar: typeof routes['admin.users.updateAvatar']
+      destroy: typeof routes['admin.users.destroy']
     }
     resources: {
       index: typeof routes['admin.resources.index']

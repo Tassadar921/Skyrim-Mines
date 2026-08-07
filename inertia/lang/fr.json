@@ -276,6 +276,13 @@
                 "title": "Utilisateur",
                 "back": "Retour à la liste",
                 "save": "Enregistrer les modifications",
+                "delete": "Supprimer l'utilisateur",
+                "deleteConfirm": {
+                    "title": "Supprimer cet utilisateur ?",
+                    "description": "{username} sera supprimé définitivement. Cette action est impossible si des devis, commandes ou mouvements de ressources lui sont liés.",
+                    "cancel": "Annuler",
+                    "confirm": "Supprimer"
+                },
                 "fields": {
                     "username": "Nom d'utilisateur",
                     "role": "Rôle",

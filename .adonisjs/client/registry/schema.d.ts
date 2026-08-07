@@ -439,6 +439,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/users_controller').default['updateAvatar']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'admin.users.destroy': {
+    methods: ["DELETE"]
+    pattern: '/admin/users/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/users_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/users_controller').default['destroy']>>>
+    }
+  }
   'admin.resources.index': {
     methods: ["GET","HEAD"]
     pattern: '/admin/resources'

@@ -161,4 +161,26 @@ export default class UsersController {
             return response.redirect().back();
         }
     }
+
+    public async destroy({ params, response, session, i18n, auth }: HttpContext) {
+        try {
+            if (auth.user?.id === params.id) {
+                session.flash('error', i18n.t('messages.admin.users.destroy.self'));
+                return response.redirect().toRoute('admin.users.index');
+            }
+
+            if (await this.userRepository.hasLinkedRecords(params.id)) {
+                session.flash('error', i18n.t('messages.admin.users.destroy.linked'));
+                return response.redirect().toRoute('admin.users.index');
+            }
+
+            await this.userRepository.delete(params.id);
+            session.flash('success', i18n.t('messages.admin.users.destroy.success'));
+        } catch (e) {
+            logger.error({ err: e }, 'users.destroy failed');
+            session.flash('error', i18n.t('messages.admin.users.destroy.error'));
+        }
+
+        return response.redirect().toRoute('admin.users.index');
+    }
 }
