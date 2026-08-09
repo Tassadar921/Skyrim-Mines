@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon';
 
-export const GAME_WEEK_ONE_START = DateTime.fromObject({ year: 2026, month: 7, day: 26 }, { zone: 'utc' });
+export const GAME_WEEK_ONE_START = DateTime.fromObject({ year: 2026, month: 7, day: 27 }, { zone: 'utc' });
 
 export function getWeekNumber(date: DateTime): number {
     const day = date.setZone('utc').startOf('day');
