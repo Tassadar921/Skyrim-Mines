@@ -10,6 +10,9 @@ WORKDIR /app
 # Stage 1a — Deps (toutes les dépendances, pour le build)
 # =============================================================================
 FROM base AS deps
+# Filet de secours si le téléchargement du binaire précompilé de better-sqlite3 échoue/timeout :
+# node-gyp peut alors compiler depuis les sources au lieu de faire échouer tout le build.
+RUN apk add --no-cache python3 make g++
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN pnpm install
 
@@ -18,6 +21,7 @@ RUN pnpm install
 # Stage 1b — Deps de production uniquement (pour l'image finale)
 # =============================================================================
 FROM base AS production-deps
+RUN apk add --no-cache python3 make g++
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN pnpm install --prod
 
