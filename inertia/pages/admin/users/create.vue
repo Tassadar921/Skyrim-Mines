@@ -37,6 +37,7 @@ const isClient = computed(() => form.role === 'client' || form.role === 'auditor
 function submit() {
     form.transform((data) => ({
         ...data,
+        organizationMode: data.organizationMode === 'none' ? undefined : data.organizationMode,
         organizationId: data.organizationId || undefined,
         organizationName: data.organizationName || undefined,
         organizationRole: data.organizationRole || undefined,
