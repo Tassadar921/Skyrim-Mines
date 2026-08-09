@@ -8,3 +8,8 @@ export const createDepositValidator = vine.create({
         }),
     ),
 });
+
+export const updateDepositValidator = vine.create({
+    resourceId: vine.string().uuid(),
+    quantity: vine.number().min(1),
+});

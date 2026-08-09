@@ -34,6 +34,7 @@ export interface ApiDefinition {
   }
   deposits: {
     store: typeof routes['deposits.store']
+    update: typeof routes['deposits.update']
   }
   buybacks: {
     store: typeof routes['buybacks.store']

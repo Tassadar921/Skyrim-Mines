@@ -247,6 +247,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/deposits_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'deposits.update': {
+    methods: ["PATCH"]
+    pattern: '/deposits/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/deposits').updateDepositValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/deposits').updateDepositValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/deposits_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/deposits_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'buybacks.store': {
     methods: ["POST"]
     pattern: '/buybacks'

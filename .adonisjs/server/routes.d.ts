@@ -24,6 +24,7 @@ export type ScannedRoutes = {
     'stocks.resources.updateQuantity': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'stocks.materials.updateQuantity': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'deposits.store': { paramsTuple?: []; params?: {} }
+    'deposits.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'buybacks.store': { paramsTuple?: []; params?: {} }
     'organization.show': { paramsTuple?: []; params?: {} }
     'organization.members.store': { paramsTuple?: []; params?: {} }
@@ -196,6 +197,7 @@ export type ScannedRoutes = {
     'commandes.cancel': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'stocks.resources.updateQuantity': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'stocks.materials.updateQuantity': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'deposits.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'organization.members.updateRole': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.resources.reorder': { paramsTuple?: []; params?: {} }
     'admin.materials.reorder': { paramsTuple?: []; params?: {} }

@@ -1,7 +1,9 @@
+import { DateTime } from 'luxon';
 import { type HttpContext } from '@adonisjs/core/http';
 import logger from '@adonisjs/core/services/logger';
 import ResourceDepositRepository from '#repositories/resource_deposit_repository';
-import { createDepositValidator } from '#validators/deposits';
+import { createDepositValidator, updateDepositValidator } from '#validators/deposits';
+import { DEPOSIT_EDIT_WINDOW_MINUTES } from '#helpers/deposit_edit_window_helper';
 
 export default class DepositsController {
     constructor(private readonly resourceDepositRepository: ResourceDepositRepository = new ResourceDepositRepository()) {}
@@ -15,6 +17,33 @@ export default class DepositsController {
         } catch (e) {
             logger.error({ err: e }, 'deposits.store failed');
             session.flash('error', i18n.t('messages.deposits.create.error'));
+        }
+
+        return response.redirect().back();
+    }
+
+    public async update({ params, request, auth, response, session, i18n }: HttpContext) {
+        const deposit = await this.resourceDepositRepository.find(params.id);
+        const viewer = auth.user!;
+
+        if (!deposit || deposit.userId !== viewer.id) {
+            session.flash('error', i18n.t('messages.deposits.update.forbidden'));
+            return response.redirect().back();
+        }
+
+        if (deposit.createdAt < DateTime.now().minus({ minutes: DEPOSIT_EDIT_WINDOW_MINUTES })) {
+            session.flash('error', i18n.t('messages.deposits.update.expired'));
+            return response.redirect().back();
+        }
+
+        const { resourceId, quantity } = await request.validateUsing(updateDepositValidator);
+
+        try {
+            await this.resourceDepositRepository.update(deposit.id, { resourceId, quantity });
+            session.flash('success', i18n.t('messages.deposits.update.success'));
+        } catch (e) {
+            logger.error({ err: e }, 'deposits.update failed');
+            session.flash('error', i18n.t('messages.deposits.update.error'));
         }
 
         return response.redirect().back();

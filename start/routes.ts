@@ -30,6 +30,7 @@ router.post('/commandes/:orderId/livraisons', [controllers.Livraisons, 'store'])
 router.patch('/stocks/resources/:id', [controllers.Stocks, 'updateResourceQuantity']).as('stocks.resources.updateQuantity').use(middleware.auth()).use(middleware.admin());
 router.patch('/stocks/materials/:id', [controllers.Stocks, 'updateMaterialQuantity']).as('stocks.materials.updateQuantity').use(middleware.auth()).use(middleware.admin());
 router.post('/deposits', [controllers.Deposits, 'store']).as('deposits.store').use(middleware.auth());
+router.patch('/deposits/:id', [controllers.Deposits, 'update']).as('deposits.update').use(middleware.auth());
 router.post('/buybacks', [controllers.Buybacks, 'store']).as('buybacks.store').use(middleware.auth()).use(middleware.admin());
 
 const organizationManage = middleware.organization({ roles: [OrganizationRoleEnum.OWNER, OrganizationRoleEnum.ADMIN] });

@@ -28,7 +28,7 @@ import BuybackModal from '~/partials/buyback/BuybackModal.vue';
 import QuantityStepper from '~/partials/stocks/QuantityStepper.vue';
 import type { Data } from '@generated/data';
 
-type ResourceWithBarrel = Data.Resource & { quantityBarrel: number };
+type ResourceWithBarrel = Data.Resource & { quantityBarrel: number; myQuantityBarrel: number };
 type RemainingLine = { orderLineId: string; resourceName: string; resourceType: string; unitPrice: number; orderedQuantity: number; remainingQuantity: number };
 type OrderToDeliver = {
     id: string;
@@ -43,10 +43,13 @@ const { t } = useI18n();
 const { isAdmin } = useAuth();
 const page = usePage<Data.SharedProps>();
 
+type MyDeposit = { id: string; resourceId: string; quantity: number; createdAt: string };
+
 const props = defineProps<{
     resources: ResourceWithBarrel[];
     ordersToDeliver: OrderToDeliver[];
     castellanies: { id: string; name: string; commissionRate: number }[];
+    myDeposits: MyDeposit[];
 }>();
 
 const PICKUP = 'pickup';
@@ -105,6 +108,11 @@ const lingots = computed(() => props.resources.filter((r) => r.type === 'lingot'
 
 const totalBarrelValue = computed(() => props.resources.reduce((sum, resource) => sum + resource.buyPrice * resource.quantityBarrel, 0));
 
+const myMinerais = computed(() => props.resources.filter((r) => r.type === 'minerai' && r.myQuantityBarrel > 0));
+const myLingots = computed(() => props.resources.filter((r) => r.type === 'lingot' && r.myQuantityBarrel > 0));
+
+const totalMyBarrelValue = computed(() => props.resources.reduce((sum, resource) => sum + resource.buyPrice * resource.myQuantityBarrel, 0));
+
 const canSeeToDeliver = page.props.user?.role === 'admin' || page.props.user?.role === 'staff';
 
 let barrelSubscription: ReturnType<ReturnType<typeof getTransmit>['subscription']> | undefined;
@@ -142,7 +150,7 @@ onUnmounted(() => {
                 {{ t('home.balance', { amount: page.props.user.balance.toFixed(2) }) }}
             </p>
             <div class="flex items-center gap-3">
-                <DepositModal :resources="resources" />
+                <DepositModal :resources="resources" :my-deposits="myDeposits" />
                 <BuybackModal v-if="isAdmin" :resources="resources" />
             </div>
         </div>
@@ -218,6 +226,55 @@ onUnmounted(() => {
                         </AlertDialogContent>
                     </AlertDialog>
                 </div>
+            </div>
+        </div>
+
+        <div v-if="myMinerais.length || myLingots.length" class="max-w-3xl mx-auto space-y-10">
+            <h2 class="font-serif text-2xl font-light text-slate-800 dark:text-slate-100 text-center">{{ t('home.myBarrel.title') }}</h2>
+
+            <div v-if="myMinerais.length" class="space-y-3">
+                <h3 class="text-lg font-medium">{{ t('admin.resources.types.minerai') }}</h3>
+                <div class="rounded-md border">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead></TableHead>
+                                <TableHead>{{ t('deposit.quantity') }}</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            <TableRow v-for="resource in myMinerais" :key="resource.id">
+                                <TableCell class="text-sm font-medium">{{ resource.name }}</TableCell>
+                                <TableCell class="text-sm text-muted-foreground">{{ resource.myQuantityBarrel }}</TableCell>
+                            </TableRow>
+                        </TableBody>
+                    </Table>
+                </div>
+            </div>
+
+            <div v-if="myLingots.length" class="space-y-3">
+                <h3 class="text-lg font-medium">{{ t('admin.resources.types.lingot') }}</h3>
+                <div class="rounded-md border">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead></TableHead>
+                                <TableHead>{{ t('deposit.quantity') }}</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            <TableRow v-for="resource in myLingots" :key="resource.id">
+                                <TableCell class="text-sm font-medium">{{ resource.name }}</TableCell>
+                                <TableCell class="text-sm text-muted-foreground">{{ resource.myQuantityBarrel }}</TableCell>
+                            </TableRow>
+                        </TableBody>
+                    </Table>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-2 text-lg">
+                <span class="text-slate-600 dark:text-slate-300">{{ t('home.myBarrel.totalValue') }}</span>
+                <span class="font-medium text-slate-800 dark:text-slate-100">{{ totalMyBarrelValue.toFixed(2) }} s</span>
             </div>
         </div>
 

@@ -7,6 +7,10 @@
             "title": "Dans le tonneau",
             "totalValue": "Valeur totale dans le tonneau :"
         },
+        "myBarrel": {
+            "title": "Mon tonneau",
+            "totalValue": "Valeur totale de mon tonneau :"
+        },
         "toDeliver": {
             "title": "Commandes à livrer",
             "count": "commande à livrer | commande à livrer | commandes à livrer",
@@ -30,7 +34,14 @@
         "trigger": "Réaliser un dépôt",
         "title": "Réaliser un dépôt",
         "quantity": "Quantité",
-        "submit": "Valider"
+        "submit": "Valider",
+        "myDeposits": {
+            "title": "Mes dépôts récents",
+            "hint": "Modifiables pendant 1h après le dépôt",
+            "empty": "Aucun dépôt récent",
+            "resource": "Ressource",
+            "save": "Enregistrer"
+        }
     },
     "buyback": {
         "trigger": "Racheter",

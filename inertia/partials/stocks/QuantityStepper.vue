@@ -7,6 +7,7 @@ const props = defineProps<{
     modelValue: number;
     max?: number;
     showMax?: boolean;
+    disabled?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -30,15 +31,15 @@ function setMax() {
 
 <template>
     <div class="flex items-center gap-1">
-        <Button type="button" variant="outline" size="icon-sm" class="shrink-0" @click="step(-1, $event)">
+        <Button type="button" variant="outline" size="icon-sm" class="shrink-0" :disabled="disabled" @click="step(-1, $event)">
             <Minus class="size-4" />
         </Button>
         <div class="w-20 shrink-0">
-            <Input type="number" class="w-full text-center" :model-value="modelValue" @update:model-value="(value) => emit('update:modelValue', normalize(value))" />
+            <Input type="number" class="w-full text-center" :disabled="disabled" :model-value="modelValue" @update:model-value="(value) => emit('update:modelValue', normalize(value))" />
         </div>
-        <Button type="button" variant="outline" size="icon-sm" class="shrink-0" @click="step(1, $event)">
+        <Button type="button" variant="outline" size="icon-sm" class="shrink-0" :disabled="disabled" @click="step(1, $event)">
             <Plus class="size-4" />
         </Button>
-        <Button v-if="showMax" type="button" variant="outline" size="icon-sm" class="w-auto shrink-0 px-2 text-xs" @click="setMax">Max</Button>
+        <Button v-if="showMax" type="button" variant="outline" size="icon-sm" class="w-auto shrink-0 px-2 text-xs" :disabled="disabled" @click="setMax">Max</Button>
     </div>
 </template>

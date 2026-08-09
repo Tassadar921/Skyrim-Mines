@@ -126,6 +126,12 @@ const routes = {
     tokens: [{"old":"/deposits","type":0,"val":"deposits","end":""}],
     types: placeholder as Registry['deposits.store']['types'],
   },
+  'deposits.update': {
+    methods: ["PATCH"],
+    pattern: '/deposits/:id',
+    tokens: [{"old":"/deposits/:id","type":0,"val":"deposits","end":""},{"old":"/deposits/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['deposits.update']['types'],
+  },
   'buybacks.store': {
     methods: ["POST"],
     pattern: '/buybacks',

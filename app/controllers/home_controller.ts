@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon';
 import { type HttpContext } from '@adonisjs/core/http';
 import ResourceRepository from '#repositories/resource_repository';
 import ResourceDepositRepository from '#repositories/resource_deposit_repository';
@@ -9,6 +10,7 @@ import CastellanyRepository from '#repositories/castellany_repository';
 import ResourceTransformer from '#transformers/resource_transformer';
 import CastellanyTransformer from '#transformers/castellany_transformer';
 import { isStaffOrAdmin } from '#helpers/user_role_helper';
+import { DEPOSIT_EDIT_WINDOW_MINUTES } from '#helpers/deposit_edit_window_helper';
 
 export default class HomeController {
     constructor(
@@ -22,15 +24,20 @@ export default class HomeController {
     ) {}
 
     public async index({ inertia, auth }: HttpContext) {
-        const [resources, depositTotals, buybackTotals] = await Promise.all([
+        const user = auth.user;
+
+        const [resources, depositTotals, buybackTotals, myDepositTotals, myBuybackTotals] = await Promise.all([
             this.resourceRepository.all(),
             this.resourceDepositRepository.sumByResource(),
             this.resourceBuybackRepository.sumByResource(),
+            user ? this.resourceDepositRepository.sumByUser(user.id) : new Map<string, number>(),
+            user ? this.resourceBuybackRepository.sumByUser(user.id) : new Map<string, number>(),
         ]);
 
-        const user = auth.user;
         const canDeliver = !!user && isStaffOrAdmin(user.role);
         const ordersToDeliver = canDeliver ? await this.orderRepository.findToDeliver() : [];
+
+        const myDeposits = user ? await this.resourceDepositRepository.findRecentByUser(user.id, DateTime.now().minus({ minutes: DEPOSIT_EDIT_WINDOW_MINUTES })) : [];
 
         const [organizations, castellanies] = canDeliver ? await Promise.all([this.organizationRepository.all(), this.castellanyRepository.all()]) : [[], []];
         const organizationCastellanyById = new Map(organizations.map((organization) => [organization.id, organization.castellanyId]));
@@ -62,9 +69,16 @@ export default class HomeController {
             resources: resources.map((r) => ({
                 ...new ResourceTransformer(r).toObject(),
                 quantityBarrel: (depositTotals.get(r.id) ?? 0) - (buybackTotals.get(r.id) ?? 0),
+                myQuantityBarrel: (myDepositTotals.get(r.id) ?? 0) - (myBuybackTotals.get(r.id) ?? 0),
             })),
             ordersToDeliver: ordersToDeliverWithRemaining.filter((order) => order.lines.length > 0),
             castellanies: castellanies.map((castellany) => new CastellanyTransformer(castellany).toObject()),
+            myDeposits: myDeposits.map((deposit) => ({
+                id: deposit.id,
+                resourceId: deposit.resourceId,
+                quantity: deposit.quantity,
+                createdAt: deposit.createdAt.toISO()!,
+            })),
         });
     }
 }

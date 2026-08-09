@@ -177,6 +177,12 @@
         "create": {
             "success": "Dépôt enregistré avec succès",
             "error": "Erreur lors de l'enregistrement du dépôt"
+        },
+        "update": {
+            "success": "Dépôt modifié avec succès",
+            "error": "Erreur lors de la modification du dépôt",
+            "forbidden": "Vous ne pouvez pas modifier ce dépôt",
+            "expired": "Ce dépôt ne peut plus être modifié (plus d'une heure s'est écoulée)"
         }
     },
     "buybacks": {
