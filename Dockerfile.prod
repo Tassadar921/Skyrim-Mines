@@ -28,6 +28,9 @@ RUN pnpm install --prod
 # =============================================================================
 FROM base AS build
 COPY --from=deps /app/node_modules ./node_modules
+# Casse le cache Docker à partir d'ici, indépendamment du contenu copié (bug de cache Dokploy — https://github.com/Dokploy/dokploy/issues/2911)
+ARG CACHEBUST=1
+RUN echo "$CACHEBUST" > /dev/null
 COPY . .
 RUN node ace build --ignore-ts-errors
 
