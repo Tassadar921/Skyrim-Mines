@@ -382,7 +382,7 @@
             "new": "Nouvelle châtellerie",
             "table": {
                 "name": "Châtellerie",
-                "commissionRate": "Commission",
+                "commissionAmount": "Commission",
                 "largeOrderFeeRate": "Frais grosse commande",
                 "empty": "Aucune châtellerie enregistrée"
             },
@@ -392,7 +392,7 @@
                 "submit": "Créer",
                 "fields": {
                     "name": "Nom de la châtellerie",
-                    "commissionRate": "Commission (%)",
+                    "commissionAmount": "Commission (s)",
                     "largeOrderFeeRate": "Frais grosse commande (%)"
                 }
             },

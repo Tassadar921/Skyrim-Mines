@@ -106,7 +106,7 @@ export default class DeliveryRepository extends BaseRepository<typeof Delivery> 
             const totalProfit = linesWithProfit.reduce((sum, line) => sum + (line.profit ?? 0), 0);
 
             if (deliverer?.role === UserRoleEnum.STAFF && castellany) {
-                commissionAmount = Math.round(totalProfit * (castellany.commissionRate / 100) * 100) / 100;
+                commissionAmount = castellany.commissionAmount;
             }
 
             if (castellany) {

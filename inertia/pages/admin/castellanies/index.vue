@@ -18,7 +18,7 @@ const { isAdmin } = useAuth();
 pageTitle.value = t('admin.castellanies.title');
 
 defineProps<{
-    castellanies: { id: string; name: string; commissionRate: number; largeOrderFeeRate: number }[];
+    castellanies: { id: string; name: string; commissionAmount: number; largeOrderFeeRate: number }[];
 }>();
 </script>
 
@@ -38,7 +38,7 @@ defineProps<{
                 <TableHeader>
                     <TableRow>
                         <TableHead>{{ t('admin.castellanies.table.name') }}</TableHead>
-                        <TableHead>{{ t('admin.castellanies.table.commissionRate') }}</TableHead>
+                        <TableHead>{{ t('admin.castellanies.table.commissionAmount') }}</TableHead>
                         <TableHead>{{ t('admin.castellanies.table.largeOrderFeeRate') }}</TableHead>
                     </TableRow>
                 </TableHeader>
@@ -46,7 +46,7 @@ defineProps<{
                     <template v-if="castellanies.length">
                         <TableRow v-for="castellany in castellanies" :key="castellany.id" class="cursor-pointer" @click="router.visit(urlFor('admin.castellanies.show', { id: castellany.id }))">
                             <TableCell class="text-sm font-medium">{{ castellany.name }}</TableCell>
-                            <TableCell class="text-sm text-muted-foreground">{{ castellany.commissionRate }} %</TableCell>
+                            <TableCell class="text-sm text-muted-foreground">{{ castellany.commissionAmount }} s</TableCell>
                             <TableCell class="text-sm text-muted-foreground">{{ castellany.largeOrderFeeRate }} %</TableCell>
                         </TableRow>
                     </template>

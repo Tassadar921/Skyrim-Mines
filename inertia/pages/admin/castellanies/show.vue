@@ -19,13 +19,13 @@ const { pageTitle } = useAdminLayout();
 const { isAdmin } = useAuth();
 
 const props = defineProps<{
-    castellany: { id: string; name: string; commissionRate: number; largeOrderFeeRate: number };
+    castellany: { id: string; name: string; commissionAmount: number; largeOrderFeeRate: number };
 }>();
 
 pageTitle.value = `${t('admin.castellanies.show.title')} - ${props.castellany.name}`;
 
 const name = ref(props.castellany.name);
-const commissionRate = ref(String(props.castellany.commissionRate));
+const commissionAmount = ref(String(props.castellany.commissionAmount));
 const largeOrderFeeRate = ref(String(props.castellany.largeOrderFeeRate));
 const isSubmitting = ref(false);
 
@@ -33,7 +33,7 @@ function submit() {
     isSubmitting.value = true;
     router.put(
         urlFor('admin.castellanies.update', { id: props.castellany.id }),
-        { name: name.value, commissionRate: commissionRate.value, largeOrderFeeRate: largeOrderFeeRate.value },
+        { name: name.value, commissionAmount: commissionAmount.value, largeOrderFeeRate: largeOrderFeeRate.value },
         { onFinish: () => (isSubmitting.value = false) },
     );
 }
@@ -69,7 +69,7 @@ function destroyCastellany() {
 
         <div class="rounded-md border p-5 space-y-4">
             <Input v-model="name" :label="t('admin.castellanies.create.fields.name')" maxlength="100" required :readonly="!isAdmin" />
-            <Input v-model="commissionRate" type="number" :label="t('admin.castellanies.create.fields.commissionRate')" min="0" :max="100" step="1" required :readonly="!isAdmin" />
+            <Input v-model="commissionAmount" type="number" :label="t('admin.castellanies.create.fields.commissionAmount')" min="0" step="1" required :readonly="!isAdmin" />
             <Input v-model="largeOrderFeeRate" type="number" :label="t('admin.castellanies.create.fields.largeOrderFeeRate')" min="0" :max="100" step="1" required :readonly="!isAdmin" />
         </div>
     </div>

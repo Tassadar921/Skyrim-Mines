@@ -48,7 +48,7 @@ type MyDeposit = { id: string; resourceId: string; quantity: number; createdAt: 
 const props = defineProps<{
     resources: ResourceWithBarrel[];
     ordersToDeliver: OrderToDeliver[];
-    castellanies: { id: string; name: string; commissionRate: number }[];
+    castellanies: { id: string; name: string; commissionAmount: number }[];
     myDeposits: MyDeposit[];
 }>();
 

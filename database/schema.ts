@@ -8,10 +8,10 @@ import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 
 export class CastellanySchema extends BaseModel {
-  static $columns = ['commissionRate', 'createdAt', 'id', 'largeOrderFeeRate', 'name', 'updatedAt'] as const
+  static $columns = ['commissionAmount', 'createdAt', 'id', 'largeOrderFeeRate', 'name', 'updatedAt'] as const
   $columns = CastellanySchema.$columns
   @column()
-  declare commissionRate: number
+  declare commissionAmount: number
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
   @column({ isPrimary: true })

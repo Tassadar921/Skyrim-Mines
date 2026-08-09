@@ -17,7 +17,7 @@ pageTitle.value = t('admin.castellanies.create.title');
 
 const form = useForm({
     name: '',
-    commissionRate: '0',
+    commissionAmount: '0',
     largeOrderFeeRate: '0',
 });
 
@@ -39,7 +39,7 @@ function submit() {
 
         <div class="rounded-md border p-5 space-y-4">
             <Input v-model="form.name" :label="t('admin.castellanies.create.fields.name')" :error="form.errors.name" maxlength="100" required />
-            <Input v-model="form.commissionRate" type="number" :label="t('admin.castellanies.create.fields.commissionRate')" :error="form.errors.commissionRate" min="0" :max="100" step="1" required />
+            <Input v-model="form.commissionAmount" type="number" :label="t('admin.castellanies.create.fields.commissionAmount')" :error="form.errors.commissionAmount" min="0" step="1" required />
             <Input
                 v-model="form.largeOrderFeeRate"
                 type="number"
