@@ -19,17 +19,21 @@ type WeeklyRecap = {
     buybacksAmount: number;
     licensesAmount: number;
     employeeDueAmount: number;
+    capital: number | null;
+    stockValue: number | null;
+    totalCapital: number | null;
 };
 
 const METRICS = [
     { value: 'deliveriesAmount', labelKey: 'admin.dashboard.weeklyRecap.deliveries' },
-    { value: 'commissionsAmount', labelKey: 'admin.dashboard.weeklyRecap.commissions' },
-    { value: 'largeOrderFeesAmount', labelKey: 'admin.dashboard.weeklyRecap.largeOrderFees' },
     { value: 'profit', labelKey: 'admin.dashboard.weeklyRecap.profit' },
     { value: 'weeklyTax', labelKey: 'admin.dashboard.weeklyRecap.weeklyTax' },
     { value: 'buybacksAmount', labelKey: 'admin.dashboard.weeklyRecap.buybacks' },
     { value: 'licensesAmount', labelKey: 'admin.dashboard.weeklyRecap.licenses' },
     { value: 'employeeDueAmount', labelKey: 'admin.dashboard.weeklyRecap.employeeDue' },
+    { value: 'capital', labelKey: 'admin.dashboard.weeklyRecap.capital' },
+    { value: 'stockValue', labelKey: 'admin.dashboard.weeklyRecap.stockValue' },
+    { value: 'totalCapital', labelKey: 'admin.dashboard.weeklyRecap.totalCapital' },
 ] as const;
 
 type MetricKey = (typeof METRICS)[number]['value'];

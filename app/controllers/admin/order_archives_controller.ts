@@ -39,6 +39,13 @@ export default class OrderArchivesController {
         const organizationNameById = new Map(allOrganizations.map((organization) => [organization.id, organization.name]));
         const organizationCastellanyById = new Map(allOrganizations.map((organization) => [organization.id, organization.castellanyId]));
 
+        const currentWeek = getWeekNumber(DateTime.now());
+        const availableWeeks = [];
+        for (let weekNumber = currentWeek; weekNumber >= 1; weekNumber--) {
+            const { start, end } = getWeekRange(weekNumber);
+            availableWeeks.push({ weekNumber, startDate: start.toJSDate().toISOString(), endDate: end.toJSDate().toISOString() });
+        }
+
         return inertia.render('admin/commandes/archive', {
             resources: resources.map((resource) => new ResourceTransformer(resource).toObject()),
             clients: clientUsers.map((client) => ({
@@ -51,7 +58,8 @@ export default class OrderArchivesController {
             organizations: allOrganizations.map((organization) => ({ id: organization.id, name: organization.name, castellanyId: organization.castellanyId })),
             organizationResourcePrices: allResourcePrices,
             castellanies: castellanies.map((castellany) => new CastellanyTransformer(castellany).toObject()),
-            currentWeek: getWeekNumber(DateTime.now()),
+            currentWeek,
+            availableWeeks,
         });
     }
 

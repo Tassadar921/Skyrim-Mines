@@ -11,6 +11,11 @@ export default class DepositsController {
     public async store({ request, auth, response, session, i18n }: HttpContext) {
         const { items } = await request.validateUsing(createDepositValidator);
 
+        if (items.some((item) => (item.soljundQuantity ?? 0) > item.quantity)) {
+            session.flash('error', i18n.t('messages.deposits.create.invalidSoljundQuantity'));
+            return response.redirect().back();
+        }
+
         try {
             await this.resourceDepositRepository.createMany(auth.user!.id, items);
             session.flash('success', i18n.t('messages.deposits.create.success'));

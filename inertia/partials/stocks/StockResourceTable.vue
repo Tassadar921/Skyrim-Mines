@@ -10,7 +10,7 @@ const { isAdmin } = useAuth();
 
 const props = defineProps<{
     resources: Data.Resource[];
-    quantities: Record<string, { quantityBarrel: number; quantityPurchased: number }>;
+    quantities: Record<string, { quantityBarrel: number; quantityPurchased: number; soljundQuantity: number }>;
 }>();
 
 const emit = defineEmits<{
@@ -41,7 +41,12 @@ function stockValue(resource: Data.Resource): number {
                         <TableCell class="text-sm font-medium">{{ resource.name }}</TableCell>
                         <TableCell class="text-sm text-muted-foreground">{{ resource.buyPrice }}</TableCell>
                         <TableCell class="text-sm text-muted-foreground">{{ resource.sellPrice }}</TableCell>
-                        <TableCell class="text-sm">{{ quantities[resource.id]?.quantityBarrel ?? 0 }}</TableCell>
+                        <TableCell class="text-sm">
+                            {{ quantities[resource.id]?.quantityBarrel ?? 0 }}
+                            <div v-if="quantities[resource.id]?.soljundQuantity" class="text-xs text-muted-foreground">
+                                {{ t('stocks.table.soljundQuantity', { quantity: quantities[resource.id].soljundQuantity }) }}
+                            </div>
+                        </TableCell>
                         <TableCell>
                             <QuantityStepper
                                 v-if="isAdmin"

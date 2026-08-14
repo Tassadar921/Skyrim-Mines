@@ -63,6 +63,9 @@ export interface ApiDefinition {
       largeOrderSetting: {
         update: typeof routes['admin.dashboard.largeOrderSetting.update']
       }
+      capitalSnapshot: {
+        store: typeof routes['admin.dashboard.capitalSnapshot.store']
+      }
     }
     users: {
       index: typeof routes['admin.users.index']
@@ -118,6 +121,10 @@ export interface ApiDefinition {
     livraisons: {
       index: typeof routes['admin.livraisons.index']
       destroy: typeof routes['admin.livraisons.destroy']
+    }
+    tonneau: {
+      index: typeof routes['admin.tonneau.index']
+      update: typeof routes['admin.tonneau.update']
     }
     organizations: {
       index: typeof routes['admin.organizations.index']

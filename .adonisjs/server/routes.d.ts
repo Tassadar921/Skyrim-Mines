@@ -37,6 +37,7 @@ export type ScannedRoutes = {
     'admin.dashboard': { paramsTuple?: []; params?: {} }
     'admin.dashboard.castellanyTax.update': { paramsTuple?: []; params?: {} }
     'admin.dashboard.largeOrderSetting.update': { paramsTuple?: []; params?: {} }
+    'admin.dashboard.capitalSnapshot.store': { paramsTuple?: []; params?: {} }
     'admin.users.index': { paramsTuple?: []; params?: {} }
     'admin.users.create': { paramsTuple?: []; params?: {} }
     'admin.users.store': { paramsTuple?: []; params?: {} }
@@ -74,6 +75,8 @@ export type ScannedRoutes = {
     'admin.orderArchives.store': { paramsTuple?: []; params?: {} }
     'admin.livraisons.index': { paramsTuple?: []; params?: {} }
     'admin.livraisons.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.tonneau.index': { paramsTuple?: []; params?: {} }
+    'admin.tonneau.update': { paramsTuple?: []; params?: {} }
     'admin.organizations.index': { paramsTuple?: []; params?: {} }
     'admin.organizations.create': { paramsTuple?: []; params?: {} }
     'admin.organizations.store': { paramsTuple?: []; params?: {} }
@@ -127,6 +130,7 @@ export type ScannedRoutes = {
     'admin.commandes.index': { paramsTuple?: []; params?: {} }
     'admin.orderArchives.create': { paramsTuple?: []; params?: {} }
     'admin.livraisons.index': { paramsTuple?: []; params?: {} }
+    'admin.tonneau.index': { paramsTuple?: []; params?: {} }
     'admin.organizations.index': { paramsTuple?: []; params?: {} }
     'admin.organizations.create': { paramsTuple?: []; params?: {} }
     'admin.organizations.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -167,6 +171,7 @@ export type ScannedRoutes = {
     'admin.commandes.index': { paramsTuple?: []; params?: {} }
     'admin.orderArchives.create': { paramsTuple?: []; params?: {} }
     'admin.livraisons.index': { paramsTuple?: []; params?: {} }
+    'admin.tonneau.index': { paramsTuple?: []; params?: {} }
     'admin.organizations.index': { paramsTuple?: []; params?: {} }
     'admin.organizations.create': { paramsTuple?: []; params?: {} }
     'admin.organizations.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -182,6 +187,7 @@ export type ScannedRoutes = {
     'deposits.store': { paramsTuple?: []; params?: {} }
     'buybacks.store': { paramsTuple?: []; params?: {} }
     'organization.members.store': { paramsTuple?: []; params?: {} }
+    'admin.dashboard.capitalSnapshot.store': { paramsTuple?: []; params?: {} }
     'admin.users.store': { paramsTuple?: []; params?: {} }
     'admin.users.updateAvatar': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.resources.store': { paramsTuple?: []; params?: {} }
@@ -203,6 +209,7 @@ export type ScannedRoutes = {
     'admin.materials.reorder': { paramsTuple?: []; params?: {} }
     'admin.commandes.validate': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.commandes.cancel': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.tonneau.update': { paramsTuple?: []; params?: {} }
     'admin.organizations.members.updateRole': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'memberId': ParamValue} }
   }
   DELETE: {

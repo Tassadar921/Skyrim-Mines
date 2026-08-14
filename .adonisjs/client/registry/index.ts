@@ -204,6 +204,12 @@ const routes = {
     tokens: [{"old":"/admin/large-order-threshold","type":0,"val":"admin","end":""},{"old":"/admin/large-order-threshold","type":0,"val":"large-order-threshold","end":""}],
     types: placeholder as Registry['admin.dashboard.largeOrderSetting.update']['types'],
   },
+  'admin.dashboard.capitalSnapshot.store': {
+    methods: ["POST"],
+    pattern: '/admin/capital-snapshot',
+    tokens: [{"old":"/admin/capital-snapshot","type":0,"val":"admin","end":""},{"old":"/admin/capital-snapshot","type":0,"val":"capital-snapshot","end":""}],
+    types: placeholder as Registry['admin.dashboard.capitalSnapshot.store']['types'],
+  },
   'admin.users.index': {
     methods: ["GET","HEAD"],
     pattern: '/admin/users',
@@ -425,6 +431,18 @@ const routes = {
     pattern: '/admin/livraisons/:id',
     tokens: [{"old":"/admin/livraisons/:id","type":0,"val":"admin","end":""},{"old":"/admin/livraisons/:id","type":0,"val":"livraisons","end":""},{"old":"/admin/livraisons/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['admin.livraisons.destroy']['types'],
+  },
+  'admin.tonneau.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/admin/tonneau',
+    tokens: [{"old":"/admin/tonneau","type":0,"val":"admin","end":""},{"old":"/admin/tonneau","type":0,"val":"tonneau","end":""}],
+    types: placeholder as Registry['admin.tonneau.index']['types'],
+  },
+  'admin.tonneau.update': {
+    methods: ["PATCH"],
+    pattern: '/admin/tonneau',
+    tokens: [{"old":"/admin/tonneau","type":0,"val":"admin","end":""},{"old":"/admin/tonneau","type":0,"val":"tonneau","end":""}],
+    types: placeholder as Registry['admin.tonneau.update']['types'],
   },
   'admin.organizations.index': {
     methods: ["GET","HEAD"],

@@ -6,7 +6,6 @@ import { computed, reactive, ref, watch } from 'vue';
 import { useForm } from '@inertiajs/vue3';
 import { urlFor } from '~/client';
 import { Button } from '~/components/ui/button';
-import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '~/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '~/components/ui/table';
@@ -19,6 +18,7 @@ defineOptions({ layout: AdminLayout });
 
 type ClientOption = { id: string; username: string; organizationId: string | null; organizationName: string | null };
 type OrganizationOption = { id: string; name: string; castellanyId: string | null };
+type AvailableWeek = { weekNumber: number; startDate: string; endDate: string };
 
 const { t } = useI18n();
 const { pageTitle } = useAdminLayout();
@@ -31,7 +31,13 @@ const props = defineProps<{
     organizationResourcePrices: Record<string, Record<string, number>>;
     castellanies: { id: string; name: string }[];
     currentWeek: number;
+    availableWeeks: AvailableWeek[];
 }>();
+
+function formatWeekRange(week: AvailableWeek): string {
+    const format = (iso: string) => new Date(iso).toLocaleDateString('fr-FR', { timeZone: 'UTC', day: '2-digit', month: '2-digit' });
+    return `${format(week.startDate)} - ${format(week.endDate)}`;
+}
 
 const PICKUP = 'pickup';
 
@@ -92,6 +98,24 @@ watch(effectiveOrganizationId, (organizationId) => {
 
 const orderWeekValid = computed(() => Number.isInteger(form.orderWeek) && form.orderWeek >= 1 && form.orderWeek <= props.currentWeek);
 const deliveryWeekValid = computed(() => Number.isInteger(form.deliveryWeek) && form.deliveryWeek >= form.orderWeek && form.deliveryWeek <= props.currentWeek);
+
+const deliveryWeekOptions = computed(() => props.availableWeeks.filter((week) => week.weekNumber >= form.orderWeek));
+
+const orderWeekModel = computed({
+    get: () => String(form.orderWeek),
+    set: (value: string) => (form.orderWeek = Number(value)),
+});
+const deliveryWeekModel = computed({
+    get: () => String(form.deliveryWeek),
+    set: (value: string) => (form.deliveryWeek = Number(value)),
+});
+
+watch(
+    () => form.orderWeek,
+    (orderWeek) => {
+        if (form.deliveryWeek < orderWeek) form.deliveryWeek = orderWeek;
+    },
+);
 
 const canSubmit = computed(() => {
     if (!hasSelection.value) return false;
@@ -175,12 +199,34 @@ function submit() {
 
             <div class="rounded-md border p-4 space-y-4">
                 <div class="space-y-1">
-                    <Input v-model.number="form.orderWeek" type="number" :label="t('admin.orderArchives.create.fields.orderWeek')" :error="form.errors.orderWeek" required />
-                    <p v-if="!orderWeekValid" class="text-sm text-destructive">{{ t('admin.orderArchives.create.fields.orderWeekHint', { current: currentWeek }) }}</p>
+                    <Label>{{ t('admin.orderArchives.create.fields.orderWeek') }}</Label>
+                    <Select v-model="orderWeekModel">
+                        <SelectTrigger>
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem v-for="week in availableWeeks" :key="week.weekNumber" :value="String(week.weekNumber)">
+                                {{ formatWeekRange(week) }}
+                                <span v-if="week.weekNumber === currentWeek" class="text-muted-foreground">({{ t('admin.common.weekly.current') }})</span>
+                            </SelectItem>
+                        </SelectContent>
+                    </Select>
+                    <p v-if="form.errors.orderWeek" class="text-sm text-destructive">{{ form.errors.orderWeek }}</p>
                 </div>
                 <div class="space-y-1">
-                    <Input v-model.number="form.deliveryWeek" type="number" :label="t('admin.orderArchives.create.fields.deliveryWeek')" :error="form.errors.deliveryWeek" required />
-                    <p v-if="!deliveryWeekValid" class="text-sm text-destructive">{{ t('admin.orderArchives.create.fields.deliveryWeekHint', { order: form.orderWeek, current: currentWeek }) }}</p>
+                    <Label>{{ t('admin.orderArchives.create.fields.deliveryWeek') }}</Label>
+                    <Select v-model="deliveryWeekModel">
+                        <SelectTrigger>
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem v-for="week in deliveryWeekOptions" :key="week.weekNumber" :value="String(week.weekNumber)">
+                                {{ formatWeekRange(week) }}
+                                <span v-if="week.weekNumber === currentWeek" class="text-muted-foreground">({{ t('admin.common.weekly.current') }})</span>
+                            </SelectItem>
+                        </SelectContent>
+                    </Select>
+                    <p v-if="form.errors.deliveryWeek" class="text-sm text-destructive">{{ form.errors.deliveryWeek }}</p>
                 </div>
                 <div class="space-y-1">
                     <Label>{{ t('home.toDeliver.castellany') }}</Label>

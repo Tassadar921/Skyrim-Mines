@@ -5,6 +5,7 @@ export const createDepositValidator = vine.create({
         vine.object({
             resourceId: vine.string().uuid(),
             quantity: vine.number().min(0),
+            soljundQuantity: vine.number().min(0).optional(),
         }),
     ),
 });

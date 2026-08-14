@@ -28,6 +28,13 @@
                     "success": "Seuil de grosse commande mis à jour avec succès",
                     "error": "Erreur lors de la mise à jour du seuil de grosse commande"
                 }
+            },
+            "capitalSnapshot": {
+                "store": {
+                    "success": "Capital et stock enregistrés avec succès",
+                    "error": "Erreur lors de l'enregistrement du capital et du stock",
+                    "alreadyExists": "Le capital et le stock ont déjà été enregistrés pour cette semaine"
+                }
             }
         },
         "users": {
@@ -63,6 +70,12 @@
                 "error": "Erreur lors de l'archivage de la commande",
                 "invalidOrderWeek": "La semaine de la commande doit être comprise entre la semaine 1 et la semaine en cours",
                 "invalidDeliveryWeek": "La semaine de livraison doit être postérieure ou égale à la semaine de la commande, et ne peut pas dépasser la semaine en cours"
+            }
+        },
+        "tonneau": {
+            "update": {
+                "success": "Quantité mise à jour avec succès",
+                "error": "Erreur lors de la mise à jour de la quantité"
             }
         },
         "resources": {
@@ -176,7 +189,8 @@
     "deposits": {
         "create": {
             "success": "Dépôt enregistré avec succès",
-            "error": "Erreur lors de l'enregistrement du dépôt"
+            "error": "Erreur lors de l'enregistrement du dépôt",
+            "invalidSoljundQuantity": "La quantité en provenance de la Doline de Soljund ne peut pas dépasser la quantité déposée"
         },
         "update": {
             "success": "Dépôt modifié avec succès",

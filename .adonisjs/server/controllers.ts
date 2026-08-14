@@ -16,6 +16,7 @@ export const controllers = {
     OrderArchives: () => import('#controllers/admin/order_archives_controller'),
     Organizations: () => import('#controllers/admin/organizations_controller'),
     Resources: () => import('#controllers/admin/resources_controller'),
+    Tonneau: () => import('#controllers/admin/tonneau_controller'),
     Users: () => import('#controllers/admin/users_controller'),
   },
   Auth: () => import('#controllers/auth_controller'),

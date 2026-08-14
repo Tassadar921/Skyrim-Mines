@@ -21,13 +21,14 @@ export default class StocksController {
     ) {}
 
     public async index({ inertia }: HttpContext) {
-        const [resources, materials, resourceStocks, materialStocks, resourceDepositTotals, resourceBuybackTotals] = await Promise.all([
+        const [resources, materials, resourceStocks, materialStocks, resourceDepositTotals, resourceBuybackTotals, soljundTotals] = await Promise.all([
             this.resourceRepository.all(),
             this.materialRepository.all(),
             this.resourceStockRepository.all(),
             this.materialStockRepository.all(),
             this.resourceDepositRepository.sumByResource(),
             this.resourceBuybackRepository.sumByResource(),
+            this.resourceDepositRepository.sumSoljundQuantityByResource(),
         ]);
 
         const resourceStockByResourceId = new Map(resourceStocks.map((s) => [s.resourceId, s]));
@@ -38,6 +39,7 @@ export default class StocksController {
                 ...new ResourceTransformer(r).toObject(),
                 quantityBarrel: (resourceDepositTotals.get(r.id) ?? 0) - (resourceBuybackTotals.get(r.id) ?? 0),
                 quantityPurchased: resourceStockByResourceId.get(r.id)?.quantityPurchased ?? 0,
+                soljundQuantity: soljundTotals.get(r.id) ?? 0,
             })),
             materials: materials.map((m) => ({
                 ...new MaterialTransformer(m).toObject(),

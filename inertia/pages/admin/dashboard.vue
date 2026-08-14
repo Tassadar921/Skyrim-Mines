@@ -3,7 +3,7 @@ import AdminLayout from '~/layouts/admin.vue';
 import { useAdminLayout } from '~/composables/use_admin_layout';
 import { useAuth } from '~/composables/use_auth';
 import { useI18n } from 'vue-i18n';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { router } from '@inertiajs/vue3';
 import { urlFor } from '~/client';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '~/components/ui/table';
@@ -31,6 +31,9 @@ type WeeklyRecap = {
     buybacksAmount: number;
     licensesAmount: number;
     employeeDueAmount: number;
+    capital: number | null;
+    stockValue: number | null;
+    totalCapital: number | null;
 };
 
 const props = defineProps<{
@@ -46,6 +49,10 @@ function formatWeekRange(recap: WeeklyRecap): string {
 
 function formatAmount(amount: number): string {
     return `${amount.toFixed(2)} s`;
+}
+
+function formatAmountOrDash(amount: number | null): string {
+    return amount === null ? t('admin.dashboard.weeklyRecap.notAvailable') : formatAmount(amount);
 }
 
 const castellanyTaxRate = ref(String(props.castellanyTaxRate));
@@ -65,6 +72,21 @@ function submitLargeOrderSetting() {
         urlFor('admin.dashboard.largeOrderSetting.update'),
         { thresholdQuantity: largeOrderThresholdQuantity.value },
         { preserveScroll: true, onFinish: () => (isSubmittingLargeOrderSetting.value = false) },
+    );
+}
+
+const currentWeekRecap = computed(() => props.weeklyRecap[0]);
+
+const capitalInput = ref('');
+const stockValueInput = ref('');
+const isSubmittingCapitalSnapshot = ref(false);
+
+function submitCapitalSnapshot() {
+    isSubmittingCapitalSnapshot.value = true;
+    router.post(
+        urlFor('admin.dashboard.capitalSnapshot.store'),
+        { capital: capitalInput.value, stockValue: stockValueInput.value },
+        { preserveScroll: true, onFinish: () => (isSubmittingCapitalSnapshot.value = false) },
     );
 }
 </script>
@@ -87,6 +109,34 @@ function submitLargeOrderSetting() {
                     {{ t('admin.dashboard.largeOrderSetting.save') }}
                 </Button>
             </div>
+
+            <div class="rounded-md border p-5 space-y-4 w-full max-w-xs">
+                <div class="text-sm font-medium">{{ t('admin.dashboard.capitalSnapshot.title') }}</div>
+                <template v-if="currentWeekRecap && currentWeekRecap.capital !== null && currentWeekRecap.stockValue !== null">
+                    <div class="text-sm flex items-center justify-between">
+                        <span class="text-muted-foreground">{{ t('admin.dashboard.capitalSnapshot.capital') }}</span>
+                        <span class="font-medium">{{ formatAmount(currentWeekRecap.capital) }}</span>
+                    </div>
+                    <div class="text-sm flex items-center justify-between">
+                        <span class="text-muted-foreground">{{ t('admin.dashboard.capitalSnapshot.stockValue') }}</span>
+                        <span class="font-medium">{{ formatAmount(currentWeekRecap.stockValue) }}</span>
+                    </div>
+                    <div class="text-sm flex items-center justify-between border-t pt-3">
+                        <span class="text-muted-foreground">{{ t('admin.dashboard.capitalSnapshot.totalCapital') }}</span>
+                        <span class="font-medium">{{ formatAmount(currentWeekRecap.totalCapital ?? 0) }}</span>
+                    </div>
+                </template>
+                <template v-else>
+                    <p class="text-xs text-muted-foreground">{{ t('admin.dashboard.capitalSnapshot.notEntered') }}</p>
+                    <template v-if="isAdmin">
+                        <Input v-model="capitalInput" type="number" :label="t('admin.dashboard.capitalSnapshot.capital')" min="0" step="0.01" />
+                        <Input v-model="stockValueInput" type="number" :label="t('admin.dashboard.capitalSnapshot.stockValue')" min="0" step="0.01" />
+                        <Button size="sm" :loading="isSubmittingCapitalSnapshot" :disabled="isSubmittingCapitalSnapshot" @click="submitCapitalSnapshot">
+                            {{ t('admin.dashboard.capitalSnapshot.save') }}
+                        </Button>
+                    </template>
+                </template>
+            </div>
         </div>
 
         <div class="rounded-md border">
@@ -98,13 +148,13 @@ function submitLargeOrderSetting() {
                     <TableRow>
                         <TableHead>{{ t('admin.dashboard.weeklyRecap.week') }}</TableHead>
                         <TableHead>{{ t('admin.dashboard.weeklyRecap.deliveries') }}</TableHead>
-                        <TableHead>{{ t('admin.dashboard.weeklyRecap.commissions') }}</TableHead>
-                        <TableHead>{{ t('admin.dashboard.weeklyRecap.largeOrderFees') }}</TableHead>
                         <TableHead>{{ t('admin.dashboard.weeklyRecap.profit') }}</TableHead>
                         <TableHead>{{ t('admin.dashboard.weeklyRecap.weeklyTax') }}</TableHead>
                         <TableHead>{{ t('admin.dashboard.weeklyRecap.buybacks') }}</TableHead>
                         <TableHead>{{ t('admin.dashboard.weeklyRecap.licenses') }}</TableHead>
                         <TableHead>{{ t('admin.dashboard.weeklyRecap.employeeDue') }}</TableHead>
+                        <TableHead>{{ t('admin.dashboard.weeklyRecap.capital') }}</TableHead>
+                        <TableHead>{{ t('admin.dashboard.weeklyRecap.stockValue') }}</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -118,8 +168,6 @@ function submitLargeOrderSetting() {
                                 </div>
                             </TableCell>
                             <TableCell class="text-sm">{{ formatAmount(recap.deliveriesAmount) }}</TableCell>
-                            <TableCell class="text-sm text-muted-foreground">{{ formatAmount(recap.commissionsAmount) }}</TableCell>
-                            <TableCell class="text-sm text-muted-foreground">{{ formatAmount(recap.largeOrderFeesAmount) }}</TableCell>
                             <TableCell class="text-sm" :class="recap.profit >= 0 ? 'text-green-600' : 'text-destructive'">
                                 {{ formatAmount(recap.profit) }}
                             </TableCell>
@@ -127,6 +175,8 @@ function submitLargeOrderSetting() {
                             <TableCell class="text-sm">{{ formatAmount(recap.buybacksAmount) }}</TableCell>
                             <TableCell class="text-sm">{{ formatAmount(recap.licensesAmount) }}</TableCell>
                             <TableCell class="text-sm">{{ formatAmount(recap.employeeDueAmount) }}</TableCell>
+                            <TableCell class="text-sm">{{ formatAmountOrDash(recap.capital) }}</TableCell>
+                            <TableCell class="text-sm">{{ formatAmountOrDash(recap.stockValue) }}</TableCell>
                         </TableRow>
                     </template>
                     <TableRow v-else>

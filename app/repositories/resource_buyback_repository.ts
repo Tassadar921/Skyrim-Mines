@@ -71,6 +71,18 @@ export default class ResourceBuybackRepository extends BaseRepository<typeof Res
         return new Map(rows.map((row) => [row.resourceId, Number(row.$extras.total)]));
     }
 
+    public async sumByUserAndResource(): Promise<Map<string, number>> {
+        const rows = await ResourceBuyback.query().select('userId', 'resourceId').sum('quantity as total').groupBy('userId', 'resourceId');
+
+        return new Map(rows.map((row) => [`${row.userId}:${row.resourceId}`, Number(row.$extras.total)]));
+    }
+
+    public async sumForUserAndResource(userId: string, resourceId: string): Promise<number> {
+        const result = await ResourceBuyback.query().where('userId', userId).where('resourceId', resourceId).sum('quantity as total').first();
+
+        return Number(result?.$extras.total ?? 0);
+    }
+
     public async paginateGrouped(params: { page: number; perPage: number; sort: string; dir: 'asc' | 'desc'; search?: string; week?: number }): Promise<{
         groups: BuybackGroup[];
         total: number;

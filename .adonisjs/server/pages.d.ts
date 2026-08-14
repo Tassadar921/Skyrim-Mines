@@ -29,6 +29,7 @@ declare module '@adonisjs/inertia/types' {
     'admin/resources/create': ExtractProps<(typeof import('../../inertia/pages/admin/resources/create.vue'))['default']>
     'admin/resources/index': ExtractProps<(typeof import('../../inertia/pages/admin/resources/index.vue'))['default']>
     'admin/resources/show': ExtractProps<(typeof import('../../inertia/pages/admin/resources/show.vue'))['default']>
+    'admin/tonneau/index': ExtractProps<(typeof import('../../inertia/pages/admin/tonneau/index.vue'))['default']>
     'admin/users/create': ExtractProps<(typeof import('../../inertia/pages/admin/users/create.vue'))['default']>
     'admin/users/index': ExtractProps<(typeof import('../../inertia/pages/admin/users/index.vue'))['default']>
     'admin/users/show': ExtractProps<(typeof import('../../inertia/pages/admin/users/show.vue'))['default']>

@@ -34,6 +34,7 @@
         "trigger": "Réaliser un dépôt",
         "title": "Réaliser un dépôt",
         "quantity": "Quantité",
+        "soljundColumn": "Dont Doline de Soljund",
         "submit": "Valider",
         "myDeposits": {
             "title": "Mes dépôts récents",
@@ -57,6 +58,7 @@
             "buyPrice": "Prix d'achat",
             "sellPrice": "Prix de vente",
             "quantityBarrel": "Dans le tonneau",
+            "soljundQuantity": "dont {quantity} de la Doline de Soljund (à vendre au Thalmor)",
             "quantityPurchased": "Acheté",
             "inStock": "En stock",
             "stockValue": "Valeur du stock",
@@ -260,6 +262,7 @@
                 "licenses": "Licences d'exploitation",
                 "resources": "Ressources",
                 "materials": "Matériaux",
+                "tonneau": "Tonneau",
                 "buybacks": "Historique des rachats",
                 "devis": "Devis",
                 "commandes": "Commandes",
@@ -279,6 +282,14 @@
                 "threshold": "Quantité seuil",
                 "save": "Mettre à jour"
             },
+            "capitalSnapshot": {
+                "title": "Capital & stock de la semaine",
+                "capital": "Capital",
+                "stockValue": "Valeur du stock",
+                "totalCapital": "Capital total",
+                "notEntered": "Pas encore renseigné pour cette semaine",
+                "save": "Enregistrer"
+            },
             "chart": {
                 "title": "Évolution hebdomadaire"
             },
@@ -293,7 +304,11 @@
                 "buybacks": "Rachats",
                 "licenses": "Licences",
                 "employeeDue": "Dû aux employés",
-                "empty": "Aucune donnée pour le moment"
+                "capital": "Capital",
+                "stockValue": "Valeur du stock",
+                "totalCapital": "Capital total",
+                "empty": "Aucune donnée pour le moment",
+                "notAvailable": "—"
             }
         },
         "users": {
@@ -701,9 +716,7 @@
                     "recipient": "Client ou organisation",
                     "recipientPlaceholder": "Sélectionner un destinataire",
                     "orderWeek": "Semaine de la commande",
-                    "orderWeekHint": "Doit être comprise entre la semaine 1 et la semaine en cours ({current})",
-                    "deliveryWeek": "Semaine de la livraison",
-                    "deliveryWeekHint": "Doit être postérieure ou égale à la semaine de la commande ({order}) et ne peut pas dépasser la semaine en cours ({current})"
+                    "deliveryWeek": "Semaine de la livraison"
                 }
             }
         },
@@ -749,6 +762,17 @@
                 "description": "La commande n° {number} redeviendra « À livrer » si elle était marquée comme entièrement livrée. Cette action est irréversible.",
                 "cancel": "Annuler",
                 "confirm": "Supprimer"
+            }
+        },
+        "tonneau": {
+            "title": "Tonneau",
+            "description": "Quantités actuellement au tonneau, par utilisateur et par ressource.",
+            "table": {
+                "user": "Utilisateur",
+                "resource": "Ressource",
+                "type": "Type",
+                "quantity": "Quantité",
+                "empty": "Aucune quantité au tonneau pour le moment"
             }
         }
     }

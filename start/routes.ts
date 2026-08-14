@@ -53,6 +53,7 @@ router
         router.get('/', [controllers.admin.Dashboard, 'index']).as('admin.dashboard').use(readOnly);
         router.put('/castellany-tax', [controllers.admin.Dashboard, 'updateCastellanyTax']).as('admin.dashboard.castellanyTax.update').use(middleware.admin());
         router.put('/large-order-threshold', [controllers.admin.Dashboard, 'updateLargeOrderSetting']).as('admin.dashboard.largeOrderSetting.update').use(middleware.admin());
+        router.post('/capital-snapshot', [controllers.admin.Dashboard, 'storeCapitalSnapshot']).as('admin.dashboard.capitalSnapshot.store').use(middleware.admin());
 
         router.get('/users', [controllers.admin.Users, 'index']).as('admin.users.index').use(readOnly);
         router.get('/users/create', [controllers.admin.Users, 'create']).as('admin.users.create').use(middleware.admin());
@@ -98,6 +99,9 @@ router
 
         router.get('/livraisons', [controllers.admin.Livraisons, 'index']).as('admin.livraisons.index').use(readOnly);
         router.delete('/livraisons/:id', [controllers.admin.Livraisons, 'destroy']).as('admin.livraisons.destroy').use(middleware.admin());
+
+        router.get('/tonneau', [controllers.admin.Tonneau, 'index']).as('admin.tonneau.index').use(readOnly);
+        router.patch('/tonneau', [controllers.admin.Tonneau, 'update']).as('admin.tonneau.update').use(middleware.admin());
 
         router.get('/organizations', [controllers.admin.Organizations, 'index']).as('admin.organizations.index').use(readOnly);
         router.get('/organizations/create', [controllers.admin.Organizations, 'create']).as('admin.organizations.create').use(middleware.admin());

@@ -403,6 +403,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/dashboard_controller').default['updateLargeOrderSetting']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'admin.dashboard.capitalSnapshot.store': {
+    methods: ["POST"]
+    pattern: '/admin/capital-snapshot'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/admin/company_capital_snapshot').storeCompanyCapitalSnapshotValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/admin/company_capital_snapshot').storeCompanyCapitalSnapshotValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/dashboard_controller').default['storeCapitalSnapshot']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/dashboard_controller').default['storeCapitalSnapshot']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'admin.users.index': {
     methods: ["GET","HEAD"]
     pattern: '/admin/users'
@@ -845,6 +857,30 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/livraisons_controller').default['destroy']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/livraisons_controller').default['destroy']>>>
+    }
+  }
+  'admin.tonneau.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/admin/tonneau'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/tonneau_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/tonneau_controller').default['index']>>>
+    }
+  }
+  'admin.tonneau.update': {
+    methods: ["PATCH"]
+    pattern: '/admin/tonneau'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/admin/tonneau').updateBarrelQuantityValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/admin/tonneau').updateBarrelQuantityValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/tonneau_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/tonneau_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'admin.organizations.index': {

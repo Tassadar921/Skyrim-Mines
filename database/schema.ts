@@ -37,6 +37,23 @@ export class CastellanyTaxSchema extends BaseModel {
   declare updatedAt: DateTime | null
 }
 
+export class CompanyCapitalSnapshotSchema extends BaseModel {
+  static $columns = ['capital', 'createdAt', 'id', 'stockValue', 'updatedAt', 'weekNumber'] as const
+  $columns = CompanyCapitalSnapshotSchema.$columns
+  @column()
+  declare capital: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare stockValue: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare weekNumber: number
+}
+
 export class DeliverySchema extends BaseModel {
   static $columns = ['castellanyId', 'commissionAmount', 'createdAt', 'deliveredAt', 'deliveredByUserId', 'deliveredWeekNumber', 'id', 'largeOrderFeeAmount', 'orderId', 'updatedAt'] as const
   $columns = DeliverySchema.$columns
@@ -340,6 +357,25 @@ export class QuoteSchema extends BaseModel {
   declare userId: string
 }
 
+export class ResourceBarrelAdjustmentSchema extends BaseModel {
+  static $columns = ['adminId', 'createdAt', 'delta', 'id', 'resourceId', 'updatedAt', 'userId'] as const
+  $columns = ResourceBarrelAdjustmentSchema.$columns
+  @column()
+  declare adminId: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare delta: number
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare resourceId: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare userId: string
+}
+
 export class ResourceBuybackBatchSchema extends BaseModel {
   static $columns = ['createdAt', 'id', 'updatedAt', 'weekNumber'] as const
   $columns = ResourceBuybackBatchSchema.$columns
@@ -375,7 +411,7 @@ export class ResourceBuybackSchema extends BaseModel {
 }
 
 export class ResourceDepositSchema extends BaseModel {
-  static $columns = ['createdAt', 'id', 'quantity', 'resourceId', 'updatedAt', 'userId'] as const
+  static $columns = ['createdAt', 'id', 'quantity', 'resourceId', 'soljundQuantity', 'updatedAt', 'userId'] as const
   $columns = ResourceDepositSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -385,6 +421,8 @@ export class ResourceDepositSchema extends BaseModel {
   declare quantity: number
   @column()
   declare resourceId: string
+  @column()
+  declare soljundQuantity: number
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
   @column()

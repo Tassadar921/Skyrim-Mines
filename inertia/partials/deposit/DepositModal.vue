@@ -30,6 +30,9 @@ const open = ref(false);
 const isSubmitting = ref(false);
 const quantities = reactive<Record<string, number>>(buildQuantities(props.resources));
 
+const soljundResourceId = computed(() => minerais.value.find((r) => r.name === 'Pierre de Lune')?.id);
+const soljundQuantity = ref(0);
+
 watch(
     () => props.resources,
     (value) => {
@@ -39,6 +42,9 @@ watch(
 
 function setQuantity(id: string, value: number) {
     quantities[id] = value;
+    if (id === soljundResourceId.value && soljundQuantity.value > value) {
+        soljundQuantity.value = value;
+    }
 }
 
 const EDIT_WINDOW_MS = 60 * 60 * 1000;
@@ -81,7 +87,11 @@ function saveDeposit(deposit: MyDeposit) {
 }
 
 function submitDeposit() {
-    const items = props.resources.map((resource) => ({ resourceId: resource.id, quantity: quantities[resource.id] ?? 0 }));
+    const items = props.resources.map((resource) => ({
+        resourceId: resource.id,
+        quantity: quantities[resource.id] ?? 0,
+        soljundQuantity: resource.id === soljundResourceId.value ? soljundQuantity.value : 0,
+    }));
 
     isSubmitting.value = true;
     router.post(
@@ -91,6 +101,7 @@ function submitDeposit() {
             preserveScroll: true,
             onSuccess: () => {
                 Object.assign(quantities, buildQuantities(props.resources));
+                soljundQuantity.value = 0;
                 open.value = false;
             },
             onFinish: () => {
@@ -124,6 +135,7 @@ function submitDeposit() {
                                 <TableRow>
                                     <TableHead>{{ t('stocks.table.name') }}</TableHead>
                                     <TableHead>{{ t('deposit.quantity') }}</TableHead>
+                                    <TableHead>{{ t('deposit.soljundColumn') }}</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -131,6 +143,15 @@ function submitDeposit() {
                                     <TableCell class="text-sm font-medium">{{ resource.name }}</TableCell>
                                     <TableCell>
                                         <QuantityStepper :model-value="quantities[resource.id] ?? 0" @update:model-value="(value) => setQuantity(resource.id, value)" />
+                                    </TableCell>
+                                    <TableCell>
+                                        <QuantityStepper
+                                            v-if="resource.id === soljundResourceId"
+                                            :model-value="soljundQuantity"
+                                            :max="quantities[resource.id] ?? 0"
+                                            show-max
+                                            @update:model-value="(value) => (soljundQuantity = value)"
+                                        />
                                     </TableCell>
                                 </TableRow>
                             </TableBody>

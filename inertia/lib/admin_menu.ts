@@ -1,7 +1,7 @@
 import type { Component } from 'vue';
 import type { useI18n } from 'vue-i18n';
 import type { urlFor } from '~/client';
-import { BarChart2, Home, Users, Pickaxe, Package, History, Building2, FileText, ShoppingCart, Truck, BadgeCheck, Landmark } from '@lucide/vue';
+import { BarChart2, Home, Users, Pickaxe, Package, Barrel, History, Building2, FileText, ShoppingCart, Truck, BadgeCheck, Landmark } from '@lucide/vue';
 
 type RouteName = Parameters<typeof urlFor>[0];
 
@@ -19,6 +19,7 @@ export const getItems = (t: ReturnType<typeof useI18n>['t']): MenuItem[] => [
     { title: t('admin.layout.menu.licenses'), route: 'admin.licenses.index', icon: BadgeCheck },
     { title: t('admin.layout.menu.resources'), route: 'admin.resources.index', icon: Pickaxe },
     { title: t('admin.layout.menu.materials'), route: 'admin.materials.index', icon: Package },
+    { title: t('admin.layout.menu.tonneau'), route: 'admin.tonneau.index', icon: Barrel },
     { title: t('admin.layout.menu.buybacks'), route: 'admin.buybacks.index', icon: History },
     { title: t('admin.layout.menu.devis'), route: 'admin.devis.index', icon: FileText },
     { title: t('admin.layout.menu.commandes'), route: 'admin.commandes.index', icon: ShoppingCart },

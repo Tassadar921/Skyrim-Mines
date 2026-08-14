@@ -6,10 +6,12 @@ import ResourceBuybackRepository from '#repositories/resource_buyback_repository
 import LicensePaymentRepository from '#repositories/license_payment_repository';
 import CastellanyTaxRepository from '#repositories/castellany_tax_repository';
 import LargeOrderSettingRepository from '#repositories/large_order_setting_repository';
+import CompanyCapitalSnapshotRepository from '#repositories/company_capital_snapshot_repository';
 import UserRoleEnum from '#types/enum/user_role_enum';
 import { getWeekNumber, getWeekRange } from '#helpers/game_week_helper';
 import { updateCastellanyTaxValidator } from '#validators/admin/castellany_tax';
 import { updateLargeOrderSettingValidator } from '#validators/admin/large_order_setting';
+import { storeCompanyCapitalSnapshotValidator } from '#validators/admin/company_capital_snapshot';
 
 const MAX_WEEKS_IN_RECAP = 20;
 
@@ -20,12 +22,13 @@ export default class DashboardController {
         private readonly licensePaymentRepository: LicensePaymentRepository = new LicensePaymentRepository(),
         private readonly castellanyTaxRepository: CastellanyTaxRepository = new CastellanyTaxRepository(),
         private readonly largeOrderSettingRepository: LargeOrderSettingRepository = new LargeOrderSettingRepository(),
+        private readonly companyCapitalSnapshotRepository: CompanyCapitalSnapshotRepository = new CompanyCapitalSnapshotRepository(),
     ) {}
 
     public async index({ inertia }: HttpContext) {
         const currentWeek = getWeekNumber(DateTime.now());
 
-        const [deliveryTotals, commissionTotals, largeOrderFeeTotals, buybackTotals, licenseTotals, employeeDueTotals, castellanyTax, largeOrderSetting] = await Promise.all([
+        const [deliveryTotals, commissionTotals, largeOrderFeeTotals, buybackTotals, licenseTotals, employeeDueTotals, castellanyTax, largeOrderSetting, capitalSnapshotsByWeek] = await Promise.all([
             this.deliveryRepository.getWeeklyTotals(),
             this.deliveryRepository.getWeeklyCommissionTotals(),
             this.deliveryRepository.getWeeklyLargeOrderFeeTotals(),
@@ -34,6 +37,7 @@ export default class DashboardController {
             this.resourceBuybackRepository.getWeeklyTotalsByRole(UserRoleEnum.STAFF),
             this.castellanyTaxRepository.get(),
             this.largeOrderSettingRepository.get(),
+            this.companyCapitalSnapshotRepository.allByWeek(),
         ]);
 
         const deliveriesByWeek = new Map(deliveryTotals.map((entry) => [entry.weekNumber, entry.totalAmount]));
@@ -54,6 +58,9 @@ export default class DashboardController {
             const largeOrderFeesAmount = largeOrderFeesByWeek.get(weekNumber) ?? 0;
             const grossProfit = (deliveriesProfitByWeek.get(weekNumber) ?? 0) + licensesAmount;
             const profit = grossProfit + largeOrderFeesAmount - commissionsAmount;
+            const capitalSnapshot = capitalSnapshotsByWeek.get(weekNumber);
+            const capital = capitalSnapshot ? Number(capitalSnapshot.capital) : null;
+            const stockValue = capitalSnapshot ? Number(capitalSnapshot.stockValue) : null;
             weeklyRecap.push({
                 weekNumber,
                 startDate: start.toJSDate().toISOString(),
@@ -66,6 +73,9 @@ export default class DashboardController {
                 buybacksAmount: buybacksByWeek.get(weekNumber) ?? 0,
                 licensesAmount,
                 employeeDueAmount: employeeDueByWeek.get(weekNumber) ?? 0,
+                capital,
+                stockValue,
+                totalCapital: capital !== null && stockValue !== null ? capital + stockValue : null,
             });
         }
 
@@ -99,6 +109,27 @@ export default class DashboardController {
         } catch (e) {
             logger.error({ err: e }, 'dashboard.updateLargeOrderSetting failed');
             session.flash('error', i18n.t('messages.admin.dashboard.largeOrderSetting.update.error'));
+        }
+
+        return response.redirect().back();
+    }
+
+    public async storeCapitalSnapshot({ request, response, session, i18n }: HttpContext) {
+        const { capital, stockValue } = await request.validateUsing(storeCompanyCapitalSnapshotValidator);
+        const weekNumber = getWeekNumber(DateTime.now());
+
+        try {
+            const existing = await this.companyCapitalSnapshotRepository.findOneBy({ weekNumber });
+            if (existing) {
+                session.flash('error', i18n.t('messages.admin.dashboard.capitalSnapshot.store.alreadyExists'));
+                return response.redirect().back();
+            }
+
+            await this.companyCapitalSnapshotRepository.create({ weekNumber, capital: String(capital), stockValue: String(stockValue) });
+            session.flash('success', i18n.t('messages.admin.dashboard.capitalSnapshot.store.success'));
+        } catch (e) {
+            logger.error({ err: e }, 'dashboard.storeCapitalSnapshot failed');
+            session.flash('error', i18n.t('messages.admin.dashboard.capitalSnapshot.store.error'));
         }
 
         return response.redirect().back();
