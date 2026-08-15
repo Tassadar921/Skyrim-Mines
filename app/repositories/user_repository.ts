@@ -14,8 +14,8 @@ export default class UserRepository extends BaseRepository<typeof User> {
         super(User);
     }
 
-    public async paginate(params: { page: number; perPage: number; sort: string; dir: 'asc' | 'desc'; search?: string; withoutAvatar?: boolean }) {
-        const { page, perPage, sort, dir, search, withoutAvatar } = params;
+    public async paginate(params: { page: number; perPage: number; sort: string; dir: 'asc' | 'desc'; search?: string; withoutAvatar?: boolean; role?: UserRoleEnum; enabled?: string }) {
+        const { page, perPage, sort, dir, search, withoutAvatar, role, enabled } = params;
         const allowedSorts: Record<string, string> = {
             username: 'username',
             createdAt: 'created_at',
@@ -28,6 +28,12 @@ export default class UserRepository extends BaseRepository<typeof User> {
         }
         if (withoutAvatar) {
             q.whereNull('avatarId');
+        }
+        if (role) {
+            q.where('role', role);
+        }
+        if (enabled === 'true' || enabled === 'false') {
+            q.where('enabled', enabled === 'true');
         }
         return q.paginate(page, perPage);
     }
@@ -79,6 +85,11 @@ export default class UserRepository extends BaseRepository<typeof User> {
     public async incrementBalance(id: string, amount: number, trx?: TransactionClientContract): Promise<void> {
         const query = trx ? User.query({ client: trx }) : User.query();
         await query.where('id', id).increment('balance', amount);
+    }
+
+    public async incrementPickaxes(id: string, amount: number, trx?: TransactionClientContract): Promise<void> {
+        const query = trx ? User.query({ client: trx }) : User.query();
+        await query.where('id', id).increment('pickaxes', amount);
     }
 
     /**

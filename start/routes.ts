@@ -15,6 +15,7 @@ transmit.registerRoutes((route) => {
 router.get('/', [controllers.Home, 'index']).as('home').use(middleware.auth());
 router.get('/tarifs', [controllers.Tarifs, 'index']).as('tarifs').use(middleware.auth());
 const companyOnly = middleware.admin({ roles: [UserRoleEnum.ADMIN, UserRoleEnum.AUDITOR, UserRoleEnum.STAFF] });
+const employeeOnly = middleware.admin({ roles: [UserRoleEnum.ADMIN, UserRoleEnum.STAFF] });
 router.get('/stocks', [controllers.Stocks, 'index']).as('stocks').use(middleware.auth()).use(companyOnly);
 router.get('/organigramme', [controllers.Organigramme, 'index']).as('organigramme').use(middleware.auth());
 router.get('/devis', [controllers.Devis, 'create']).as('devis.create').use(middleware.auth());
@@ -32,6 +33,8 @@ router.patch('/stocks/materials/:id', [controllers.Stocks, 'updateMaterialQuanti
 router.post('/deposits', [controllers.Deposits, 'store']).as('deposits.store').use(middleware.auth());
 router.patch('/deposits/:id', [controllers.Deposits, 'update']).as('deposits.update').use(middleware.auth());
 router.post('/buybacks', [controllers.Buybacks, 'store']).as('buybacks.store').use(middleware.auth()).use(middleware.admin());
+router.post('/pickaxes/take', [controllers.Pickaxes, 'take']).as('pickaxes.take').use(middleware.auth()).use(employeeOnly);
+router.post('/pickaxes/deposit', [controllers.Pickaxes, 'deposit']).as('pickaxes.deposit').use(middleware.auth()).use(employeeOnly);
 
 const organizationManage = middleware.organization({ roles: [OrganizationRoleEnum.OWNER, OrganizationRoleEnum.ADMIN] });
 const organizationOwnerOnly = middleware.organization({ roles: [OrganizationRoleEnum.OWNER] });

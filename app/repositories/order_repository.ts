@@ -24,12 +24,13 @@ export default class OrderRepository extends BaseRepository<typeof Order> {
         return Order.query().where('id', id).preload('file').preload('lines').firstOrFail();
     }
 
-    public async paginate(params: { page: number; perPage: number; sort: string; dir: 'asc' | 'desc'; search?: string }) {
-        const { page, perPage, sort, dir, search } = params;
+    public async paginate(params: { page: number; perPage: number; sort: string; dir: 'asc' | 'desc'; search?: string; status?: OrderStatusEnum }) {
+        const { page, perPage, sort, dir, search, status } = params;
         const allowedSorts: Record<string, string> = {
             number: 'number',
             createdAt: 'created_at',
             requesterName: 'requester_name',
+            organizationName: 'organization_name',
             totalAmount: 'total_amount',
         };
         const sortColumn = allowedSorts[sort] ?? 'created_at';
@@ -39,6 +40,9 @@ export default class OrderRepository extends BaseRepository<typeof Order> {
             q.where((builder) => {
                 builder.whereILike('requesterName', `%${search}%`).orWhereILike('organizationName', `%${search}%`);
             });
+        }
+        if (status) {
+            q.where('status', status);
         }
         return q.paginate(page, perPage);
     }

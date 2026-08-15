@@ -26,6 +26,8 @@ export type ScannedRoutes = {
     'deposits.store': { paramsTuple?: []; params?: {} }
     'deposits.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'buybacks.store': { paramsTuple?: []; params?: {} }
+    'pickaxes.take': { paramsTuple?: []; params?: {} }
+    'pickaxes.deposit': { paramsTuple?: []; params?: {} }
     'organization.show': { paramsTuple?: []; params?: {} }
     'organization.members.store': { paramsTuple?: []; params?: {} }
     'organization.members.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -186,6 +188,8 @@ export type ScannedRoutes = {
     'livraisons.store': { paramsTuple: [ParamValue]; params: {'orderId': ParamValue} }
     'deposits.store': { paramsTuple?: []; params?: {} }
     'buybacks.store': { paramsTuple?: []; params?: {} }
+    'pickaxes.take': { paramsTuple?: []; params?: {} }
+    'pickaxes.deposit': { paramsTuple?: []; params?: {} }
     'organization.members.store': { paramsTuple?: []; params?: {} }
     'admin.dashboard.capitalSnapshot.store': { paramsTuple?: []; params?: {} }
     'admin.users.store': { paramsTuple?: []; params?: {} }

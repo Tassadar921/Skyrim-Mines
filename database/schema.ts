@@ -466,7 +466,7 @@ export class ResourceSchema extends BaseModel {
 }
 
 export class UserSchema extends BaseModel {
-  static $columns = ['avatarId', 'balance', 'createdAt', 'discordId', 'enabled', 'id', 'lastLoginAt', 'organizationId', 'organizationRole', 'role', 'updatedAt', 'username'] as const
+  static $columns = ['avatarId', 'balance', 'createdAt', 'discordId', 'enabled', 'id', 'lastLoginAt', 'organizationId', 'organizationRole', 'pickaxes', 'role', 'updatedAt', 'username'] as const
   $columns = UserSchema.$columns
   @column()
   declare avatarId: string | null
@@ -486,6 +486,8 @@ export class UserSchema extends BaseModel {
   declare organizationId: string | null
   @column()
   declare organizationRole: string | null
+  @column()
+  declare pickaxes: number
   @column()
   declare role: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })

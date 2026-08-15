@@ -2,15 +2,35 @@ import { type HttpContext } from '@adonisjs/core/http';
 import logger from '@adonisjs/core/services/logger';
 import CastellanyRepository from '#repositories/castellany_repository';
 import CastellanyTransformer from '#transformers/castellany_transformer';
-import { createCastellanyValidator, updateCastellanyValidator } from '#validators/admin/castellanies';
+import { createCastellanyValidator, updateCastellanyValidator, indexCastellanyValidator } from '#validators/admin/castellanies';
 
 export default class CastellaniesController {
     constructor(private readonly castellanyRepository: CastellanyRepository = new CastellanyRepository()) {}
 
-    public async index({ inertia }: HttpContext) {
-        const castellanies = await this.castellanyRepository.all();
+    public async index({ inertia, request }: HttpContext) {
+        const { page, sort, dir, search } = await request.validateUsing(indexCastellanyValidator);
+
+        const currentSort = sort ?? 'name';
+        const currentDir = dir ?? 'asc';
+        const currentPage = page ?? 1;
+
+        const castellanies = await this.castellanyRepository.paginate({
+            page: currentPage,
+            perPage: 20,
+            sort: currentSort,
+            dir: currentDir,
+            search,
+        });
+
         return inertia.render('admin/castellanies/index', {
-            castellanies: castellanies.map((castellany) => new CastellanyTransformer(castellany).toObject()),
+            castellanies: castellanies.all().map((castellany) => new CastellanyTransformer(castellany).toObject()),
+            meta: {
+                total: castellanies.total,
+                currentPage: castellanies.currentPage,
+                lastPage: castellanies.lastPage,
+                perPage: castellanies.perPage,
+            },
+            filters: { search: search ?? '', sort: currentSort, dir: currentDir },
         });
     }
 

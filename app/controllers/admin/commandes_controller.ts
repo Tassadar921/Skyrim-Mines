@@ -14,7 +14,7 @@ export default class CommandesController {
     ) {}
 
     public async index({ inertia, request }: HttpContext) {
-        const { page, sort, dir, search } = await request.validateUsing(indexOrderValidator);
+        const { page, sort, dir, search, status } = await request.validateUsing(indexOrderValidator);
 
         const currentSort = sort ?? 'createdAt';
         const currentDir = dir ?? 'desc';
@@ -26,6 +26,7 @@ export default class CommandesController {
             sort: currentSort,
             dir: currentDir,
             search,
+            status,
         });
 
         return inertia.render('admin/commandes/index', {
@@ -61,7 +62,7 @@ export default class CommandesController {
                 lastPage: orders.lastPage,
                 perPage: orders.perPage,
             },
-            filters: { search: search ?? '', sort: currentSort, dir: currentDir },
+            filters: { search: search ?? '', sort: currentSort, dir: currentDir, status: status ?? '' },
         });
     }
 

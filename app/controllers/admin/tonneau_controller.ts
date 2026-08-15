@@ -5,7 +5,7 @@ import UserRepository from '#repositories/user_repository';
 import ResourceDepositRepository from '#repositories/resource_deposit_repository';
 import ResourceBuybackRepository from '#repositories/resource_buyback_repository';
 import ResourceBarrelAdjustmentRepository from '#repositories/resource_barrel_adjustment_repository';
-import { updateBarrelQuantityValidator } from '#validators/admin/tonneau';
+import { indexTonneauValidator, updateBarrelQuantityValidator } from '#validators/admin/tonneau';
 
 export default class TonneauController {
     constructor(
@@ -16,7 +16,14 @@ export default class TonneauController {
         private readonly resourceBarrelAdjustmentRepository: ResourceBarrelAdjustmentRepository = new ResourceBarrelAdjustmentRepository(),
     ) {}
 
-    public async index({ inertia }: HttpContext) {
+    public async index({ inertia, request }: HttpContext) {
+        const { page, sort, dir, search, resourceType } = await request.validateUsing(indexTonneauValidator);
+
+        const currentSort = sort ?? 'username';
+        const currentDir = dir ?? 'asc';
+        const currentPage = page ?? 1;
+        const perPage = 20;
+
         const [resources, users, depositTotals, buybackTotals, adjustmentTotals] = await Promise.all([
             this.resourceRepository.all(),
             this.userRepository.all(),
@@ -29,7 +36,7 @@ export default class TonneauController {
         const userById = new Map(users.map((user) => [user.id, user]));
         const keys = new Set([...depositTotals.keys(), ...buybackTotals.keys(), ...adjustmentTotals.keys()]);
 
-        const entries = [...keys]
+        let entries = [...keys]
             .map((key) => {
                 const [userId, resourceId] = key.split(':');
                 const resource = resourceById.get(resourceId);
@@ -47,10 +54,32 @@ export default class TonneauController {
                     quantity,
                 };
             })
-            .filter((entry): entry is NonNullable<typeof entry> => entry !== null && entry.quantity !== 0)
-            .sort((a, b) => a.username.localeCompare(b.username) || a.resourceName.localeCompare(b.resourceName));
+            .filter((entry): entry is NonNullable<typeof entry> => entry !== null && entry.quantity !== 0);
 
-        return inertia.render('admin/tonneau/index', { entries });
+        if (search) {
+            const needle = search.toLowerCase();
+            entries = entries.filter((entry) => entry.username.toLowerCase().includes(needle) || entry.resourceName.toLowerCase().includes(needle));
+        }
+
+        if (resourceType) {
+            entries = entries.filter((entry) => entry.resourceType === resourceType);
+        }
+
+        entries.sort((a, b) => {
+            const comparison = a[currentSort].localeCompare(b[currentSort]);
+            return currentDir === 'asc' ? comparison : -comparison;
+        });
+
+        const total = entries.length;
+        const lastPage = Math.max(1, Math.ceil(total / perPage));
+        const start = (currentPage - 1) * perPage;
+        const paginated = entries.slice(start, start + perPage);
+
+        return inertia.render('admin/tonneau/index', {
+            entries: paginated,
+            meta: { total, currentPage, lastPage, perPage },
+            filters: { search: search ?? '', sort: currentSort, dir: currentDir, resourceType: resourceType ?? 'all' },
+        });
     }
 
     public async update({ request, auth, response, session, i18n }: HttpContext) {

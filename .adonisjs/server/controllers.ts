@@ -28,6 +28,7 @@ export const controllers = {
   Livraisons: () => import('#controllers/livraisons_controller'),
   Organigramme: () => import('#controllers/organigramme_controller'),
   Organization: () => import('#controllers/organization_controller'),
+  Pickaxes: () => import('#controllers/pickaxes_controller'),
   Stocks: () => import('#controllers/stocks_controller'),
   Tarifs: () => import('#controllers/tarifs_controller'),
 }

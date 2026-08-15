@@ -271,6 +271,30 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/buybacks_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'pickaxes.take': {
+    methods: ["POST"]
+    pattern: '/pickaxes/take'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/pickaxes_controller').default['take']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/pickaxes_controller').default['take']>>>
+    }
+  }
+  'pickaxes.deposit': {
+    methods: ["POST"]
+    pattern: '/pickaxes/deposit'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/pickaxes_controller').default['deposit']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/pickaxes_controller').default['deposit']>>>
+    }
+  }
   'organization.show': {
     methods: ["GET","HEAD"]
     pattern: '/organization'
@@ -518,9 +542,9 @@ export interface Registry {
       body: {}
       paramsTuple: []
       params: {}
-      query: {}
+      query: ExtractQueryForGet<InferInput<(typeof import('#validators/admin/resources').indexResourceValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/resources_controller').default['index']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/resources_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/resources_controller').default['index']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'admin.resources.create': {
@@ -602,9 +626,9 @@ export interface Registry {
       body: {}
       paramsTuple: []
       params: {}
-      query: {}
+      query: ExtractQueryForGet<InferInput<(typeof import('#validators/admin/materials').indexMaterialValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/materials_controller').default['index']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/materials_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/materials_controller').default['index']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'admin.materials.create': {
@@ -686,9 +710,9 @@ export interface Registry {
       body: {}
       paramsTuple: []
       params: {}
-      query: {}
+      query: ExtractQueryForGet<InferInput<(typeof import('#validators/admin/castellanies').indexCastellanyValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/castellanies_controller').default['index']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/castellanies_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/castellanies_controller').default['index']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'admin.castellanies.create': {
@@ -866,9 +890,9 @@ export interface Registry {
       body: {}
       paramsTuple: []
       params: {}
-      query: {}
+      query: ExtractQueryForGet<InferInput<(typeof import('#validators/admin/tonneau').indexTonneauValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/tonneau_controller').default['index']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/tonneau_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/tonneau_controller').default['index']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'admin.tonneau.update': {
@@ -890,9 +914,9 @@ export interface Registry {
       body: {}
       paramsTuple: []
       params: {}
-      query: {}
+      query: ExtractQueryForGet<InferInput<(typeof import('#validators/admin/organizations').indexOrganizationValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/organizations_controller').default['index']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/organizations_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/organizations_controller').default['index']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'admin.organizations.create': {
@@ -1022,9 +1046,9 @@ export interface Registry {
       body: {}
       paramsTuple: []
       params: {}
-      query: {}
+      query: ExtractQueryForGet<InferInput<(typeof import('#validators/admin/license_subscribers').indexLicenseSubscriberValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/licenses_controller').default['index']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/licenses_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/licenses_controller').default['index']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'admin.licenses.prices.update': {

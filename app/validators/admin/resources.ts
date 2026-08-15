@@ -10,6 +10,14 @@ export const createResourceValidator = vine.create({
 
 export const updateResourceValidator = createResourceValidator;
 
+export const indexResourceValidator = vine.create({
+    mineraiPage: vine.number().min(1).optional(),
+    lingotPage: vine.number().min(1).optional(),
+    sort: vine.enum(['name']).optional(),
+    dir: vine.enum(['asc', 'desc']).optional(),
+    search: vine.string().trim().maxLength(100).optional(),
+});
+
 export const reorderResourcesValidator = vine.create({
     items: vine.array(
         vine.object({

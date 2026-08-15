@@ -3,18 +3,22 @@ import AdminLayout from '~/layouts/admin.vue';
 import { useAdminLayout } from '~/composables/use_admin_layout';
 import { useAuth } from '~/composables/use_auth';
 import { useI18n } from 'vue-i18n';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { router } from '@inertiajs/vue3';
 import { urlFor } from '~/client';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '~/components/ui/table';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Badge } from '~/components/ui/badge';
-import { ArrowUp, ArrowDown, ArrowUpDown, ChevronDown, ChevronRight, Download, CircleCheck, Archive } from '@lucide/vue';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select';
+import type { AcceptableValue } from 'reka-ui';
+import { ArrowUp, ArrowDown, ArrowUpDown, ChevronDown, ChevronRight, Download, CircleCheck, Archive, FilterX } from '@lucide/vue';
 import { Link } from '@adonisjs/inertia/vue';
 import CancelOrderButton from '~/partials/commande/CancelOrderButton.vue';
 import { orderStatusVariant, orderStatusLabelKey } from '~/lib/order_status';
 import { deliveryProgressLabel } from '~/lib/delivery_progress';
+
+const ORDER_STATUSES = ['pending', 'to_deliver', 'delivered', 'cancelled'] as const;
 
 defineOptions({ layout: AdminLayout });
 
@@ -39,7 +43,7 @@ pageTitle.value = t('admin.commandes.title');
 const props = defineProps<{
     orders: OrderRow[];
     meta: { total: number; currentPage: number; lastPage: number; perPage: number };
-    filters: { search: string; sort: string; dir: string };
+    filters: { search: string; sort: string; dir: string; status: string };
 }>();
 
 const searchValue = ref(props.filters.search);
@@ -60,6 +64,7 @@ function navigate(overrides: Record<string, string | number | undefined>) {
         search: searchValue.value || undefined,
         sort: props.filters.sort,
         dir: props.filters.dir,
+        status: props.filters.status || undefined,
         page: 1,
         ...overrides,
     };
@@ -76,6 +81,10 @@ function onSearchInput(value: string | number) {
     debounceTimer = setTimeout(() => {
         navigate({ search: searchValue.value || undefined, page: 1 });
     }, 300);
+}
+
+function onStatusFilterChange(value: AcceptableValue) {
+    navigate({ status: value === 'all' || value === null ? undefined : String(value), page: 1 });
 }
 
 function onSort(column: string) {
@@ -117,6 +126,13 @@ function validateOrder(order: OrderRow) {
 function cancelOrder(order: OrderRow) {
     router.patch(urlFor('admin.commandes.cancel', { id: order.id }), {}, { preserveScroll: true });
 }
+
+const hasActiveFilters = computed(() => !!props.filters.search || !!props.filters.sort || !!props.filters.status || props.meta.currentPage !== 1);
+
+function resetFilters() {
+    searchValue.value = '';
+    router.get(urlFor('admin.commandes.index'), {}, { preserveState: true, preserveScroll: true });
+}
 </script>
 
 <template>
@@ -133,6 +149,19 @@ function cancelOrder(order: OrderRow) {
 
         <div class="flex items-center gap-2">
             <Input :placeholder="t('admin.commandes.table.search')" :model-value="searchValue" class="max-w-sm" @update:model-value="onSearchInput" />
+            <Select :model-value="filters.status || 'all'" @update:model-value="onStatusFilterChange">
+                <SelectTrigger class="w-56">
+                    <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="all">{{ t('admin.commandes.table.allStatuses') }}</SelectItem>
+                    <SelectItem v-for="status in ORDER_STATUSES" :key="status" :value="status">{{ t(orderStatusLabelKey(status)) }}</SelectItem>
+                </SelectContent>
+            </Select>
+            <Button variant="ghost" size="sm" class="gap-1" :disabled="!hasActiveFilters" @click="resetFilters">
+                <FilterX class="size-4" />
+                {{ t('admin.common.resetFilters') }}
+            </Button>
         </div>
 
         <div class="rounded-md border">
@@ -158,7 +187,12 @@ function cancelOrder(order: OrderRow) {
                                 <component :is="sortIcon('requesterName')" class="size-4" />
                             </Button>
                         </TableHead>
-                        <TableHead>{{ t('admin.commandes.table.organization') }}</TableHead>
+                        <TableHead>
+                            <Button variant="ghost" class="gap-1 px-2" @click="onSort('organizationName')">
+                                {{ t('admin.commandes.table.organization') }}
+                                <component :is="sortIcon('organizationName')" class="size-4" />
+                            </Button>
+                        </TableHead>
                         <TableHead>{{ t('admin.commandes.table.status') }}</TableHead>
                         <TableHead>
                             <Button variant="ghost" class="gap-1 px-2" @click="onSort('totalAmount')">

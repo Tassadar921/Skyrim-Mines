@@ -2,16 +2,34 @@ import { type HttpContext } from '@adonisjs/core/http';
 import logger from '@adonisjs/core/services/logger';
 import ResourceRepository from '#repositories/resource_repository';
 import ResourceTransformer from '#transformers/resource_transformer';
-import { createResourceValidator, updateResourceValidator, reorderResourcesValidator } from '#validators/admin/resources';
+import ResourceTypeEnum from '#types/enum/resource_type_enum';
+import { createResourceValidator, updateResourceValidator, reorderResourcesValidator, indexResourceValidator } from '#validators/admin/resources';
 
 export default class ResourcesController {
     constructor(private readonly resourceRepository: ResourceRepository = new ResourceRepository()) {}
 
-    public async index({ inertia }: HttpContext) {
-        const resources = await this.resourceRepository.all();
+    public async index({ inertia, request }: HttpContext) {
+        const { mineraiPage, lingotPage, sort, dir, search } = await request.validateUsing(indexResourceValidator);
+
+        const currentDir = dir ?? 'asc';
+        const mineraiCurrentPage = mineraiPage ?? 1;
+        const lingotCurrentPage = lingotPage ?? 1;
+
+        const [minerais, lingots] = await Promise.all([
+            this.resourceRepository.paginate({ type: ResourceTypeEnum.MINERAI, page: mineraiCurrentPage, perPage: 20, sort, dir: currentDir, search }),
+            this.resourceRepository.paginate({ type: ResourceTypeEnum.LINGOT, page: lingotCurrentPage, perPage: 20, sort, dir: currentDir, search }),
+        ]);
 
         return inertia.render('admin/resources/index', {
-            resources: resources.map((r) => new ResourceTransformer(r).toObject()),
+            minerais: {
+                resources: minerais.all().map((r) => new ResourceTransformer(r).toObject()),
+                meta: { total: minerais.total, currentPage: minerais.currentPage, lastPage: minerais.lastPage, perPage: minerais.perPage },
+            },
+            lingots: {
+                resources: lingots.all().map((r) => new ResourceTransformer(r).toObject()),
+                meta: { total: lingots.total, currentPage: lingots.currentPage, lastPage: lingots.lastPage, perPage: lingots.perPage },
+            },
+            filters: { search: search ?? '', sort: sort ?? '', dir: currentDir },
         });
     }
 

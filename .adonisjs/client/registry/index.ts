@@ -138,6 +138,18 @@ const routes = {
     tokens: [{"old":"/buybacks","type":0,"val":"buybacks","end":""}],
     types: placeholder as Registry['buybacks.store']['types'],
   },
+  'pickaxes.take': {
+    methods: ["POST"],
+    pattern: '/pickaxes/take',
+    tokens: [{"old":"/pickaxes/take","type":0,"val":"pickaxes","end":""},{"old":"/pickaxes/take","type":0,"val":"take","end":""}],
+    types: placeholder as Registry['pickaxes.take']['types'],
+  },
+  'pickaxes.deposit': {
+    methods: ["POST"],
+    pattern: '/pickaxes/deposit',
+    tokens: [{"old":"/pickaxes/deposit","type":0,"val":"pickaxes","end":""},{"old":"/pickaxes/deposit","type":0,"val":"deposit","end":""}],
+    types: placeholder as Registry['pickaxes.deposit']['types'],
+  },
   'organization.show': {
     methods: ["GET","HEAD"],
     pattern: '/organization',

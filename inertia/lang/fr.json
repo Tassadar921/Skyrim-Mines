@@ -11,6 +11,12 @@
             "title": "Mon tonneau",
             "totalValue": "Valeur totale de mon tonneau :"
         },
+        "pickaxes": {
+            "title": "Pioches",
+            "companyStock": "Stock de la compagnie : {count}",
+            "take": "Prendre",
+            "deposit": "Déposer"
+        },
         "toDeliver": {
             "title": "Commandes à livrer",
             "count": "commande à livrer | commande à livrer | commandes à livrer",
@@ -250,7 +256,8 @@
         "common": {
             "weekly": {
                 "current": "Actuelle"
-            }
+            },
+            "resetFilters": "Réinitialiser les filtres"
         },
         "layout": {
             "logout": "Se déconnecter",
@@ -320,12 +327,17 @@
                 "role": "Rôle",
                 "enabled": "Actif",
                 "balance": "Solde dû",
+                "pickaxes": "Pioches",
                 "createdAt": "Inscrit le",
                 "actions": "Actions",
                 "view": "Voir",
                 "userCount": "utilisateur | utilisateur | utilisateurs",
                 "empty": "Aucun utilisateur trouvé",
-                "withoutAvatar": "Sans avatar uniquement"
+                "withoutAvatar": "Sans avatar uniquement",
+                "allRoles": "Tous les rôles",
+                "allStatuses": "Tous les statuts",
+                "active": "Actif",
+                "inactive": "Inactif"
             },
             "show": {
                 "title": "Utilisateur",
@@ -429,6 +441,7 @@
             "new": "Créer une organisation",
             "table": {
                 "count": "organisation | organisation | organisations",
+                "search": "Rechercher une organisation…",
                 "name": "Nom",
                 "members": "Membres",
                 "owner": "Propriétaire",
@@ -517,7 +530,10 @@
                 "view": "Voir",
                 "upToDate": "À jour",
                 "late": "En retard",
-                "empty": "Aucun contractor/client inscrit"
+                "empty": "Aucun contractor/client inscrit",
+                "search": "Rechercher un nom d'utilisateur…",
+                "allRoles": "Tous les rôles",
+                "allStatuses": "Tous les statuts"
             },
             "show": {
                 "title": "Inscription",
@@ -608,6 +624,7 @@
                 "view": "Voir",
                 "empty": "Aucun matériau trouvé"
             },
+            "search": "Rechercher un matériau…",
             "delete": {
                 "label": "Supprimer",
                 "title": "Supprimer ce matériau ?",
@@ -689,6 +706,7 @@
                 "organization": "Organisation",
                 "noOrganization": "Aucune",
                 "status": "Statut",
+                "allStatuses": "Tous les statuts",
                 "amount": "Montant",
                 "actions": "Actions",
                 "download": "Télécharger",
@@ -772,6 +790,8 @@
                 "resource": "Ressource",
                 "type": "Type",
                 "quantity": "Quantité",
+                "search": "Rechercher un utilisateur ou une ressource…",
+                "allTypes": "Tous les types",
                 "empty": "Aucune quantité au tonneau pour le moment"
             }
         }

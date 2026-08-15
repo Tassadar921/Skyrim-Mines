@@ -8,6 +8,8 @@ export const indexUserValidator = vine.create({
     dir: vine.enum(['asc', 'desc']).optional(),
     search: vine.string().trim().maxLength(100).optional(),
     withoutAvatar: vine.boolean().optional(),
+    role: vine.enum(Object.values(UserRoleEnum)).optional(),
+    enabled: vine.enum(['true', 'false']).optional(),
 });
 
 export const updateUserValidator = vine.create({

@@ -12,6 +12,20 @@ export default class ResourceRepository extends BaseRepository<typeof Resource> 
         return Resource.query().orderBy('type', 'asc').orderBy('order', 'asc');
     }
 
+    public async paginate(params: { type: ResourceTypeEnum; page: number; perPage: number; sort?: string; dir: 'asc' | 'desc'; search?: string }) {
+        const { type, page, perPage, sort, dir, search } = params;
+        const q = Resource.query().where('type', type);
+        if (search) {
+            q.whereILike('name', `%${search}%`);
+        }
+        if (sort === 'name') {
+            q.orderBy('name', dir);
+        } else {
+            q.orderBy('order', 'asc');
+        }
+        return q.paginate(page, perPage);
+    }
+
     public async findOrFail(id: string): Promise<Resource> {
         return Resource.findOrFail(id);
     }

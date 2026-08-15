@@ -19,7 +19,7 @@ export default class UsersController {
     ) {}
 
     public async index({ inertia, request }: HttpContext) {
-        const { page, sort, dir, search, withoutAvatar } = await request.validateUsing(indexUserValidator);
+        const { page, sort, dir, search, withoutAvatar, role, enabled } = await request.validateUsing(indexUserValidator);
 
         const currentSort = sort ?? 'createdAt';
         const currentDir = dir ?? 'desc';
@@ -32,6 +32,8 @@ export default class UsersController {
             dir: currentDir,
             search,
             withoutAvatar,
+            role,
+            enabled,
         });
 
         return inertia.render('admin/users/index', {
@@ -42,7 +44,7 @@ export default class UsersController {
                 lastPage: users.lastPage,
                 perPage: users.perPage,
             },
-            filters: { search: search ?? '', sort: currentSort, dir: currentDir, withoutAvatar: withoutAvatar ?? false },
+            filters: { search: search ?? '', sort: currentSort, dir: currentDir, withoutAvatar: withoutAvatar ?? false, role: role ?? 'all', enabled: enabled ?? 'all' },
         });
     }
 

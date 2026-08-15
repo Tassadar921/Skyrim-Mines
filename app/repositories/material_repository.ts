@@ -11,6 +11,25 @@ export default class MaterialRepository extends BaseRepository<typeof Material> 
         return Material.query().orderBy('order', 'asc');
     }
 
+    public async paginate(params: { page: number; perPage: number; sort?: string; dir: 'asc' | 'desc'; search?: string }) {
+        const { page, perPage, sort, dir, search } = params;
+        const allowedSorts: Record<string, string> = {
+            name: 'name',
+        };
+        const sortColumn = sort ? allowedSorts[sort] : undefined;
+
+        const q = Material.query();
+        if (search) {
+            q.whereILike('name', `%${search}%`);
+        }
+        if (sortColumn) {
+            q.orderBy(sortColumn, dir);
+        } else {
+            q.orderBy('order', 'asc');
+        }
+        return q.paginate(page, perPage);
+    }
+
     public async findOrFail(id: string): Promise<Material> {
         return Material.findOrFail(id);
     }

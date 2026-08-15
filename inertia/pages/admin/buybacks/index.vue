@@ -2,7 +2,7 @@
 import AdminLayout from '~/layouts/admin.vue';
 import { useAdminLayout } from '~/composables/use_admin_layout';
 import { useI18n } from 'vue-i18n';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { router } from '@inertiajs/vue3';
 import { urlFor } from '~/client';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '~/components/ui/table';
@@ -11,7 +11,7 @@ import { Input } from '~/components/ui/input';
 import { Badge } from '~/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select';
 import type { AcceptableValue } from 'reka-ui';
-import { ArrowUp, ArrowDown, ArrowUpDown, ChevronDown, ChevronRight } from '@lucide/vue';
+import { ArrowUp, ArrowDown, ArrowUpDown, ChevronDown, ChevronRight, FilterX } from '@lucide/vue';
 
 defineOptions({ layout: AdminLayout });
 
@@ -127,6 +127,13 @@ function sortIcon(column: string) {
     if (props.filters.sort !== column) return ArrowUpDown;
     return props.filters.dir === 'asc' ? ArrowUp : ArrowDown;
 }
+
+const hasActiveFilters = computed(() => !!props.filters.search || !!props.filters.sort || props.filters.week !== null || props.meta.currentPage !== 1);
+
+function resetFilters() {
+    searchValue.value = '';
+    router.get(urlFor('admin.buybacks.index'), {}, { preserveState: true, preserveScroll: true });
+}
 </script>
 
 <template>
@@ -170,6 +177,10 @@ function sortIcon(column: string) {
                     </SelectItem>
                 </SelectContent>
             </Select>
+            <Button variant="ghost" size="sm" class="gap-1" :disabled="!hasActiveFilters" @click="resetFilters">
+                <FilterX class="size-4" />
+                {{ t('admin.common.resetFilters') }}
+            </Button>
         </div>
 
         <div class="rounded-md border">

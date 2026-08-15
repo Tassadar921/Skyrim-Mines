@@ -13,21 +13,45 @@ export default class OrganizationRepository extends BaseRepository<typeof Organi
         return Organization.query().orderBy('name', 'asc');
     }
 
-    public async allWithStats(): Promise<{ id: string; name: string; memberCount: number; ownerUsernames: string[] }[]> {
-        const organizations = await this.all();
-        const members = await User.query().whereNotNull('organizationId').select('id', 'username', 'organizationId', 'organizationRole');
+    public async paginate(params: { page: number; perPage: number; sort: string; dir: 'asc' | 'desc'; search?: string }): Promise<{
+        data: { id: string; name: string; memberCount: number; ownerUsernames: string[] }[];
+        total: number;
+        currentPage: number;
+        lastPage: number;
+        perPage: number;
+    }> {
+        const { page, perPage, sort, dir, search } = params;
+        const allowedSorts: Record<string, string> = {
+            name: 'name',
+        };
+        const sortColumn = allowedSorts[sort] ?? 'name';
 
-        return organizations.map((organization) => {
-            const organizationMembers = members.filter((member) => member.organizationId === organization.id);
-            const owners = organizationMembers.filter((member) => member.organizationRole === OrganizationRoleEnum.OWNER);
+        const q = Organization.query().orderBy(sortColumn, dir);
+        if (search) {
+            q.whereILike('name', `%${search}%`);
+        }
+        const organizations = await q.paginate(page, perPage);
+        const organizationIds = organizations.all().map((organization) => organization.id);
 
-            return {
-                id: organization.id,
-                name: organization.name,
-                memberCount: organizationMembers.length,
-                ownerUsernames: owners.map((owner) => owner.username),
-            };
-        });
+        const members = organizationIds.length ? await User.query().whereIn('organizationId', organizationIds).select('id', 'username', 'organizationId', 'organizationRole') : [];
+
+        return {
+            data: organizations.all().map((organization) => {
+                const organizationMembers = members.filter((member) => member.organizationId === organization.id);
+                const owners = organizationMembers.filter((member) => member.organizationRole === OrganizationRoleEnum.OWNER);
+
+                return {
+                    id: organization.id,
+                    name: organization.name,
+                    memberCount: organizationMembers.length,
+                    ownerUsernames: owners.map((owner) => owner.username),
+                };
+            }),
+            total: organizations.total,
+            currentPage: organizations.currentPage,
+            lastPage: organizations.lastPage,
+            perPage: organizations.perPage,
+        };
     }
 
     public async findOrFail(id: string): Promise<Organization> {

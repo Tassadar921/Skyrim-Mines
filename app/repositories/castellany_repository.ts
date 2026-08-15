@@ -10,6 +10,20 @@ export default class CastellanyRepository extends BaseRepository<typeof Castella
         return Castellany.query().orderBy('name', 'asc');
     }
 
+    public async paginate(params: { page: number; perPage: number; sort: string; dir: 'asc' | 'desc'; search?: string }) {
+        const { page, perPage, sort, dir, search } = params;
+        const allowedSorts: Record<string, string> = {
+            name: 'name',
+        };
+        const sortColumn = allowedSorts[sort] ?? 'name';
+
+        const q = Castellany.query().orderBy(sortColumn, dir);
+        if (search) {
+            q.whereILike('name', `%${search}%`);
+        }
+        return q.paginate(page, perPage);
+    }
+
     public async findOrFail(id: string): Promise<Castellany> {
         return Castellany.findOrFail(id);
     }

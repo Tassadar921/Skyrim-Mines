@@ -7,10 +7,13 @@ import OrderRepository from '#repositories/order_repository';
 import DeliveryRepository from '#repositories/delivery_repository';
 import OrganizationRepository from '#repositories/organization_repository';
 import CastellanyRepository from '#repositories/castellany_repository';
+import MaterialRepository from '#repositories/material_repository';
+import MaterialStockRepository from '#repositories/material_stock_repository';
 import ResourceTransformer from '#transformers/resource_transformer';
 import CastellanyTransformer from '#transformers/castellany_transformer';
 import { isStaffOrAdmin } from '#helpers/user_role_helper';
 import { DEPOSIT_EDIT_WINDOW_MINUTES } from '#helpers/deposit_edit_window_helper';
+import { PICKAXE_MATERIAL_NAME } from '#helpers/pickaxe_helper';
 
 export default class HomeController {
     constructor(
@@ -21,25 +24,31 @@ export default class HomeController {
         private readonly deliveryRepository: DeliveryRepository = new DeliveryRepository(),
         private readonly organizationRepository: OrganizationRepository = new OrganizationRepository(),
         private readonly castellanyRepository: CastellanyRepository = new CastellanyRepository(),
+        private readonly materialRepository: MaterialRepository = new MaterialRepository(),
+        private readonly materialStockRepository: MaterialStockRepository = new MaterialStockRepository(),
     ) {}
 
     public async index({ inertia, auth }: HttpContext) {
         const user = auth.user;
+        const isEmployeeOrAdmin = !!user && isStaffOrAdmin(user.role);
 
-        const [resources, depositTotals, buybackTotals, myDepositTotals, myBuybackTotals] = await Promise.all([
+        const [resources, depositTotals, buybackTotals, myDepositTotals, myBuybackTotals, pickaxeMaterial] = await Promise.all([
             this.resourceRepository.all(),
             this.resourceDepositRepository.sumByResource(),
             this.resourceBuybackRepository.sumByResource(),
             user ? this.resourceDepositRepository.sumByUser(user.id) : new Map<string, number>(),
             user ? this.resourceBuybackRepository.sumByUser(user.id) : new Map<string, number>(),
+            isEmployeeOrAdmin ? this.materialRepository.findOneBy({ name: PICKAXE_MATERIAL_NAME }) : null,
         ]);
 
-        const canDeliver = !!user && isStaffOrAdmin(user.role);
-        const ordersToDeliver = canDeliver ? await this.orderRepository.findToDeliver() : [];
+        const pickaxeMaterialStock = pickaxeMaterial ? await this.materialStockRepository.findOneBy({ materialId: pickaxeMaterial.id }) : null;
+        const pickaxeStock = pickaxeMaterial ? (pickaxeMaterialStock?.quantity ?? 0) : null;
+
+        const ordersToDeliver = isEmployeeOrAdmin ? await this.orderRepository.findToDeliver() : [];
 
         const myDeposits = user ? await this.resourceDepositRepository.findRecentByUser(user.id, DateTime.now().minus({ minutes: DEPOSIT_EDIT_WINDOW_MINUTES })) : [];
 
-        const [organizations, castellanies] = canDeliver ? await Promise.all([this.organizationRepository.all(), this.castellanyRepository.all()]) : [[], []];
+        const [organizations, castellanies] = isEmployeeOrAdmin ? await Promise.all([this.organizationRepository.all(), this.castellanyRepository.all()]) : [[], []];
         const organizationCastellanyById = new Map(organizations.map((organization) => [organization.id, organization.castellanyId]));
 
         const ordersToDeliverWithRemaining = await Promise.all(
@@ -79,6 +88,7 @@ export default class HomeController {
                 quantity: deposit.quantity,
                 createdAt: deposit.createdAt.toISO()!,
             })),
+            pickaxeStock,
         });
     }
 }

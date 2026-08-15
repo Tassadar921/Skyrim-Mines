@@ -179,12 +179,19 @@ export default class DeliveryRepository extends BaseRepository<typeof Delivery> 
     public async paginate(params: { page: number; perPage: number; sort: string; dir: 'asc' | 'desc'; search?: string; week?: number }) {
         const { page, perPage, sort, dir, search, week } = params;
         const allowedSorts: Record<string, string> = {
-            deliveredAt: 'delivered_at',
-            week: 'delivered_week_number',
+            deliveredAt: 'deliveries.delivered_at',
+            week: 'deliveries.delivered_week_number',
+            requesterName: 'orders.requester_name',
         };
-        const sortColumn = allowedSorts[sort] ?? 'delivered_at';
+        const sortColumn = allowedSorts[sort] ?? 'deliveries.delivered_at';
 
-        const q = Delivery.query().preload('order').preload('lines').preload('castellany').orderBy(sortColumn, dir);
+        const q = Delivery.query().preload('order').preload('lines').preload('castellany');
+
+        if (sort === 'requesterName') {
+            q.join('orders', 'orders.id', 'deliveries.order_id').select('deliveries.*');
+        }
+
+        q.orderBy(sortColumn, dir);
 
         if (week) {
             q.where('deliveredWeekNumber', week);

@@ -27,6 +27,7 @@ export default class QuoteRepository extends BaseRepository<typeof Quote> {
             number: 'number',
             createdAt: 'created_at',
             requesterName: 'requester_name',
+            organizationName: 'organization_name',
             totalAmount: 'total_amount',
         };
         const sortColumn = allowedSorts[sort] ?? 'created_at';

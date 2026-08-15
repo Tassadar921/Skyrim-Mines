@@ -11,7 +11,13 @@ import ResourceTransformer from '#transformers/resource_transformer';
 import CastellanyTransformer from '#transformers/castellany_transformer';
 import UserRoleEnum from '#types/enum/user_role_enum';
 import { isClientOrAuditor } from '#helpers/user_role_helper';
-import { createOrganizationValidator, updateOrganizationValidator, storeOrganizationMemberValidator, updateOrganizationMemberRoleValidator } from '#validators/admin/organizations';
+import {
+    indexOrganizationValidator,
+    createOrganizationValidator,
+    updateOrganizationValidator,
+    storeOrganizationMemberValidator,
+    updateOrganizationMemberRoleValidator,
+} from '#validators/admin/organizations';
 import { upsertOrganizationResourcePriceValidator } from '#validators/admin/organization_resource_prices';
 
 export default class OrganizationsController {
@@ -23,10 +29,31 @@ export default class OrganizationsController {
         private readonly castellanyRepository: CastellanyRepository = new CastellanyRepository(),
     ) {}
 
-    public async index({ inertia }: HttpContext) {
-        const organizations = await this.organizationRepository.allWithStats();
+    public async index({ inertia, request }: HttpContext) {
+        const { page, sort, dir, search } = await request.validateUsing(indexOrganizationValidator);
 
-        return inertia.render('admin/organizations/index', { organizations });
+        const currentSort = sort ?? 'name';
+        const currentDir = dir ?? 'asc';
+        const currentPage = page ?? 1;
+
+        const organizations = await this.organizationRepository.paginate({
+            page: currentPage,
+            perPage: 20,
+            sort: currentSort,
+            dir: currentDir,
+            search,
+        });
+
+        return inertia.render('admin/organizations/index', {
+            organizations: organizations.data,
+            meta: {
+                total: organizations.total,
+                currentPage: organizations.currentPage,
+                lastPage: organizations.lastPage,
+                perPage: organizations.perPage,
+            },
+            filters: { search: search ?? '', sort: currentSort, dir: currentDir },
+        });
     }
 
     public async create({ inertia }: HttpContext) {

@@ -2,14 +2,14 @@
 import AdminLayout from '~/layouts/admin.vue';
 import { useAdminLayout } from '~/composables/use_admin_layout';
 import { useI18n } from 'vue-i18n';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { router } from '@inertiajs/vue3';
 import { urlFor } from '~/client';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '~/components/ui/table';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Badge } from '~/components/ui/badge';
-import { ArrowUp, ArrowDown, ArrowUpDown, ChevronDown, ChevronRight, Download } from '@lucide/vue';
+import { ArrowUp, ArrowDown, ArrowUpDown, ChevronDown, ChevronRight, Download, FilterX } from '@lucide/vue';
 
 defineOptions({ layout: AdminLayout });
 
@@ -94,6 +94,13 @@ function lineSections(quote: QuoteRow): { type: string; label: string; lines: Qu
         { type: 'lingot', label: t('devis.sections.lingots'), lines: quote.lines.filter((line) => line.resourceType === 'lingot') },
     ].filter((section) => section.lines.length);
 }
+
+const hasActiveFilters = computed(() => !!props.filters.search || !!props.filters.sort || props.meta.currentPage !== 1);
+
+function resetFilters() {
+    searchValue.value = '';
+    router.get(urlFor('admin.devis.index'), {}, { preserveState: true, preserveScroll: true });
+}
 </script>
 
 <template>
@@ -104,6 +111,10 @@ function lineSections(quote: QuoteRow): { type: string; label: string; lines: Qu
 
         <div class="flex items-center gap-2">
             <Input :placeholder="t('admin.devis.table.search')" :model-value="searchValue" class="max-w-sm" @update:model-value="onSearchInput" />
+            <Button variant="ghost" size="sm" class="gap-1" :disabled="!hasActiveFilters" @click="resetFilters">
+                <FilterX class="size-4" />
+                {{ t('admin.common.resetFilters') }}
+            </Button>
         </div>
 
         <div class="rounded-md border">
@@ -129,7 +140,12 @@ function lineSections(quote: QuoteRow): { type: string; label: string; lines: Qu
                                 <component :is="sortIcon('requesterName')" class="size-4" />
                             </Button>
                         </TableHead>
-                        <TableHead>{{ t('admin.devis.table.organization') }}</TableHead>
+                        <TableHead>
+                            <Button variant="ghost" class="gap-1 px-2" @click="onSort('organizationName')">
+                                {{ t('admin.devis.table.organization') }}
+                                <component :is="sortIcon('organizationName')" class="size-4" />
+                            </Button>
+                        </TableHead>
                         <TableHead>
                             <Button variant="ghost" class="gap-1 px-2" @click="onSort('totalAmount')">
                                 {{ t('admin.devis.table.amount') }}

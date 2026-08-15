@@ -8,7 +8,7 @@ import UserRepository from '#repositories/user_repository';
 import UserTransformer from '#transformers/user_transformer';
 import UserRoleEnum from '#types/enum/user_role_enum';
 import { updateLicensePricesValidator } from '#validators/admin/license_prices';
-import { storeLicenseSubscriberValidator } from '#validators/admin/license_subscribers';
+import { indexLicenseSubscriberValidator, storeLicenseSubscriberValidator } from '#validators/admin/license_subscribers';
 import { storeLicensePaymentValidator } from '#validators/admin/license_payments';
 import { getWeekNumber, getWeekRange } from '#helpers/game_week_helper';
 
@@ -22,13 +22,30 @@ export default class LicensesController {
         private readonly userRepository: UserRepository = new UserRepository(),
     ) {}
 
-    public async index({ inertia }: HttpContext) {
+    public async index({ inertia, request }: HttpContext) {
+        const { page, sort, dir, search, role, status } = await request.validateUsing(indexLicenseSubscriberValidator);
+
+        const currentSort = sort ?? 'username';
+        const currentDir = dir ?? 'asc';
+        const currentPage = page ?? 1;
+        const perPage = 20;
+
         const prices = await this.licensePriceRepository.get();
-        const subscribers = await this.licenseSubscriberRepository.all();
-        const summaries = await this.licensePaymentRepository.summaryBySubscriber();
         const eligibleUsers = await this.userRepository.findEligibleForLicenseSubscription();
 
         const currentWeek = getWeekNumber(DateTime.now());
+
+        const { rows: subscribers, total } = await this.licenseSubscriberRepository.paginate({
+            page: currentPage,
+            perPage,
+            sort: currentSort,
+            dir: currentDir,
+            search,
+            role,
+            status,
+            currentWeek,
+        });
+
         const rawWeeklyTotals = await this.licensePaymentRepository.getWeeklyTotals();
         const weeklyTotalsByWeek = new Map(rawWeeklyTotals.map((entry) => [entry.weekNumber, entry]));
 
@@ -47,17 +64,9 @@ export default class LicensesController {
 
         return inertia.render('admin/licenses/index', {
             prices: { citizenPrice: Number(prices.citizenPrice), nonCitizenPrice: Number(prices.nonCitizenPrice) },
-            subscribers: subscribers.map((subscriber) => {
-                const summary = summaries.get(subscriber.id);
-                return {
-                    id: subscriber.id,
-                    username: subscriber.user.username,
-                    role: subscriber.user.role,
-                    lastPaidWeek: summary?.lastPaidWeek ?? null,
-                    totalPaid: summary?.totalPaid ?? 0,
-                    paymentCount: summary?.paymentCount ?? 0,
-                };
-            }),
+            subscribers,
+            meta: { total, currentPage, lastPage: Math.max(1, Math.ceil(total / perPage)), perPage },
+            filters: { search: search ?? '', sort: currentSort, dir: currentDir, role: role ?? '', status: status ?? '' },
             eligibleUsers: eligibleUsers.map((user) => new UserTransformer(user).toObject()),
             currentWeek,
             weeklyTotals,

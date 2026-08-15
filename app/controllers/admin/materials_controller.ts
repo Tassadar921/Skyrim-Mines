@@ -2,16 +2,34 @@ import { type HttpContext } from '@adonisjs/core/http';
 import logger from '@adonisjs/core/services/logger';
 import MaterialRepository from '#repositories/material_repository';
 import MaterialTransformer from '#transformers/material_transformer';
-import { createMaterialValidator, updateMaterialValidator, reorderMaterialsValidator } from '#validators/admin/materials';
+import { createMaterialValidator, updateMaterialValidator, reorderMaterialsValidator, indexMaterialValidator } from '#validators/admin/materials';
 
 export default class MaterialsController {
     constructor(private readonly materialRepository: MaterialRepository = new MaterialRepository()) {}
 
-    public async index({ inertia }: HttpContext) {
-        const materials = await this.materialRepository.all();
+    public async index({ inertia, request }: HttpContext) {
+        const { page, sort, dir, search } = await request.validateUsing(indexMaterialValidator);
+
+        const currentDir = dir ?? 'asc';
+        const currentPage = page ?? 1;
+
+        const materials = await this.materialRepository.paginate({
+            page: currentPage,
+            perPage: 20,
+            sort,
+            dir: currentDir,
+            search,
+        });
 
         return inertia.render('admin/materials/index', {
-            materials: materials.map((m) => new MaterialTransformer(m).toObject()),
+            materials: materials.all().map((m) => new MaterialTransformer(m).toObject()),
+            meta: {
+                total: materials.total,
+                currentPage: materials.currentPage,
+                lastPage: materials.lastPage,
+                perPage: materials.perPage,
+            },
+            filters: { search: search ?? '', sort: sort ?? '', dir: currentDir },
         });
     }
 

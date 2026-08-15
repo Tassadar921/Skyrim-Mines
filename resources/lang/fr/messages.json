@@ -199,6 +199,15 @@
             "expired": "Ce dépôt ne peut plus être modifié (plus d'une heure s'est écoulée)"
         }
     },
+    "pickaxes": {
+        "take": {
+            "empty": "Il n'y a plus aucune pioche dans le stock de la compagnie",
+            "error": "Erreur lors de la prise d'une pioche"
+        },
+        "deposit": {
+            "error": "Erreur lors du dépôt d'une pioche"
+        }
+    },
     "buybacks": {
         "create": {
             "success": "Rachat effectué avec succès",

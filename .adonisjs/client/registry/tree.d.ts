@@ -39,6 +39,10 @@ export interface ApiDefinition {
   buybacks: {
     store: typeof routes['buybacks.store']
   }
+  pickaxes: {
+    take: typeof routes['pickaxes.take']
+    deposit: typeof routes['pickaxes.deposit']
+  }
   organization: {
     show: typeof routes['organization.show']
     members: {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, reactive, watch } from 'vue';
+import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue';
 import { Head, router, usePage } from '@inertiajs/vue3';
 import { useI18n } from 'vue-i18n';
 import { useAuth } from '~/composables/use_auth';
@@ -22,7 +22,7 @@ import {
     AlertDialogCancel,
     AlertDialogAction,
 } from '~/components/ui/alert-dialog';
-import { PackageCheck } from '@lucide/vue';
+import { PackageCheck, ArrowDownToLine, ArrowUpFromLine } from '@lucide/vue';
 import DepositModal from '~/partials/deposit/DepositModal.vue';
 import BuybackModal from '~/partials/buyback/BuybackModal.vue';
 import QuantityStepper from '~/partials/stocks/QuantityStepper.vue';
@@ -50,7 +50,21 @@ const props = defineProps<{
     ordersToDeliver: OrderToDeliver[];
     castellanies: { id: string; name: string; commissionAmount: number }[];
     myDeposits: MyDeposit[];
+    pickaxeStock: number | null;
 }>();
+
+const isTakingPickaxe = ref(false);
+const isDepositingPickaxe = ref(false);
+
+function takePickaxe() {
+    isTakingPickaxe.value = true;
+    router.post(urlFor('pickaxes.take'), {}, { preserveScroll: true, onFinish: () => (isTakingPickaxe.value = false) });
+}
+
+function depositPickaxe() {
+    isDepositingPickaxe.value = true;
+    router.post(urlFor('pickaxes.deposit'), {}, { preserveScroll: true, onFinish: () => (isDepositingPickaxe.value = false) });
+}
 
 const PICKUP = 'pickup';
 
@@ -152,6 +166,23 @@ onUnmounted(() => {
             <div class="flex items-center gap-3">
                 <DepositModal :resources="resources" :my-deposits="myDeposits" />
                 <BuybackModal v-if="isAdmin" :resources="resources" />
+            </div>
+        </div>
+
+        <div v-if="pickaxeStock !== null" class="max-w-md mx-auto w-full space-y-4">
+            <h2 class="font-serif text-2xl font-light text-slate-800 dark:text-slate-100 text-center">{{ t('home.pickaxes.title') }}</h2>
+            <div class="rounded-md border p-4 space-y-4 text-center">
+                <div class="text-sm text-slate-600 dark:text-slate-300">{{ t('home.pickaxes.companyStock', { count: pickaxeStock }) }}</div>
+                <div class="flex items-center justify-center gap-3">
+                    <Button variant="outline" class="gap-1" :disabled="pickaxeStock === 0 || isTakingPickaxe" @click="takePickaxe">
+                        <ArrowDownToLine class="size-4" />
+                        {{ t('home.pickaxes.take') }}
+                    </Button>
+                    <Button variant="outline" class="gap-1" :disabled="isDepositingPickaxe" @click="depositPickaxe">
+                        <ArrowUpFromLine class="size-4" />
+                        {{ t('home.pickaxes.deposit') }}
+                    </Button>
+                </div>
             </div>
         </div>
 

@@ -3,7 +3,7 @@ import AdminLayout from '~/layouts/admin.vue';
 import { useAdminLayout } from '~/composables/use_admin_layout';
 import { useAuth } from '~/composables/use_auth';
 import { useI18n } from 'vue-i18n';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { router } from '@inertiajs/vue3';
 import { urlFor } from '~/client';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '~/components/ui/table';
@@ -12,10 +12,14 @@ import { Input } from '~/components/ui/input';
 import { Badge } from '~/components/ui/badge';
 import { Checkbox } from '~/components/ui/checkbox';
 import { Label } from '~/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select';
+import type { AcceptableValue } from 'reka-ui';
 import { Link } from '@adonisjs/inertia/vue';
-import { ArrowUp, ArrowDown, ArrowUpDown, Eye, CheckCircle, XCircle, Plus, UserCircle } from '@lucide/vue';
+import { ArrowUp, ArrowDown, ArrowUpDown, Eye, CheckCircle, XCircle, Plus, UserCircle, FilterX } from '@lucide/vue';
 import { canHaveBalance } from '~/lib/user_balance';
 import type { Data } from '@generated/data';
+
+const roles = ['admin', 'auditor', 'staff', 'contractor', 'client'] as const;
 
 defineOptions({ layout: AdminLayout });
 
@@ -29,7 +33,7 @@ type UserLine = Data.User & { avatarUrl: string | null };
 const props = defineProps<{
     users: UserLine[];
     meta: { total: number; currentPage: number; lastPage: number; perPage: number };
-    filters: { search: string; sort: string; dir: string; withoutAvatar: boolean };
+    filters: { search: string; sort: string; dir: string; withoutAvatar: boolean; role: string; enabled: string };
 }>();
 
 const searchValue = ref(props.filters.search);
@@ -41,6 +45,8 @@ function navigate(overrides: Record<string, string | number | boolean | undefine
         sort: props.filters.sort,
         dir: props.filters.dir,
         withoutAvatar: props.filters.withoutAvatar || undefined,
+        role: props.filters.role !== 'all' ? props.filters.role : undefined,
+        enabled: props.filters.enabled !== 'all' ? props.filters.enabled : undefined,
         page: 1,
         ...overrides,
     };
@@ -53,6 +59,14 @@ function navigate(overrides: Record<string, string | number | boolean | undefine
 
 function onWithoutAvatarChange(checked: unknown) {
     navigate({ withoutAvatar: checked ? true : undefined, page: 1 });
+}
+
+function onRoleFilterChange(value: AcceptableValue) {
+    navigate({ role: value === 'all' ? undefined : String(value), page: 1 });
+}
+
+function onEnabledFilterChange(value: AcceptableValue) {
+    navigate({ enabled: value === 'all' ? undefined : String(value), page: 1 });
 }
 
 function onSearchInput(value: string | number) {
@@ -75,6 +89,15 @@ function sortIcon(column: string) {
     if (props.filters.sort !== column) return ArrowUpDown;
     return props.filters.dir === 'asc' ? ArrowUp : ArrowDown;
 }
+
+const hasActiveFilters = computed(
+    () => !!props.filters.search || !!props.filters.sort || props.filters.withoutAvatar || props.filters.role !== 'all' || props.filters.enabled !== 'all' || props.meta.currentPage !== 1,
+);
+
+function resetFilters() {
+    searchValue.value = '';
+    router.get(urlFor('admin.users.index'), {}, { preserveState: true, preserveScroll: true });
+}
 </script>
 
 <template>
@@ -91,10 +114,33 @@ function sortIcon(column: string) {
 
         <div class="flex items-center gap-4">
             <Input :placeholder="$t('admin.users.table.username') + '…'" :model-value="searchValue" class="max-w-sm" @update:model-value="onSearchInput" />
+            <Select :model-value="filters.role" @update:model-value="onRoleFilterChange">
+                <SelectTrigger class="w-48">
+                    <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="all">{{ t('admin.users.table.allRoles') }}</SelectItem>
+                    <SelectItem v-for="role in roles" :key="role" :value="role">{{ t(`admin.users.show.fields.roles.${role}`) }}</SelectItem>
+                </SelectContent>
+            </Select>
+            <Select :model-value="filters.enabled" @update:model-value="onEnabledFilterChange">
+                <SelectTrigger class="w-40">
+                    <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="all">{{ t('admin.users.table.allStatuses') }}</SelectItem>
+                    <SelectItem value="true">{{ t('admin.users.table.active') }}</SelectItem>
+                    <SelectItem value="false">{{ t('admin.users.table.inactive') }}</SelectItem>
+                </SelectContent>
+            </Select>
             <div class="flex items-center gap-2">
                 <Checkbox id="withoutAvatar" :model-value="filters.withoutAvatar" @update:model-value="onWithoutAvatarChange" />
                 <Label for="withoutAvatar" class="cursor-pointer text-sm text-muted-foreground">{{ t('admin.users.table.withoutAvatar') }}</Label>
             </div>
+            <Button variant="ghost" size="sm" class="gap-1" :disabled="!hasActiveFilters" @click="resetFilters">
+                <FilterX class="size-4" />
+                {{ t('admin.common.resetFilters') }}
+            </Button>
         </div>
 
         <div class="rounded-md border">
@@ -111,6 +157,7 @@ function sortIcon(column: string) {
                         <TableHead>{{ $t('admin.users.table.role') }}</TableHead>
                         <TableHead>{{ $t('admin.users.table.enabled') }}</TableHead>
                         <TableHead>{{ $t('admin.users.table.balance') }}</TableHead>
+                        <TableHead>{{ $t('admin.users.table.pickaxes') }}</TableHead>
                         <TableHead>
                             <Button variant="ghost" class="gap-1 px-2" @click="onSort('createdAt')">
                                 {{ $t('admin.users.table.createdAt') }}
@@ -136,6 +183,7 @@ function sortIcon(column: string) {
                                 <XCircle v-else class="size-4 text-muted-foreground" />
                             </TableCell>
                             <TableCell class="text-sm text-muted-foreground">{{ canHaveBalance(user.role) ? `${user.balance.toFixed(2)} s` : '—' }}</TableCell>
+                            <TableCell class="text-sm text-muted-foreground">{{ user.pickaxes }}</TableCell>
                             <TableCell class="text-sm text-muted-foreground">{{ new Date(user.createdAt).toLocaleDateString(undefined, { timeZone: 'UTC' }) }}</TableCell>
                             <TableCell>
                                 <Link :route="'admin.users.show'" :params="{ id: user.id }">
@@ -148,7 +196,7 @@ function sortIcon(column: string) {
                         </TableRow>
                     </template>
                     <TableRow v-else>
-                        <TableCell :colspan="7" class="h-24 text-center text-muted-foreground">
+                        <TableCell :colspan="8" class="h-24 text-center text-muted-foreground">
                             {{ $t('admin.users.table.empty') }}
                         </TableCell>
                     </TableRow>

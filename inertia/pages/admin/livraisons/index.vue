@@ -3,7 +3,7 @@ import AdminLayout from '~/layouts/admin.vue';
 import { useAdminLayout } from '~/composables/use_admin_layout';
 import { useAuth } from '~/composables/use_auth';
 import { useI18n } from 'vue-i18n';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { router } from '@inertiajs/vue3';
 import { urlFor } from '~/client';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '~/components/ui/table';
@@ -13,7 +13,7 @@ import { Badge } from '~/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select';
 import DeleteButton from '~/components/ui/DeleteButton.vue';
 import type { AcceptableValue } from 'reka-ui';
-import { ArrowUp, ArrowDown, ArrowUpDown, ChevronDown, ChevronRight } from '@lucide/vue';
+import { ArrowUp, ArrowDown, ArrowUpDown, ChevronDown, ChevronRight, FilterX } from '@lucide/vue';
 
 defineOptions({ layout: AdminLayout });
 
@@ -126,6 +126,13 @@ function sortIcon(column: string) {
 function deleteDelivery(delivery: DeliveryRow) {
     router.delete(urlFor('admin.livraisons.destroy', { id: delivery.id }), { preserveScroll: true });
 }
+
+const hasActiveFilters = computed(() => !!props.filters.search || !!props.filters.sort || props.filters.week !== null || props.meta.currentPage !== 1);
+
+function resetFilters() {
+    searchValue.value = '';
+    router.get(urlFor('admin.livraisons.index'), {}, { preserveState: true, preserveScroll: true });
+}
 </script>
 
 <template>
@@ -169,6 +176,10 @@ function deleteDelivery(delivery: DeliveryRow) {
                     </SelectItem>
                 </SelectContent>
             </Select>
+            <Button variant="ghost" size="sm" class="gap-1" :disabled="!hasActiveFilters" @click="resetFilters">
+                <FilterX class="size-4" />
+                {{ t('admin.common.resetFilters') }}
+            </Button>
         </div>
 
         <div class="rounded-md border">
@@ -189,7 +200,12 @@ function deleteDelivery(delivery: DeliveryRow) {
                             </Button>
                         </TableHead>
                         <TableHead>{{ t('admin.livraisons.table.order') }}</TableHead>
-                        <TableHead>{{ t('admin.livraisons.table.requester') }}</TableHead>
+                        <TableHead>
+                            <Button variant="ghost" class="gap-1 px-2" @click="onSort('requesterName')">
+                                {{ t('admin.livraisons.table.requester') }}
+                                <component :is="sortIcon('requesterName')" class="size-4" />
+                            </Button>
+                        </TableHead>
                         <TableHead>{{ t('admin.livraisons.table.organization') }}</TableHead>
                         <TableHead>{{ t('admin.livraisons.table.castellany') }}</TableHead>
                         <TableHead>{{ t('admin.livraisons.table.resource') }}</TableHead>
