@@ -10,6 +10,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '~
 import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '~/components/ui/tooltip';
+import { HelpCircle } from '@lucide/vue';
 import WeeklyMetricChart from '~/partials/admin/WeeklyMetricChart.vue';
 
 defineOptions({ layout: AdminLayout });
@@ -148,7 +150,23 @@ function submitCapitalSnapshot() {
                     <TableRow>
                         <TableHead>{{ t('admin.dashboard.weeklyRecap.week') }}</TableHead>
                         <TableHead>{{ t('admin.dashboard.weeklyRecap.deliveries') }}</TableHead>
-                        <TableHead>{{ t('admin.dashboard.weeklyRecap.profit') }}</TableHead>
+                        <TableHead>
+                            <div class="flex items-center gap-1">
+                                {{ t('admin.dashboard.weeklyRecap.profit') }}
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger as-child>
+                                            <button type="button" class="text-muted-foreground hover:text-foreground">
+                                                <HelpCircle class="size-3.5" />
+                                            </button>
+                                        </TooltipTrigger>
+                                        <TooltipContent class="max-w-64">
+                                            {{ t('admin.dashboard.weeklyRecap.profitHelp') }}
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+                            </div>
+                        </TableHead>
                         <TableHead>{{ t('admin.dashboard.weeklyRecap.weeklyTax') }}</TableHead>
                         <TableHead>{{ t('admin.dashboard.weeklyRecap.buybacks') }}</TableHead>
                         <TableHead>{{ t('admin.dashboard.weeklyRecap.licenses') }}</TableHead>

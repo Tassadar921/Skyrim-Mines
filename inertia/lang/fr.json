@@ -307,6 +307,7 @@
                 "commissions": "Commissions livraison",
                 "largeOrderFees": "Frais grosse commande",
                 "profit": "Bénéfice",
+                "profitHelp": "Bénéfice des livraisons + licences + frais grosse commande − commissions livraison",
                 "weeklyTax": "Taxe hebdo",
                 "buybacks": "Rachats",
                 "licenses": "Licences",

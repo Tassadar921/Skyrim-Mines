@@ -65,10 +65,6 @@ function toggleExpanded(delivery: DeliveryRow) {
     }
 }
 
-function resourceSummary(delivery: DeliveryRow): string {
-    return delivery.lines.map((line) => line.resourceName).join(', ');
-}
-
 function deliveryTotal(delivery: DeliveryRow): number {
     return delivery.lines.reduce((sum, line) => sum + line.totalPrice, 0);
 }
@@ -207,8 +203,6 @@ function resetFilters() {
                             </Button>
                         </TableHead>
                         <TableHead>{{ t('admin.livraisons.table.organization') }}</TableHead>
-                        <TableHead>{{ t('admin.livraisons.table.castellany') }}</TableHead>
-                        <TableHead>{{ t('admin.livraisons.table.resource') }}</TableHead>
                         <TableHead>{{ t('admin.livraisons.table.amount') }}</TableHead>
                         <TableHead>{{ t('admin.livraisons.table.profit') }}</TableHead>
                         <TableHead>{{ t('admin.livraisons.table.commission') }}</TableHead>
@@ -234,11 +228,6 @@ function resetFilters() {
                                     <span v-if="delivery.organizationName">{{ delivery.organizationName }}</span>
                                     <span v-else class="italic">{{ t('admin.livraisons.table.noOrganization') }}</span>
                                 </TableCell>
-                                <TableCell class="text-sm text-muted-foreground">
-                                    <span v-if="delivery.castellanyName">{{ delivery.castellanyName }}</span>
-                                    <span v-else class="italic">{{ t('admin.livraisons.table.castellanyPickup') }}</span>
-                                </TableCell>
-                                <TableCell class="text-sm font-medium">{{ resourceSummary(delivery) }}</TableCell>
                                 <TableCell class="text-sm font-medium">{{ deliveryTotal(delivery).toFixed(2) }} s</TableCell>
                                 <TableCell class="text-sm font-medium" :class="delivery.totalProfit >= 0 ? 'text-green-600' : 'text-destructive'">{{ delivery.totalProfit.toFixed(2) }} s</TableCell>
                                 <TableCell class="text-sm text-muted-foreground">{{ delivery.commissionAmount.toFixed(2) }} s</TableCell>
@@ -257,7 +246,7 @@ function resetFilters() {
                             </TableRow>
                             <TableRow v-if="expanded.has(delivery.id)">
                                 <TableCell />
-                                <TableCell :colspan="12" class="bg-muted/30 p-3">
+                                <TableCell :colspan="10" class="bg-muted/30 p-3">
                                     <Table>
                                         <TableHeader>
                                             <TableRow>
@@ -286,7 +275,7 @@ function resetFilters() {
                         </template>
                     </template>
                     <TableRow v-else>
-                        <TableCell :colspan="13" class="h-24 text-center text-muted-foreground">
+                        <TableCell :colspan="11" class="h-24 text-center text-muted-foreground">
                             {{ t('admin.livraisons.table.empty') }}
                         </TableCell>
                     </TableRow>
