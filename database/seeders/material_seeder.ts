@@ -1,7 +1,7 @@
 import { BaseSeeder } from '@adonisjs/lucid/seeders';
 import MaterialRepository from '#repositories/material_repository';
 
-const MATERIAL_ORDER = ['Charbon pauvre', 'Charbon', 'Briquette', 'Coke', 'Pioches'];
+const MATERIAL_ORDER = ['Charbon pauvre', 'Charbon', 'Briquette', 'Coke', 'Pioches', 'Doline'];
 
 export default class extends BaseSeeder {
     private readonly materialRepository: MaterialRepository = new MaterialRepository();

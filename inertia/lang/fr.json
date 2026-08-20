@@ -149,6 +149,8 @@
             "clients": "Clients",
             "clientsPersonal": "Clients à titre personnel",
             "organizations": "Organisations",
+            "search": "Rechercher…",
+            "searchEmpty": "Aucun résultat",
             "scope": "Destinataire de la commande",
             "scopeOrganization": "Pour son organisation ({name})",
             "scopePersonal": "À titre personnel"

@@ -46,6 +46,12 @@ export default class ResourceDepositRepository extends BaseRepository<typeof Res
         return new Map(rows.map((row) => [row.resourceId, Number(row.$extras.total)]));
     }
 
+    public async sumSoljundQuantityForResource(resourceId: string): Promise<number> {
+        const result = await ResourceDeposit.query().where('resourceId', resourceId).sum('soljund_quantity as total').first();
+
+        return Number(result?.$extras.total ?? 0);
+    }
+
     public async sumByUserForResource(resourceId: string): Promise<Map<string, number>> {
         const rows = await ResourceDeposit.query().where('resourceId', resourceId).select('userId').sum('quantity as total').groupBy('userId');
 

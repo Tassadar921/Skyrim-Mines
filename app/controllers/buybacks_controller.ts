@@ -7,8 +7,13 @@ import ResourceDepositRepository from '#repositories/resource_deposit_repository
 import ResourceBuybackRepository from '#repositories/resource_buyback_repository';
 import ResourceBuybackBatchRepository from '#repositories/resource_buyback_batch_repository';
 import ResourceStockRepository from '#repositories/resource_stock_repository';
+import MaterialRepository from '#repositories/material_repository';
+import MaterialStockRepository from '#repositories/material_stock_repository';
 import UserRepository from '#repositories/user_repository';
 import { createBuybackValidator } from '#validators/buybacks';
+import { MOONSTONE_RESOURCE_NAME } from '#helpers/moonstone_helper';
+import { DOLINE_MATERIAL_NAME } from '#helpers/doline_helper';
+import ResourceTypeEnum from '#types/enum/resource_type_enum';
 
 function allocateProportionally(total: number, weights: Map<string, number>): Map<string, number> {
     const totalWeight = [...weights.values()].reduce((sum, weight) => sum + weight, 0);
@@ -44,6 +49,8 @@ export default class BuybacksController {
         private readonly resourceBuybackRepository: ResourceBuybackRepository = new ResourceBuybackRepository(),
         private readonly resourceBuybackBatchRepository: ResourceBuybackBatchRepository = new ResourceBuybackBatchRepository(),
         private readonly resourceStockRepository: ResourceStockRepository = new ResourceStockRepository(),
+        private readonly materialRepository: MaterialRepository = new MaterialRepository(),
+        private readonly materialStockRepository: MaterialStockRepository = new MaterialStockRepository(),
         private readonly userRepository: UserRepository = new UserRepository(),
     ) {}
 
@@ -84,16 +91,43 @@ export default class BuybacksController {
                     const allocations = allocateProportionally(quantity, outstandingByUser);
                     const buyPrice = Number(resource.buyPrice);
 
-                    const buybackEntries: { batchId: string; userId: string; resourceId: string; quantity: number; amount: number }[] = [];
+                    const isMoonstoneOre = resource.name === MOONSTONE_RESOURCE_NAME && resource.type === ResourceTypeEnum.MINERAI;
+                    let soljundQuantity = 0;
+                    let soljundAllocations = new Map<string, number>();
+                    if (isMoonstoneOre) {
+                        const [depositedSoljund, boughtBackSoljund] = await Promise.all([
+                            this.resourceDepositRepository.sumSoljundQuantityForResource(item.resourceId),
+                            this.resourceBuybackRepository.sumSoljundQuantityForResource(item.resourceId),
+                        ]);
+                        const outstandingSoljund = Math.max(0, depositedSoljund - boughtBackSoljund);
+                        soljundQuantity = Math.min(item.soljundQuantity ?? 0, quantity, outstandingSoljund);
+                        soljundAllocations = allocateProportionally(soljundQuantity, allocations);
+                    }
+
+                    const buybackEntries: { batchId: string; userId: string; resourceId: string; quantity: number; amount: number; soljundQuantity: number }[] = [];
                     for (const [userId, allocatedQuantity] of allocations) {
                         if (allocatedQuantity <= 0) continue;
                         const amount = allocatedQuantity * buyPrice;
-                        buybackEntries.push({ batchId: batch.id, userId, resourceId: item.resourceId, quantity: allocatedQuantity, amount });
+                        buybackEntries.push({
+                            batchId: batch.id,
+                            userId,
+                            resourceId: item.resourceId,
+                            quantity: allocatedQuantity,
+                            amount,
+                            soljundQuantity: soljundAllocations.get(userId) ?? 0,
+                        });
                         await this.userRepository.incrementBalance(userId, amount, trx);
                     }
 
                     await this.resourceBuybackRepository.createMany(buybackEntries, trx);
                     await this.resourceStockRepository.incrementPurchasedQuantity(item.resourceId, quantity, trx);
+
+                    if (soljundQuantity > 0) {
+                        const dolineMaterial = await this.materialRepository.findOneBy({ name: DOLINE_MATERIAL_NAME }, [], trx);
+                        if (dolineMaterial) {
+                            await this.materialStockRepository.increment(dolineMaterial.id, trx, soljundQuantity);
+                        }
+                    }
                 }
             });
 

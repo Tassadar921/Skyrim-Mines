@@ -390,7 +390,7 @@ export class ResourceBuybackBatchSchema extends BaseModel {
 }
 
 export class ResourceBuybackSchema extends BaseModel {
-  static $columns = ['amount', 'batchId', 'createdAt', 'id', 'quantity', 'resourceId', 'updatedAt', 'userId'] as const
+  static $columns = ['amount', 'batchId', 'createdAt', 'id', 'quantity', 'resourceId', 'soljundQuantity', 'updatedAt', 'userId'] as const
   $columns = ResourceBuybackSchema.$columns
   @column()
   declare amount: string
@@ -404,6 +404,8 @@ export class ResourceBuybackSchema extends BaseModel {
   declare quantity: number
   @column()
   declare resourceId: string
+  @column()
+  declare soljundQuantity: number
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
   @column()

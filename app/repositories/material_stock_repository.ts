@@ -27,9 +27,9 @@ export default class MaterialStockRepository extends BaseRepository<typeof Mater
         return true;
     }
 
-    public async increment(materialId: string, trx: TransactionClientContract): Promise<void> {
+    public async increment(materialId: string, trx: TransactionClientContract, amount: number = 1): Promise<void> {
         const stock = await this.firstOrNew({ materialId }, { materialId, quantity: 0 }, trx);
-        stock.quantity += 1;
+        stock.quantity += amount;
         await stock.save();
     }
 }

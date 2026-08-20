@@ -32,12 +32,14 @@ export default class HomeController {
         const user = auth.user;
         const isEmployeeOrAdmin = !!user && isStaffOrAdmin(user.role);
 
-        const [resources, depositTotals, buybackTotals, myDepositTotals, myBuybackTotals, pickaxeMaterial] = await Promise.all([
+        const [resources, depositTotals, buybackTotals, myDepositTotals, myBuybackTotals, soljundDepositTotals, soljundBuybackTotals, pickaxeMaterial] = await Promise.all([
             this.resourceRepository.all(),
             this.resourceDepositRepository.sumByResource(),
             this.resourceBuybackRepository.sumByResource(),
             user ? this.resourceDepositRepository.sumByUser(user.id) : new Map<string, number>(),
             user ? this.resourceBuybackRepository.sumByUser(user.id) : new Map<string, number>(),
+            this.resourceDepositRepository.sumSoljundQuantityByResource(),
+            this.resourceBuybackRepository.sumSoljundQuantityByResource(),
             isEmployeeOrAdmin ? this.materialRepository.findOneBy({ name: PICKAXE_MATERIAL_NAME }) : null,
         ]);
 
@@ -79,6 +81,7 @@ export default class HomeController {
                 ...new ResourceTransformer(r).toObject(),
                 quantityBarrel: (depositTotals.get(r.id) ?? 0) - (buybackTotals.get(r.id) ?? 0),
                 myQuantityBarrel: (myDepositTotals.get(r.id) ?? 0) - (myBuybackTotals.get(r.id) ?? 0),
+                soljundBarrel: (soljundDepositTotals.get(r.id) ?? 0) - (soljundBuybackTotals.get(r.id) ?? 0),
             })),
             ordersToDeliver: ordersToDeliverWithRemaining.filter((order) => order.lines.length > 0),
             castellanies: castellanies.map((castellany) => new CastellanyTransformer(castellany).toObject()),

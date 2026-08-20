@@ -28,7 +28,7 @@ import BuybackModal from '~/partials/buyback/BuybackModal.vue';
 import QuantityStepper from '~/partials/stocks/QuantityStepper.vue';
 import type { Data } from '@generated/data';
 
-type ResourceWithBarrel = Data.Resource & { quantityBarrel: number; myQuantityBarrel: number };
+type ResourceWithBarrel = Data.Resource & { quantityBarrel: number; myQuantityBarrel: number; soljundBarrel: number };
 type RemainingLine = { orderLineId: string; resourceName: string; resourceType: string; unitPrice: number; orderedQuantity: number; remainingQuantity: number };
 type OrderToDeliver = {
     id: string;
@@ -128,6 +128,7 @@ const myLingots = computed(() => props.resources.filter((r) => r.type === 'lingo
 const totalMyBarrelValue = computed(() => props.resources.reduce((sum, resource) => sum + resource.buyPrice * resource.myQuantityBarrel, 0));
 
 const canSeeToDeliver = page.props.user?.role === 'admin' || page.props.user?.role === 'staff';
+const canSeeCompanyBarrel = page.props.user?.role === 'admin' || page.props.user?.role === 'auditor' || page.props.user?.role === 'staff';
 
 let barrelSubscription: ReturnType<ReturnType<typeof getTransmit>['subscription']> | undefined;
 let toDeliverSubscription: ReturnType<ReturnType<typeof getTransmit>['subscription']> | undefined;
@@ -309,7 +310,7 @@ onUnmounted(() => {
             </div>
         </div>
 
-        <div v-if="minerais.length || lingots.length" class="max-w-3xl mx-auto space-y-10">
+        <div v-if="canSeeCompanyBarrel && (minerais.length || lingots.length)" class="max-w-3xl mx-auto space-y-10">
             <h2 class="font-serif text-2xl font-light text-slate-800 dark:text-slate-100 text-center">{{ t('home.barrel.title') }}</h2>
 
             <div v-if="minerais.length" class="space-y-3">

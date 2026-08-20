@@ -9,6 +9,7 @@ import { Button } from '~/components/ui/button';
 import { Label } from '~/components/ui/label';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '~/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '~/components/ui/table';
+import { Input } from '~/components/ui/input';
 import { Link } from '@adonisjs/inertia/vue';
 import { ArrowLeft } from '@lucide/vue';
 import QuantityStepper from '~/partials/stocks/QuantityStepper.vue';
@@ -46,6 +47,27 @@ const lingots = computed(() => props.resources.filter((r) => r.type === 'lingot'
 
 const clientsWithOrganization = computed(() => props.clients.filter((client) => client.organizationName));
 const clientsWithoutOrganization = computed(() => props.clients.filter((client) => !client.organizationName));
+
+const recipientSearch = ref('');
+
+function matchesSearch(...values: (string | null)[]): boolean {
+    const needle = recipientSearch.value.trim().toLowerCase();
+    if (!needle) return true;
+    return values.some((value) => value?.toLowerCase().includes(needle));
+}
+
+const filteredClientsWithOrganization = computed(() => clientsWithOrganization.value.filter((client) => matchesSearch(client.username, client.organizationName)));
+const filteredClientsWithoutOrganization = computed(() => clientsWithoutOrganization.value.filter((client) => matchesSearch(client.username)));
+const filteredOrganizations = computed(() => props.organizations.filter((organization) => matchesSearch(organization.name)));
+const hasRecipientResults = computed(() => filteredClientsWithOrganization.value.length || filteredClientsWithoutOrganization.value.length || filteredOrganizations.value.length);
+
+function onRecipientOpenChange(open: boolean) {
+    if (!open) recipientSearch.value = '';
+}
+
+function onRecipientSearchKeydown(event: KeyboardEvent) {
+    if (event.key !== 'Escape') event.stopPropagation();
+}
 
 function buildQuantities(items: Data.Resource[]): Record<string, number> {
     return Object.fromEntries(items.map((item) => [item.id, 0]));
@@ -155,24 +177,30 @@ function submit() {
             <div class="rounded-md border p-4 space-y-4">
                 <div class="space-y-1">
                     <Label>{{ t('admin.orderArchives.create.fields.recipient') }}</Label>
-                    <Select v-model="recipientSelection">
+                    <Select v-model="recipientSelection" @update:open="onRecipientOpenChange">
                         <SelectTrigger>
                             <SelectValue :placeholder="t('admin.orderArchives.create.fields.recipientPlaceholder')" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectGroup v-if="clientsWithOrganization.length">
+                            <div class="p-1">
+                                <Input v-model="recipientSearch" :placeholder="t('commande.recipient.search')" class="h-8" @click.stop @keydown="onRecipientSearchKeydown" />
+                            </div>
+                            <p v-if="!hasRecipientResults" class="px-2 py-4 text-center text-sm text-muted-foreground">{{ t('commande.recipient.searchEmpty') }}</p>
+                            <SelectGroup v-if="filteredClientsWithOrganization.length">
                                 <SelectLabel>{{ t('commande.recipient.clients') }}</SelectLabel>
-                                <SelectItem v-for="client in clientsWithOrganization" :key="client.id" :value="`client:${client.id}`">{{ client.username }} ({{ client.organizationName }})</SelectItem>
+                                <SelectItem v-for="client in filteredClientsWithOrganization" :key="client.id" :value="`client:${client.id}`">
+                                    {{ client.username }} ({{ client.organizationName }})
+                                </SelectItem>
                             </SelectGroup>
-                            <SelectGroup v-if="clientsWithoutOrganization.length">
+                            <SelectGroup v-if="filteredClientsWithoutOrganization.length">
                                 <SelectLabel>{{ t('commande.recipient.clientsPersonal') }}</SelectLabel>
-                                <SelectItem v-for="client in clientsWithoutOrganization" :key="client.id" :value="`client:${client.id}`">
+                                <SelectItem v-for="client in filteredClientsWithoutOrganization" :key="client.id" :value="`client:${client.id}`">
                                     {{ client.username }}
                                 </SelectItem>
                             </SelectGroup>
-                            <SelectGroup>
+                            <SelectGroup v-if="filteredOrganizations.length">
                                 <SelectLabel>{{ t('commande.recipient.organizations') }}</SelectLabel>
-                                <SelectItem v-for="organization in organizations" :key="organization.id" :value="`organization:${organization.id}`">
+                                <SelectItem v-for="organization in filteredOrganizations" :key="organization.id" :value="`organization:${organization.id}`">
                                     {{ organization.name }}
                                 </SelectItem>
                             </SelectGroup>
