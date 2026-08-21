@@ -16,7 +16,6 @@ type WeeklyRecap = {
     largeOrderFeesAmount: number;
     profit: number;
     weeklyTax: number;
-    buybacksAmount: number;
     licensesAmount: number;
     employeeDueAmount: number;
     capital: number | null;
@@ -28,7 +27,6 @@ const METRICS = [
     { value: 'deliveriesAmount', labelKey: 'admin.dashboard.weeklyRecap.deliveries' },
     { value: 'profit', labelKey: 'admin.dashboard.weeklyRecap.profit' },
     { value: 'weeklyTax', labelKey: 'admin.dashboard.weeklyRecap.weeklyTax' },
-    { value: 'buybacksAmount', labelKey: 'admin.dashboard.weeklyRecap.buybacks' },
     { value: 'licensesAmount', labelKey: 'admin.dashboard.weeklyRecap.licenses' },
     { value: 'employeeDueAmount', labelKey: 'admin.dashboard.weeklyRecap.employeeDue' },
     { value: 'capital', labelKey: 'admin.dashboard.weeklyRecap.capital' },

@@ -211,30 +211,6 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/livraisons_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
-  'stocks.resources.updateQuantity': {
-    methods: ["PATCH"]
-    pattern: '/stocks/resources/:id'
-    types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/stocks').updateResourceStockQuantityValidator)>>
-      paramsTuple: [ParamValue]
-      params: { id: ParamValue }
-      query: ExtractQuery<InferInput<(typeof import('#validators/stocks').updateResourceStockQuantityValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/stocks_controller').default['updateResourceQuantity']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/stocks_controller').default['updateResourceQuantity']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
-  'stocks.materials.updateQuantity': {
-    methods: ["PATCH"]
-    pattern: '/stocks/materials/:id'
-    types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/stocks').updateMaterialStockQuantityValidator)>>
-      paramsTuple: [ParamValue]
-      params: { id: ParamValue }
-      query: ExtractQuery<InferInput<(typeof import('#validators/stocks').updateMaterialStockQuantityValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/stocks_controller').default['updateMaterialQuantity']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/stocks_controller').default['updateMaterialQuantity']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
   'deposits.store': {
     methods: ["POST"]
     pattern: '/deposits'
@@ -773,6 +749,30 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/castellanies_controller').default['destroy']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/castellanies_controller').default['destroy']>>>
+    }
+  }
+  'admin.stocks.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/admin/stocks'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/stocks_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/stocks_controller').default['index']>>>
+    }
+  }
+  'admin.stocks.doline.update': {
+    methods: ["PATCH"]
+    pattern: '/admin/stocks/doline'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/admin/stocks').updateDolineStockQuantityValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/admin/stocks').updateDolineStockQuantityValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/stocks_controller').default['updateDoline']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/stocks_controller').default['updateDoline']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'admin.buybacks.index': {

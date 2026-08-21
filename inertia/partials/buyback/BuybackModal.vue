@@ -90,14 +90,14 @@ function submitBuyback() {
         <DialogTrigger as-child>
             <Button variant="outline">{{ t('buyback.trigger') }}</Button>
         </DialogTrigger>
-        <DialogScrollContent class="max-w-2xl">
+        <DialogScrollContent class="max-w-3xl">
             <DialogHeader>
                 <DialogTitle>{{ t('buyback.title') }}</DialogTitle>
             </DialogHeader>
 
             <Button class="w-full" @click="setAllMax">{{ t('buyback.buyAll') }}</Button>
 
-            <div class="rounded-md border">
+            <div class="overflow-x-auto rounded-md border">
                 <Table>
                     <TableHeader>
                         <TableRow>

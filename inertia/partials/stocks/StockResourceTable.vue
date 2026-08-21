@@ -1,20 +1,13 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
-import { useAuth } from '~/composables/use_auth';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '~/components/ui/table';
-import QuantityStepper from './QuantityStepper.vue';
 import type { Data } from '@generated/data';
 
 const { t } = useI18n();
-const { isAdmin } = useAuth();
 
 const props = defineProps<{
     resources: Data.Resource[];
     quantities: Record<string, { quantityBarrel: number; quantityPurchased: number; soljundQuantity: number }>;
-}>();
-
-const emit = defineEmits<{
-    'update-quantity': [id: string, value: number];
 }>();
 
 function stockValue(resource: Data.Resource): number {
@@ -47,14 +40,7 @@ function stockValue(resource: Data.Resource): number {
                                 {{ t('stocks.table.soljundQuantity', { quantity: quantities[resource.id].soljundQuantity }) }}
                             </div>
                         </TableCell>
-                        <TableCell>
-                            <QuantityStepper
-                                v-if="isAdmin"
-                                :model-value="quantities[resource.id]?.quantityPurchased ?? 0"
-                                @update:model-value="(value) => emit('update-quantity', resource.id, value)"
-                            />
-                            <span v-else class="text-sm">{{ quantities[resource.id]?.quantityPurchased ?? 0 }}</span>
-                        </TableCell>
+                        <TableCell class="text-sm">{{ quantities[resource.id]?.quantityPurchased ?? 0 }}</TableCell>
                         <TableCell class="text-sm font-medium">{{ stockValue(resource).toFixed(2) }}</TableCell>
                     </TableRow>
                 </template>

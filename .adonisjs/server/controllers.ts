@@ -18,6 +18,7 @@ export const controllers = {
     Resources: () => import('#controllers/admin/resources_controller'),
     Tonneau: () => import('#controllers/admin/tonneau_controller'),
     Users: () => import('#controllers/admin/users_controller'),
+    Stocks: () => import('#controllers/admin/stocks_controller'),
   },
   Auth: () => import('#controllers/auth_controller'),
   Buybacks: () => import('#controllers/buybacks_controller'),

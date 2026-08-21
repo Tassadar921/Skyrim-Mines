@@ -28,11 +28,10 @@ export default class DashboardController {
     public async index({ inertia }: HttpContext) {
         const currentWeek = getWeekNumber(DateTime.now());
 
-        const [deliveryTotals, commissionTotals, largeOrderFeeTotals, buybackTotals, licenseTotals, employeeDueTotals, castellanyTax, largeOrderSetting, capitalSnapshotsByWeek] = await Promise.all([
+        const [deliveryTotals, commissionTotals, largeOrderFeeTotals, licenseTotals, employeeDueTotals, castellanyTax, largeOrderSetting, capitalSnapshotsByWeek] = await Promise.all([
             this.deliveryRepository.getWeeklyTotals(),
             this.deliveryRepository.getWeeklyCommissionTotals(),
             this.deliveryRepository.getWeeklyLargeOrderFeeTotals(),
-            this.resourceBuybackRepository.getWeeklyTotals(),
             this.licensePaymentRepository.getWeeklyTotals(),
             this.resourceBuybackRepository.getWeeklyTotalsByRole(UserRoleEnum.STAFF),
             this.castellanyTaxRepository.get(),
@@ -44,7 +43,6 @@ export default class DashboardController {
         const deliveriesProfitByWeek = new Map(deliveryTotals.map((entry) => [entry.weekNumber, entry.totalProfit]));
         const commissionsByWeek = new Map(commissionTotals.map((entry) => [entry.weekNumber, entry.totalCommission]));
         const largeOrderFeesByWeek = new Map(largeOrderFeeTotals.map((entry) => [entry.weekNumber, entry.totalFee]));
-        const buybacksByWeek = new Map(buybackTotals.map((entry) => [entry.weekNumber, entry.totalAmount]));
         const licensesByWeek = new Map(licenseTotals.map((entry) => [entry.weekNumber, entry.totalAmount]));
         const employeeDueByWeek = new Map(employeeDueTotals.map((entry) => [entry.weekNumber, entry.totalAmount]));
 
@@ -70,7 +68,6 @@ export default class DashboardController {
                 largeOrderFeesAmount,
                 profit,
                 weeklyTax: profit * (castellanyTax.rate / 100),
-                buybacksAmount: buybacksByWeek.get(weekNumber) ?? 0,
                 licensesAmount,
                 employeeDueAmount: employeeDueByWeek.get(weekNumber) ?? 0,
                 capital,

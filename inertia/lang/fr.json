@@ -271,6 +271,7 @@
                 "licenses": "Licences d'exploitation",
                 "resources": "Ressources",
                 "materials": "Matériaux",
+                "stocks": "Stocks",
                 "tonneau": "Tonneau",
                 "buybacks": "Historique des rachats",
                 "devis": "Devis",
@@ -311,7 +312,6 @@
                 "profit": "Bénéfice",
                 "profitHelp": "Bénéfice des livraisons + licences + frais grosse commande − commissions livraison",
                 "weeklyTax": "Taxe hebdo",
-                "buybacks": "Rachats",
                 "licenses": "Licences",
                 "employeeDue": "Dû aux employés",
                 "capital": "Capital",
@@ -797,6 +797,10 @@
                 "allTypes": "Tous les types",
                 "empty": "Aucune quantité au tonneau pour le moment"
             }
+        },
+        "stocks": {
+            "title": "Stocks",
+            "description": "Vue identique à la page « Stocks » publique. Seule la quantité de Doline peut être modifiée ici, à la main."
         }
     }
 }

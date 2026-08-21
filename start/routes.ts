@@ -28,8 +28,6 @@ router.get('/mes-commandes', [controllers.Commandes, 'index']).as('commandes.ind
 router.get('/commandes/:id', [controllers.Commandes, 'show']).as('commandes.show').use(middleware.auth());
 router.patch('/commandes/:id/cancel', [controllers.Commandes, 'cancel']).as('commandes.cancel').use(middleware.auth());
 router.post('/commandes/:orderId/livraisons', [controllers.Livraisons, 'store']).as('livraisons.store').use(middleware.auth());
-router.patch('/stocks/resources/:id', [controllers.Stocks, 'updateResourceQuantity']).as('stocks.resources.updateQuantity').use(middleware.auth()).use(middleware.admin());
-router.patch('/stocks/materials/:id', [controllers.Stocks, 'updateMaterialQuantity']).as('stocks.materials.updateQuantity').use(middleware.auth()).use(middleware.admin());
 router.post('/deposits', [controllers.Deposits, 'store']).as('deposits.store').use(middleware.auth());
 router.patch('/deposits/:id', [controllers.Deposits, 'update']).as('deposits.update').use(middleware.auth());
 router.post('/buybacks', [controllers.Buybacks, 'store']).as('buybacks.store').use(middleware.auth()).use(middleware.admin());
@@ -89,6 +87,9 @@ router
         router.get('/castellanies/:id', [controllers.admin.Castellanies, 'show']).as('admin.castellanies.show').use(readOnly);
         router.put('/castellanies/:id', [controllers.admin.Castellanies, 'update']).as('admin.castellanies.update').use(middleware.admin());
         router.delete('/castellanies/:id', [controllers.admin.Castellanies, 'destroy']).as('admin.castellanies.destroy').use(middleware.admin());
+
+        router.get('/stocks', [controllers.admin.Stocks, 'index']).as('admin.stocks.index').use(readOnly);
+        router.patch('/stocks/doline', [controllers.admin.Stocks, 'updateDoline']).as('admin.stocks.doline.update').use(middleware.admin());
 
         router.get('/buybacks', [controllers.admin.Buybacks, 'index']).as('admin.buybacks.index').use(readOnly);
 

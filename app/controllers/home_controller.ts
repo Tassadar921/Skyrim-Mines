@@ -3,6 +3,7 @@ import { type HttpContext } from '@adonisjs/core/http';
 import ResourceRepository from '#repositories/resource_repository';
 import ResourceDepositRepository from '#repositories/resource_deposit_repository';
 import ResourceBuybackRepository from '#repositories/resource_buyback_repository';
+import ResourceBarrelAdjustmentRepository from '#repositories/resource_barrel_adjustment_repository';
 import OrderRepository from '#repositories/order_repository';
 import DeliveryRepository from '#repositories/delivery_repository';
 import OrganizationRepository from '#repositories/organization_repository';
@@ -12,6 +13,7 @@ import MaterialStockRepository from '#repositories/material_stock_repository';
 import ResourceTransformer from '#transformers/resource_transformer';
 import CastellanyTransformer from '#transformers/castellany_transformer';
 import { isStaffOrAdmin } from '#helpers/user_role_helper';
+import { computeBarrelQuantity } from '#helpers/resource_barrel_helper';
 import { DEPOSIT_EDIT_WINDOW_MINUTES } from '#helpers/deposit_edit_window_helper';
 import { PICKAXE_MATERIAL_NAME } from '#helpers/pickaxe_helper';
 
@@ -20,6 +22,7 @@ export default class HomeController {
         private readonly resourceRepository: ResourceRepository = new ResourceRepository(),
         private readonly resourceDepositRepository: ResourceDepositRepository = new ResourceDepositRepository(),
         private readonly resourceBuybackRepository: ResourceBuybackRepository = new ResourceBuybackRepository(),
+        private readonly resourceBarrelAdjustmentRepository: ResourceBarrelAdjustmentRepository = new ResourceBarrelAdjustmentRepository(),
         private readonly orderRepository: OrderRepository = new OrderRepository(),
         private readonly deliveryRepository: DeliveryRepository = new DeliveryRepository(),
         private readonly organizationRepository: OrganizationRepository = new OrganizationRepository(),
@@ -32,16 +35,19 @@ export default class HomeController {
         const user = auth.user;
         const isEmployeeOrAdmin = !!user && isStaffOrAdmin(user.role);
 
-        const [resources, depositTotals, buybackTotals, myDepositTotals, myBuybackTotals, soljundDepositTotals, soljundBuybackTotals, pickaxeMaterial] = await Promise.all([
-            this.resourceRepository.all(),
-            this.resourceDepositRepository.sumByResource(),
-            this.resourceBuybackRepository.sumByResource(),
-            user ? this.resourceDepositRepository.sumByUser(user.id) : new Map<string, number>(),
-            user ? this.resourceBuybackRepository.sumByUser(user.id) : new Map<string, number>(),
-            this.resourceDepositRepository.sumSoljundQuantityByResource(),
-            this.resourceBuybackRepository.sumSoljundQuantityByResource(),
-            isEmployeeOrAdmin ? this.materialRepository.findOneBy({ name: PICKAXE_MATERIAL_NAME }) : null,
-        ]);
+        const [resources, depositTotals, buybackTotals, adjustmentTotals, myDepositTotals, myBuybackTotals, myAdjustmentTotals, soljundDepositTotals, soljundBuybackTotals, pickaxeMaterial] =
+            await Promise.all([
+                this.resourceRepository.all(),
+                this.resourceDepositRepository.sumByResource(),
+                this.resourceBuybackRepository.sumByResource(),
+                this.resourceBarrelAdjustmentRepository.sumByResource(),
+                user ? this.resourceDepositRepository.sumByUser(user.id) : new Map<string, number>(),
+                user ? this.resourceBuybackRepository.sumByUser(user.id) : new Map<string, number>(),
+                user ? this.resourceBarrelAdjustmentRepository.sumByUser(user.id) : new Map<string, number>(),
+                this.resourceDepositRepository.sumSoljundQuantityByResource(),
+                this.resourceBuybackRepository.sumSoljundQuantityByResource(),
+                isEmployeeOrAdmin ? this.materialRepository.findOneBy({ name: PICKAXE_MATERIAL_NAME }) : null,
+            ]);
 
         const pickaxeMaterialStock = pickaxeMaterial ? await this.materialStockRepository.findOneBy({ materialId: pickaxeMaterial.id }) : null;
         const pickaxeStock = pickaxeMaterial ? (pickaxeMaterialStock?.quantity ?? 0) : null;
@@ -79,8 +85,8 @@ export default class HomeController {
         return inertia.render('home', {
             resources: resources.map((r) => ({
                 ...new ResourceTransformer(r).toObject(),
-                quantityBarrel: (depositTotals.get(r.id) ?? 0) - (buybackTotals.get(r.id) ?? 0),
-                myQuantityBarrel: (myDepositTotals.get(r.id) ?? 0) - (myBuybackTotals.get(r.id) ?? 0),
+                quantityBarrel: computeBarrelQuantity(r.id, depositTotals, buybackTotals, adjustmentTotals),
+                myQuantityBarrel: computeBarrelQuantity(r.id, myDepositTotals, myBuybackTotals, myAdjustmentTotals),
                 soljundBarrel: (soljundDepositTotals.get(r.id) ?? 0) - (soljundBuybackTotals.get(r.id) ?? 0),
             })),
             ordersToDeliver: ordersToDeliverWithRemaining.filter((order) => order.lines.length > 0),

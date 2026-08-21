@@ -7,14 +7,7 @@ export interface ApiDefinition {
   unsubscribe: typeof routes['unsubscribe']
   home: typeof routes['home']
   tarifs: typeof routes['tarifs']
-  stocks: typeof routes['stocks'] & {
-    resources: {
-      updateQuantity: typeof routes['stocks.resources.updateQuantity']
-    }
-    materials: {
-      updateQuantity: typeof routes['stocks.materials.updateQuantity']
-    }
-  }
+  stocks: typeof routes['stocks']
   organigramme: typeof routes['organigramme']
   devis: {
     create: typeof routes['devis.create']
@@ -106,6 +99,12 @@ export interface ApiDefinition {
       show: typeof routes['admin.castellanies.show']
       update: typeof routes['admin.castellanies.update']
       destroy: typeof routes['admin.castellanies.destroy']
+    }
+    stocks: {
+      index: typeof routes['admin.stocks.index']
+      doline: {
+        update: typeof routes['admin.stocks.doline.update']
+      }
     }
     buybacks: {
       index: typeof routes['admin.buybacks.index']

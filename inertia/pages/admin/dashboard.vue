@@ -30,7 +30,6 @@ type WeeklyRecap = {
     largeOrderFeesAmount: number;
     profit: number;
     weeklyTax: number;
-    buybacksAmount: number;
     licensesAmount: number;
     employeeDueAmount: number;
     capital: number | null;
@@ -168,7 +167,6 @@ function submitCapitalSnapshot() {
                             </div>
                         </TableHead>
                         <TableHead>{{ t('admin.dashboard.weeklyRecap.weeklyTax') }}</TableHead>
-                        <TableHead>{{ t('admin.dashboard.weeklyRecap.buybacks') }}</TableHead>
                         <TableHead>{{ t('admin.dashboard.weeklyRecap.licenses') }}</TableHead>
                         <TableHead>{{ t('admin.dashboard.weeklyRecap.employeeDue') }}</TableHead>
                         <TableHead>{{ t('admin.dashboard.weeklyRecap.capital') }}</TableHead>
@@ -190,7 +188,6 @@ function submitCapitalSnapshot() {
                                 {{ formatAmount(recap.profit) }}
                             </TableCell>
                             <TableCell class="text-sm">{{ formatAmount(recap.weeklyTax) }}</TableCell>
-                            <TableCell class="text-sm">{{ formatAmount(recap.buybacksAmount) }}</TableCell>
                             <TableCell class="text-sm">{{ formatAmount(recap.licensesAmount) }}</TableCell>
                             <TableCell class="text-sm">{{ formatAmount(recap.employeeDueAmount) }}</TableCell>
                             <TableCell class="text-sm">{{ formatAmountOrDash(recap.capital) }}</TableCell>
@@ -198,7 +195,7 @@ function submitCapitalSnapshot() {
                         </TableRow>
                     </template>
                     <TableRow v-else>
-                        <TableCell colspan="9" class="text-center text-sm text-muted-foreground py-6">
+                        <TableCell colspan="8" class="text-center text-sm text-muted-foreground py-6">
                             {{ t('admin.dashboard.weeklyRecap.empty') }}
                         </TableCell>
                     </TableRow>

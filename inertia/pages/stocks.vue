@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
-import { Head, router } from '@inertiajs/vue3';
+import { computed } from 'vue';
+import { Head } from '@inertiajs/vue3';
 import { useI18n } from 'vue-i18n';
-import { urlFor } from '~/client';
 import StockResourceTable from '~/partials/stocks/StockResourceTable.vue';
 import StockMaterialTable from '~/partials/stocks/StockMaterialTable.vue';
 import type { Data } from '@generated/data';
@@ -30,49 +29,10 @@ function toMaterialQuantityMap(items: MaterialStockLine[]): MaterialQuantities {
     return Object.fromEntries(items.map((item) => [item.id, item.quantity]));
 }
 
-const resourceQuantities = ref<ResourceQuantities>(toResourceQuantityMap(props.resources));
-const materialQuantities = ref<MaterialQuantities>(toMaterialQuantityMap(props.materials));
-
-watch(
-    () => props.resources,
-    (value) => {
-        resourceQuantities.value = toResourceQuantityMap(value);
-    },
-);
-watch(
-    () => props.materials,
-    (value) => {
-        materialQuantities.value = toMaterialQuantityMap(value);
-    },
-);
+const resourceQuantities = computed(() => toResourceQuantityMap(props.resources));
+const materialQuantities = computed(() => toMaterialQuantityMap(props.materials));
 
 const totalStockValue = computed(() => props.resources.reduce((sum, resource) => sum + resource.sellPrice * (resourceQuantities.value[resource.id]?.quantityPurchased ?? 0), 0));
-
-const debounceTimers: Record<string, ReturnType<typeof setTimeout>> = {};
-
-function normalizeQuantity(value: string | number): number {
-    return Math.max(0, Math.round(Number(value) || 0));
-}
-
-function updateResourceQuantity(id: string, value: string | number) {
-    const quantity = normalizeQuantity(value);
-    resourceQuantities.value[id] = { ...resourceQuantities.value[id], quantityPurchased: quantity };
-
-    if (debounceTimers[id]) clearTimeout(debounceTimers[id]);
-    debounceTimers[id] = setTimeout(() => {
-        router.patch(urlFor('stocks.resources.updateQuantity', { id }), { quantity }, { preserveScroll: true, preserveState: true });
-    }, 500);
-}
-
-function updateMaterialQuantity(id: string, value: string | number) {
-    const quantity = normalizeQuantity(value);
-    materialQuantities.value[id] = quantity;
-
-    if (debounceTimers[id]) clearTimeout(debounceTimers[id]);
-    debounceTimers[id] = setTimeout(() => {
-        router.patch(urlFor('stocks.materials.updateQuantity', { id }), { quantity }, { preserveScroll: true, preserveState: true });
-    }, 500);
-}
 </script>
 
 <template>
@@ -85,12 +45,12 @@ function updateMaterialQuantity(id: string, value: string | number) {
         <div class="max-w-5xl mx-auto space-y-10">
             <div class="space-y-3">
                 <h2 class="font-serif text-2xl font-light text-slate-800 dark:text-slate-100">{{ t('admin.resources.types.minerai') }}</h2>
-                <StockResourceTable :resources="minerais" :quantities="resourceQuantities" @update-quantity="updateResourceQuantity" />
+                <StockResourceTable :resources="minerais" :quantities="resourceQuantities" />
             </div>
 
             <div class="space-y-3">
                 <h2 class="font-serif text-2xl font-light text-slate-800 dark:text-slate-100">{{ t('admin.resources.types.lingot') }}</h2>
-                <StockResourceTable :resources="lingots" :quantities="resourceQuantities" @update-quantity="updateResourceQuantity" />
+                <StockResourceTable :resources="lingots" :quantities="resourceQuantities" />
             </div>
 
             <div class="flex items-center justify-end gap-2 text-lg">
@@ -100,7 +60,7 @@ function updateMaterialQuantity(id: string, value: string | number) {
 
             <div class="space-y-3">
                 <h2 class="font-serif text-2xl font-light text-slate-800 dark:text-slate-100">{{ t('admin.materials.title') }}</h2>
-                <StockMaterialTable :materials="materials" :quantities="materialQuantities" @update-quantity="updateMaterialQuantity" />
+                <StockMaterialTable :materials="materials" :quantities="materialQuantities" />
             </div>
         </div>
     </div>

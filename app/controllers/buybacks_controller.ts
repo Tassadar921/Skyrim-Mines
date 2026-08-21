@@ -5,6 +5,7 @@ import transmit from '@adonisjs/transmit/services/main';
 import ResourceRepository from '#repositories/resource_repository';
 import ResourceDepositRepository from '#repositories/resource_deposit_repository';
 import ResourceBuybackRepository from '#repositories/resource_buyback_repository';
+import ResourceBarrelAdjustmentRepository from '#repositories/resource_barrel_adjustment_repository';
 import ResourceBuybackBatchRepository from '#repositories/resource_buyback_batch_repository';
 import ResourceStockRepository from '#repositories/resource_stock_repository';
 import MaterialRepository from '#repositories/material_repository';
@@ -47,6 +48,7 @@ export default class BuybacksController {
         private readonly resourceRepository: ResourceRepository = new ResourceRepository(),
         private readonly resourceDepositRepository: ResourceDepositRepository = new ResourceDepositRepository(),
         private readonly resourceBuybackRepository: ResourceBuybackRepository = new ResourceBuybackRepository(),
+        private readonly resourceBarrelAdjustmentRepository: ResourceBarrelAdjustmentRepository = new ResourceBarrelAdjustmentRepository(),
         private readonly resourceBuybackBatchRepository: ResourceBuybackBatchRepository = new ResourceBuybackBatchRepository(),
         private readonly resourceStockRepository: ResourceStockRepository = new ResourceStockRepository(),
         private readonly materialRepository: MaterialRepository = new MaterialRepository(),
@@ -73,14 +75,16 @@ export default class BuybacksController {
                     const resource = resourceById.get(item.resourceId);
                     if (!resource) continue;
 
-                    const [depositedByUser, boughtBackByUser] = await Promise.all([
+                    const [depositedByUser, boughtBackByUser, adjustedByUser] = await Promise.all([
                         this.resourceDepositRepository.sumByUserForResource(item.resourceId),
                         this.resourceBuybackRepository.sumByUserForResource(item.resourceId),
+                        this.resourceBarrelAdjustmentRepository.sumByUserForResource(item.resourceId),
                     ]);
 
+                    const userIds = new Set([...depositedByUser.keys(), ...boughtBackByUser.keys(), ...adjustedByUser.keys()]);
                     const outstandingByUser = new Map<string, number>();
-                    for (const [userId, deposited] of depositedByUser) {
-                        const outstanding = deposited - (boughtBackByUser.get(userId) ?? 0);
+                    for (const userId of userIds) {
+                        const outstanding = (depositedByUser.get(userId) ?? 0) - (boughtBackByUser.get(userId) ?? 0) + (adjustedByUser.get(userId) ?? 0);
                         if (outstanding > 0) outstandingByUser.set(userId, outstanding);
                     }
 

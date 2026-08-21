@@ -108,18 +108,6 @@ const routes = {
     tokens: [{"old":"/commandes/:orderId/livraisons","type":0,"val":"commandes","end":""},{"old":"/commandes/:orderId/livraisons","type":1,"val":"orderId","end":""},{"old":"/commandes/:orderId/livraisons","type":0,"val":"livraisons","end":""}],
     types: placeholder as Registry['livraisons.store']['types'],
   },
-  'stocks.resources.updateQuantity': {
-    methods: ["PATCH"],
-    pattern: '/stocks/resources/:id',
-    tokens: [{"old":"/stocks/resources/:id","type":0,"val":"stocks","end":""},{"old":"/stocks/resources/:id","type":0,"val":"resources","end":""},{"old":"/stocks/resources/:id","type":1,"val":"id","end":""}],
-    types: placeholder as Registry['stocks.resources.updateQuantity']['types'],
-  },
-  'stocks.materials.updateQuantity': {
-    methods: ["PATCH"],
-    pattern: '/stocks/materials/:id',
-    tokens: [{"old":"/stocks/materials/:id","type":0,"val":"stocks","end":""},{"old":"/stocks/materials/:id","type":0,"val":"materials","end":""},{"old":"/stocks/materials/:id","type":1,"val":"id","end":""}],
-    types: placeholder as Registry['stocks.materials.updateQuantity']['types'],
-  },
   'deposits.store': {
     methods: ["POST"],
     pattern: '/deposits',
@@ -389,6 +377,18 @@ const routes = {
     pattern: '/admin/castellanies/:id',
     tokens: [{"old":"/admin/castellanies/:id","type":0,"val":"admin","end":""},{"old":"/admin/castellanies/:id","type":0,"val":"castellanies","end":""},{"old":"/admin/castellanies/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['admin.castellanies.destroy']['types'],
+  },
+  'admin.stocks.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/admin/stocks',
+    tokens: [{"old":"/admin/stocks","type":0,"val":"admin","end":""},{"old":"/admin/stocks","type":0,"val":"stocks","end":""}],
+    types: placeholder as Registry['admin.stocks.index']['types'],
+  },
+  'admin.stocks.doline.update': {
+    methods: ["PATCH"],
+    pattern: '/admin/stocks/doline',
+    tokens: [{"old":"/admin/stocks/doline","type":0,"val":"admin","end":""},{"old":"/admin/stocks/doline","type":0,"val":"stocks","end":""},{"old":"/admin/stocks/doline","type":0,"val":"doline","end":""}],
+    types: placeholder as Registry['admin.stocks.doline.update']['types'],
   },
   'admin.buybacks.index': {
     methods: ["GET","HEAD"],
