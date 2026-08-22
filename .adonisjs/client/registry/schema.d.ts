@@ -763,16 +763,16 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/stocks_controller').default['index']>>>
     }
   }
-  'admin.stocks.doline.update': {
+  'admin.stocks.update': {
     methods: ["PATCH"]
-    pattern: '/admin/stocks/doline'
+    pattern: '/admin/stocks'
     types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/admin/stocks').updateDolineStockQuantityValidator)>>
+      body: ExtractBody<InferInput<(typeof import('#validators/admin/stocks').updateStocksValidator)>>
       paramsTuple: []
       params: {}
-      query: ExtractQuery<InferInput<(typeof import('#validators/admin/stocks').updateDolineStockQuantityValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/stocks_controller').default['updateDoline']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/stocks_controller').default['updateDoline']>>> | { status: 422; response: { errors: SimpleError[] } }
+      query: ExtractQuery<InferInput<(typeof import('#validators/admin/stocks').updateStocksValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/stocks_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/stocks_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'admin.buybacks.index': {

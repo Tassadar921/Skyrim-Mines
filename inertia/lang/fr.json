@@ -65,7 +65,9 @@
             "sellPrice": "Prix de vente",
             "quantityBarrel": "Dans le tonneau",
             "soljundQuantity": "dont {quantity} de la Doline de Soljund (à vendre au Thalmor)",
+            "soljundQuantityLabel": "dont Doline de Soljund (à vendre au Thalmor)",
             "quantityPurchased": "Acheté",
+            "quantityPurchasedSoljund": "dont Doline",
             "inStock": "En stock",
             "stockValue": "Valeur du stock",
             "empty": "Aucun élément trouvé"
@@ -800,7 +802,8 @@
         },
         "stocks": {
             "title": "Stocks",
-            "description": "Vue identique à la page « Stocks » publique. Seule la quantité de Doline peut être modifiée ici, à la main."
+            "description": "Vue identique à la page « Stocks » publique. Les quantités « Acheté », la part de Doline dans le stock racheté et dans le tonneau de Pierre de Lune, et la quantité de Doline (matériau) peuvent être modifiées ici, à la main.",
+            "save": "Enregistrer les modifications"
         }
     }
 }

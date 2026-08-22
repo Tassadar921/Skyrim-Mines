@@ -1,5 +1,6 @@
 import { type DateTime } from 'luxon';
 import db from '@adonisjs/lucid/services/db';
+import type { TransactionClientContract } from '@adonisjs/lucid/types/database';
 import BaseRepository from '#repositories/base/base_repository';
 import ResourceDeposit from '#models/resource_deposit';
 
@@ -8,30 +9,44 @@ export default class ResourceDepositRepository extends BaseRepository<typeof Res
         super(ResourceDeposit);
     }
 
-    public async createMany(userId: string, items: { resourceId: string; quantity: number; soljundQuantity?: number }[]): Promise<void> {
+    public async createMany(userId: string, items: { resourceId: string; quantity: number; soljundQuantity?: number }[], trx?: TransactionClientContract): Promise<void> {
         const deposits = items.filter((item) => item.quantity > 0);
         if (!deposits.length) return;
 
-        await db.transaction(async (trx) => {
+        const run = async (client: TransactionClientContract) => {
             for (const item of deposits) {
-                await ResourceDeposit.create({ userId, resourceId: item.resourceId, quantity: item.quantity, soljundQuantity: item.soljundQuantity ?? 0 }, { client: trx });
+                await ResourceDeposit.create({ userId, resourceId: item.resourceId, quantity: item.quantity, soljundQuantity: item.soljundQuantity ?? 0 }, { client });
             }
-        });
+        };
+
+        if (trx) {
+            await run(trx);
+        } else {
+            await db.transaction(run);
+        }
     }
 
     public async findRecentByUser(userId: string, since: DateTime): Promise<ResourceDeposit[]> {
         return ResourceDeposit.query().where('userId', userId).where('createdAt', '>=', since.toSQL()!).orderBy('createdAt', 'desc');
     }
 
-    public async update(id: string, payload: { resourceId: string; quantity: number }): Promise<ResourceDeposit> {
-        const deposit = await ResourceDeposit.findOrFail(id);
+    /**
+     * Updates a deposit and reports the soljund delta to apply to the previous resource's
+     * running barrel-soljund counter (always <= 0: a resource change or quantity reduction
+     * can only shrink the soljund portion, never grow it).
+     */
+    public async update(id: string, payload: { resourceId: string; quantity: number }, trx?: TransactionClientContract): Promise<{ previousResourceId: string; soljundDelta: number }> {
+        const deposit = trx ? await ResourceDeposit.query({ client: trx }).where('id', id).firstOrFail() : await ResourceDeposit.findOrFail(id);
+        const previousResourceId = deposit.resourceId;
+        const previousSoljundQuantity = deposit.soljundQuantity;
         const resourceChanged = payload.resourceId !== deposit.resourceId;
+
         deposit.resourceId = payload.resourceId;
         deposit.quantity = payload.quantity;
         deposit.soljundQuantity = resourceChanged ? 0 : Math.min(deposit.soljundQuantity, payload.quantity);
         await deposit.save();
 
-        return deposit;
+        return { previousResourceId, soljundDelta: deposit.soljundQuantity - previousSoljundQuantity };
     }
 
     public async sumByResource(): Promise<Map<string, number>> {

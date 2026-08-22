@@ -67,7 +67,7 @@ export type ScannedRoutes = {
     'admin.castellanies.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.castellanies.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.stocks.index': { paramsTuple?: []; params?: {} }
-    'admin.stocks.doline.update': { paramsTuple?: []; params?: {} }
+    'admin.stocks.update': { paramsTuple?: []; params?: {} }
     'admin.buybacks.index': { paramsTuple?: []; params?: {} }
     'admin.devis.index': { paramsTuple?: []; params?: {} }
     'admin.commandes.index': { paramsTuple?: []; params?: {} }
@@ -211,7 +211,7 @@ export type ScannedRoutes = {
     'organization.members.updateRole': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.resources.reorder': { paramsTuple?: []; params?: {} }
     'admin.materials.reorder': { paramsTuple?: []; params?: {} }
-    'admin.stocks.doline.update': { paramsTuple?: []; params?: {} }
+    'admin.stocks.update': { paramsTuple?: []; params?: {} }
     'admin.commandes.validate': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.commandes.cancel': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.tonneau.update': { paramsTuple?: []; params?: {} }

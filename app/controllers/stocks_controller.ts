@@ -22,18 +22,15 @@ export default class StocksController {
     ) {}
 
     public async index({ inertia }: HttpContext) {
-        const [resources, materials, resourceStocks, materialStocks, resourceDepositTotals, resourceBuybackTotals, resourceAdjustmentTotals, soljundDepositTotals, soljundBuybackTotals] =
-            await Promise.all([
-                this.resourceRepository.all(),
-                this.materialRepository.all(),
-                this.resourceStockRepository.all(),
-                this.materialStockRepository.all(),
-                this.resourceDepositRepository.sumByResource(),
-                this.resourceBuybackRepository.sumByResource(),
-                this.resourceBarrelAdjustmentRepository.sumByResource(),
-                this.resourceDepositRepository.sumSoljundQuantityByResource(),
-                this.resourceBuybackRepository.sumSoljundQuantityByResource(),
-            ]);
+        const [resources, materials, resourceStocks, materialStocks, resourceDepositTotals, resourceBuybackTotals, resourceAdjustmentTotals] = await Promise.all([
+            this.resourceRepository.all(),
+            this.materialRepository.all(),
+            this.resourceStockRepository.all(),
+            this.materialStockRepository.all(),
+            this.resourceDepositRepository.sumByResource(),
+            this.resourceBuybackRepository.sumByResource(),
+            this.resourceBarrelAdjustmentRepository.sumByResource(),
+        ]);
 
         const resourceStockByResourceId = new Map(resourceStocks.map((s) => [s.resourceId, s]));
         const materialStockByMaterialId = new Map(materialStocks.map((s) => [s.materialId, s]));
@@ -43,7 +40,8 @@ export default class StocksController {
                 ...new ResourceTransformer(r).toObject(),
                 quantityBarrel: computeBarrelQuantity(r.id, resourceDepositTotals, resourceBuybackTotals, resourceAdjustmentTotals),
                 quantityPurchased: resourceStockByResourceId.get(r.id)?.quantityPurchased ?? 0,
-                soljundQuantity: (soljundDepositTotals.get(r.id) ?? 0) - (soljundBuybackTotals.get(r.id) ?? 0),
+                quantityPurchasedSoljund: resourceStockByResourceId.get(r.id)?.quantityPurchasedSoljund ?? 0,
+                soljundQuantity: resourceStockByResourceId.get(r.id)?.quantityBarrelSoljund ?? 0,
             })),
             materials: materials.map((m) => ({
                 ...new MaterialTransformer(m).toObject(),

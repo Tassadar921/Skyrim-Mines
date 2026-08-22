@@ -102,9 +102,7 @@ export interface ApiDefinition {
     }
     stocks: {
       index: typeof routes['admin.stocks.index']
-      doline: {
-        update: typeof routes['admin.stocks.doline.update']
-      }
+      update: typeof routes['admin.stocks.update']
     }
     buybacks: {
       index: typeof routes['admin.buybacks.index']

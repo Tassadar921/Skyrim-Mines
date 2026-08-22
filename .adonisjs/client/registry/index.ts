@@ -384,11 +384,11 @@ const routes = {
     tokens: [{"old":"/admin/stocks","type":0,"val":"admin","end":""},{"old":"/admin/stocks","type":0,"val":"stocks","end":""}],
     types: placeholder as Registry['admin.stocks.index']['types'],
   },
-  'admin.stocks.doline.update': {
+  'admin.stocks.update': {
     methods: ["PATCH"],
-    pattern: '/admin/stocks/doline',
-    tokens: [{"old":"/admin/stocks/doline","type":0,"val":"admin","end":""},{"old":"/admin/stocks/doline","type":0,"val":"stocks","end":""},{"old":"/admin/stocks/doline","type":0,"val":"doline","end":""}],
-    types: placeholder as Registry['admin.stocks.doline.update']['types'],
+    pattern: '/admin/stocks',
+    tokens: [{"old":"/admin/stocks","type":0,"val":"admin","end":""},{"old":"/admin/stocks","type":0,"val":"stocks","end":""}],
+    types: placeholder as Registry['admin.stocks.update']['types'],
   },
   'admin.buybacks.index': {
     methods: ["GET","HEAD"],

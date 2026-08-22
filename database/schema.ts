@@ -432,14 +432,18 @@ export class ResourceDepositSchema extends BaseModel {
 }
 
 export class ResourceStockSchema extends BaseModel {
-  static $columns = ['createdAt', 'id', 'quantityPurchased', 'resourceId', 'updatedAt'] as const
+  static $columns = ['createdAt', 'id', 'quantityBarrelSoljund', 'quantityPurchased', 'quantityPurchasedSoljund', 'resourceId', 'updatedAt'] as const
   $columns = ResourceStockSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
   @column({ isPrimary: true })
   declare id: string
   @column()
+  declare quantityBarrelSoljund: number
+  @column()
   declare quantityPurchased: number
+  @column()
+  declare quantityPurchasedSoljund: number
   @column()
   declare resourceId: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })

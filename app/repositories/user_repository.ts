@@ -103,6 +103,15 @@ export default class UserRepository extends BaseRepository<typeof User> {
         return user;
     }
 
+    /**
+     * Current amount owed by the company to users of a given role, i.e. the running
+     * balance right now — not attributable to a given week (see setBalance/incrementBalance).
+     */
+    public async sumBalanceByRole(role: UserRoleEnum): Promise<number> {
+        const result = await User.query().where('role', role).sum('balance as total').first();
+        return Number(result?.$extras.total ?? 0);
+    }
+
     public async findMembersForOrganization(organizationId: string): Promise<User[]> {
         return User.query().where('organizationId', organizationId).orderBy('organizationRole', 'asc').orderBy('username', 'asc');
     }

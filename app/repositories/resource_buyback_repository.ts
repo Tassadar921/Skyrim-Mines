@@ -2,7 +2,6 @@ import db from '@adonisjs/lucid/services/db';
 import type { TransactionClientContract } from '@adonisjs/lucid/types/database';
 import BaseRepository from '#repositories/base/base_repository';
 import ResourceBuyback from '#models/resource_buyback';
-import type UserRoleEnum from '#types/enum/user_role_enum';
 
 export type BuybackResourceLine = {
     resourceId: string;
@@ -183,25 +182,6 @@ export default class ResourceBuybackRepository extends BaseRepository<typeof Res
             .groupBy('resource_buyback_batches.week_number');
 
         return rows.map((row) => ({ weekNumber: row.weekNumber, totalQuantity: Number(row.totalQuantity), totalAmount: Number(row.totalAmount) }));
-    }
-
-    /**
-     * Amount newly credited to users of a given role (e.g. staff) each week, based on the
-     * resource_buyback_batches.week_number already used across the buyback/delivery/license
-     * weekly recaps. This is the debt incurred that week, not the running balance: manual
-     * balance edits/payouts aren't dated per-transaction and so can't be attributed to a week.
-     */
-    public async getWeeklyTotalsByRole(role: UserRoleEnum): Promise<{ weekNumber: number; totalAmount: number }[]> {
-        const rows = await db
-            .from('resource_buybacks')
-            .join('resource_buyback_batches', 'resource_buyback_batches.id', 'resource_buybacks.batch_id')
-            .join('users', 'users.id', 'resource_buybacks.user_id')
-            .where('users.role', role)
-            .select('resource_buyback_batches.week_number as weekNumber')
-            .sum('resource_buybacks.amount as totalAmount')
-            .groupBy('resource_buyback_batches.week_number');
-
-        return rows.map((row) => ({ weekNumber: row.weekNumber, totalAmount: Number(row.totalAmount) }));
     }
 
     public async findDetailsForBatches(batchIds: string[]): Promise<BuybackDetail[]> {

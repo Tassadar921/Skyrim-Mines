@@ -124,9 +124,11 @@ export default class BuybacksController {
                     }
 
                     await this.resourceBuybackRepository.createMany(buybackEntries, trx);
-                    await this.resourceStockRepository.incrementPurchasedQuantity(item.resourceId, quantity, trx);
+                    await this.resourceStockRepository.incrementPurchasedQuantity(item.resourceId, quantity, soljundQuantity, trx);
 
                     if (soljundQuantity > 0) {
+                        await this.resourceStockRepository.incrementBarrelSoljundQuantity(item.resourceId, -soljundQuantity, trx);
+
                         const dolineMaterial = await this.materialRepository.findOneBy({ name: DOLINE_MATERIAL_NAME }, [], trx);
                         if (dolineMaterial) {
                             await this.materialStockRepository.increment(dolineMaterial.id, trx, soljundQuantity);

@@ -11,8 +11,8 @@ export default class MaterialStockRepository extends BaseRepository<typeof Mater
         return MaterialStock.query();
     }
 
-    public async setQuantity(materialId: string, quantity: number): Promise<MaterialStock> {
-        const stock = await this.firstOrNew({ materialId }, { materialId, quantity: 0 });
+    public async setQuantity(materialId: string, quantity: number, trx?: TransactionClientContract): Promise<MaterialStock> {
+        const stock = await this.firstOrNew({ materialId }, { materialId, quantity: 0 }, trx);
         stock.quantity = quantity;
         await stock.save();
         return stock;

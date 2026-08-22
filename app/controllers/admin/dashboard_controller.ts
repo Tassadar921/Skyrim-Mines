@@ -2,11 +2,11 @@ import { type HttpContext } from '@adonisjs/core/http';
 import { DateTime } from 'luxon';
 import logger from '@adonisjs/core/services/logger';
 import DeliveryRepository from '#repositories/delivery_repository';
-import ResourceBuybackRepository from '#repositories/resource_buyback_repository';
 import LicensePaymentRepository from '#repositories/license_payment_repository';
 import CastellanyTaxRepository from '#repositories/castellany_tax_repository';
 import LargeOrderSettingRepository from '#repositories/large_order_setting_repository';
 import CompanyCapitalSnapshotRepository from '#repositories/company_capital_snapshot_repository';
+import UserRepository from '#repositories/user_repository';
 import UserRoleEnum from '#types/enum/user_role_enum';
 import { getWeekNumber, getWeekRange } from '#helpers/game_week_helper';
 import { updateCastellanyTaxValidator } from '#validators/admin/castellany_tax';
@@ -18,22 +18,22 @@ const MAX_WEEKS_IN_RECAP = 20;
 export default class DashboardController {
     constructor(
         private readonly deliveryRepository: DeliveryRepository = new DeliveryRepository(),
-        private readonly resourceBuybackRepository: ResourceBuybackRepository = new ResourceBuybackRepository(),
         private readonly licensePaymentRepository: LicensePaymentRepository = new LicensePaymentRepository(),
         private readonly castellanyTaxRepository: CastellanyTaxRepository = new CastellanyTaxRepository(),
         private readonly largeOrderSettingRepository: LargeOrderSettingRepository = new LargeOrderSettingRepository(),
         private readonly companyCapitalSnapshotRepository: CompanyCapitalSnapshotRepository = new CompanyCapitalSnapshotRepository(),
+        private readonly userRepository: UserRepository = new UserRepository(),
     ) {}
 
     public async index({ inertia }: HttpContext) {
         const currentWeek = getWeekNumber(DateTime.now());
 
-        const [deliveryTotals, commissionTotals, largeOrderFeeTotals, licenseTotals, employeeDueTotals, castellanyTax, largeOrderSetting, capitalSnapshotsByWeek] = await Promise.all([
+        const [deliveryTotals, commissionTotals, largeOrderFeeTotals, licenseTotals, employeeDueAmount, castellanyTax, largeOrderSetting, capitalSnapshotsByWeek] = await Promise.all([
             this.deliveryRepository.getWeeklyTotals(),
             this.deliveryRepository.getWeeklyCommissionTotals(),
             this.deliveryRepository.getWeeklyLargeOrderFeeTotals(),
             this.licensePaymentRepository.getWeeklyTotals(),
-            this.resourceBuybackRepository.getWeeklyTotalsByRole(UserRoleEnum.STAFF),
+            this.userRepository.sumBalanceByRole(UserRoleEnum.STAFF),
             this.castellanyTaxRepository.get(),
             this.largeOrderSettingRepository.get(),
             this.companyCapitalSnapshotRepository.allByWeek(),
@@ -44,7 +44,6 @@ export default class DashboardController {
         const commissionsByWeek = new Map(commissionTotals.map((entry) => [entry.weekNumber, entry.totalCommission]));
         const largeOrderFeesByWeek = new Map(largeOrderFeeTotals.map((entry) => [entry.weekNumber, entry.totalFee]));
         const licensesByWeek = new Map(licenseTotals.map((entry) => [entry.weekNumber, entry.totalAmount]));
-        const employeeDueByWeek = new Map(employeeDueTotals.map((entry) => [entry.weekNumber, entry.totalAmount]));
 
         const oldestWeek = Math.max(1, currentWeek - MAX_WEEKS_IN_RECAP + 1);
 
@@ -69,7 +68,7 @@ export default class DashboardController {
                 profit,
                 weeklyTax: profit * (castellanyTax.rate / 100),
                 licensesAmount,
-                employeeDueAmount: employeeDueByWeek.get(weekNumber) ?? 0,
+                employeeDueAmount,
                 capital,
                 stockValue,
                 totalCapital: capital !== null && stockValue !== null ? capital + stockValue : null,

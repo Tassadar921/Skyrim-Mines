@@ -89,7 +89,7 @@ router
         router.delete('/castellanies/:id', [controllers.admin.Castellanies, 'destroy']).as('admin.castellanies.destroy').use(middleware.admin());
 
         router.get('/stocks', [controllers.admin.Stocks, 'index']).as('admin.stocks.index').use(readOnly);
-        router.patch('/stocks/doline', [controllers.admin.Stocks, 'updateDoline']).as('admin.stocks.doline.update').use(middleware.admin());
+        router.patch('/stocks', [controllers.admin.Stocks, 'update']).as('admin.stocks.update').use(middleware.admin());
 
         router.get('/buybacks', [controllers.admin.Buybacks, 'index']).as('admin.buybacks.index').use(readOnly);
 
