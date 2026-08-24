@@ -81,7 +81,8 @@
         "stocks": {
             "update": {
                 "success": "Quantité mise à jour avec succès",
-                "error": "Erreur lors de la mise à jour de la quantité"
+                "error": "Erreur lors de la mise à jour de la quantité",
+                "invalidSoljundQuantity": "La part de Doline de Soljund ne peut pas dépasser la quantité totale de Pierre de Lune de sa catégorie"
             }
         },
         "resources": {

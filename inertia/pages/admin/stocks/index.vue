@@ -24,14 +24,12 @@ pageTitle.value = t('admin.stocks.title');
 const props = defineProps<{
     resources: (Data.Resource & ResourceStockLine)[];
     materials: (Data.Material & MaterialStockLine)[];
-    dolineMaterialName: string;
     moonstoneResourceName: string;
 }>();
 
 const minerais = computed(() => props.resources.filter((r) => r.type === 'minerai'));
 const lingots = computed(() => props.resources.filter((r) => r.type === 'lingot'));
 
-const dolineMaterialId = computed(() => props.materials.find((m) => m.name === props.dolineMaterialName)?.id);
 const moonstoneResourceId = computed(() => props.resources.find((r) => r.name === props.moonstoneResourceName && r.type === 'minerai')?.id);
 
 function toResourceQuantityMap(items: ResourceStockLine[]): ResourceQuantities {
@@ -69,22 +67,24 @@ const totalStockValue = computed(() => props.resources.reduce((sum, resource) =>
 function updatePurchased(id: string, value: string | number) {
     const quantity = Math.max(0, Math.round(Number(value) || 0));
     const current = resourceQuantities[id];
-    if (current) resourceQuantities[id] = { ...current, quantityPurchased: quantity };
+    if (current) resourceQuantities[id] = { ...current, quantityPurchased: quantity, quantityPurchasedSoljund: Math.min(current.quantityPurchasedSoljund, quantity) };
 }
 
 function updatePurchasedSoljund(id: string, value: string | number) {
-    const quantity = Math.max(0, Math.round(Number(value) || 0));
     const current = resourceQuantities[id];
-    if (current) resourceQuantities[id] = { ...current, quantityPurchasedSoljund: quantity };
+    if (!current) return;
+    const quantity = Math.min(current.quantityPurchased, Math.max(0, Math.round(Number(value) || 0)));
+    resourceQuantities[id] = { ...current, quantityPurchasedSoljund: quantity };
 }
 
 function updateBarrelSoljund(id: string, value: string | number) {
-    const quantity = Math.max(0, Math.round(Number(value) || 0));
     const current = resourceQuantities[id];
-    if (current) resourceQuantities[id] = { ...current, soljundQuantity: quantity };
+    if (!current) return;
+    const quantity = Math.min(current.quantityBarrel, Math.max(0, Math.round(Number(value) || 0)));
+    resourceQuantities[id] = { ...current, soljundQuantity: quantity };
 }
 
-function updateDolineQuantity(id: string, value: string | number) {
+function updateMaterialQuantity(id: string, value: string | number) {
     materialQuantities[id] = Math.max(0, Math.round(Number(value) || 0));
 }
 
@@ -95,7 +95,10 @@ function submit() {
     router.patch(
         urlFor('admin.stocks.update'),
         {
-            dolineQuantity: dolineMaterialId.value ? (materialQuantities[dolineMaterialId.value] ?? 0) : 0,
+            materials: props.materials.map((m) => ({
+                materialId: m.id,
+                quantity: materialQuantities[m.id] ?? 0,
+            })),
             resources: props.resources.map((r) => ({
                 resourceId: r.id,
                 quantityPurchased: resourceQuantities[r.id]?.quantityPurchased ?? 0,
@@ -140,7 +143,7 @@ function submit() {
 
         <div class="space-y-3">
             <h2 class="font-serif text-2xl font-light">{{ t('admin.materials.title') }}</h2>
-            <StockMaterialTable :materials="materials" :quantities="materialQuantities" :editable-material-id="dolineMaterialId" @update-quantity="updateDolineQuantity" />
+            <StockMaterialTable :materials="materials" :quantities="materialQuantities" editable @update-quantity="updateMaterialQuantity" />
         </div>
 
         <div class="flex justify-end">

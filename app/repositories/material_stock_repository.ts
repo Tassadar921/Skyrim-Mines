@@ -32,4 +32,12 @@ export default class MaterialStockRepository extends BaseRepository<typeof Mater
         stock.quantity += amount;
         await stock.save();
     }
+
+    public async overrideQuantities(overrides: { materialId: string; quantity: number }[], trx?: TransactionClientContract): Promise<void> {
+        for (const { materialId, quantity } of overrides) {
+            const stock = await this.firstOrNew({ materialId }, { materialId, quantity: 0 }, trx);
+            stock.quantity = quantity;
+            await stock.save();
+        }
+    }
 }

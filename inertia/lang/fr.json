@@ -802,7 +802,7 @@
         },
         "stocks": {
             "title": "Stocks",
-            "description": "Vue identique à la page « Stocks » publique. Les quantités « Acheté », la part de Doline dans le stock racheté et dans le tonneau de Pierre de Lune, et la quantité de Doline (matériau) peuvent être modifiées ici, à la main.",
+            "description": "Vue identique à la page « Stocks » publique. Les quantités « Acheté », la part de Doline dans le stock racheté et dans le tonneau de Pierre de Lune, et les quantités de tous les matériaux peuvent être modifiées ici, à la main.",
             "save": "Enregistrer les modifications"
         }
     }

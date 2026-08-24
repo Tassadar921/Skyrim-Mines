@@ -11,7 +11,6 @@ import ResourceBarrelAdjustmentRepository from '#repositories/resource_barrel_ad
 import ResourceTransformer from '#transformers/resource_transformer';
 import MaterialTransformer from '#transformers/material_transformer';
 import { updateStocksValidator } from '#validators/admin/stocks';
-import { DOLINE_MATERIAL_NAME } from '#helpers/doline_helper';
 import { MOONSTONE_RESOURCE_NAME } from '#helpers/moonstone_helper';
 import { computeBarrelQuantity } from '#helpers/resource_barrel_helper';
 
@@ -52,20 +51,33 @@ export default class StocksController {
                 ...new MaterialTransformer(m).toObject(),
                 quantity: materialStockByMaterialId.get(m.id)?.quantity ?? 0,
             })),
-            dolineMaterialName: DOLINE_MATERIAL_NAME,
             moonstoneResourceName: MOONSTONE_RESOURCE_NAME,
         });
     }
 
     public async update({ request, response, session, i18n }: HttpContext) {
-        const { dolineQuantity, resources } = await request.validateUsing(updateStocksValidator);
+        const { materials, resources } = await request.validateUsing(updateStocksValidator);
+
+        const [resourceDepositTotals, resourceBuybackTotals, resourceAdjustmentTotals] = await Promise.all([
+            this.resourceDepositRepository.sumByResource(),
+            this.resourceBuybackRepository.sumByResource(),
+            this.resourceBarrelAdjustmentRepository.sumByResource(),
+        ]);
+
+        const hasInvalidSoljundQuantity = resources.some((r) => {
+            if (r.quantityPurchasedSoljund > r.quantityPurchased) return true;
+            const quantityBarrel = computeBarrelQuantity(r.resourceId, resourceDepositTotals, resourceBuybackTotals, resourceAdjustmentTotals);
+            return r.quantityBarrelSoljund > quantityBarrel;
+        });
+
+        if (hasInvalidSoljundQuantity) {
+            session.flash('error', i18n.t('messages.admin.stocks.update.invalidSoljundQuantity'));
+            return response.redirect().back();
+        }
 
         try {
             await db.transaction(async (trx) => {
-                const doline = await this.materialRepository.findOneBy({ name: DOLINE_MATERIAL_NAME });
-                if (doline) {
-                    await this.materialStockRepository.setQuantity(doline.id, dolineQuantity, trx);
-                }
+                await this.materialStockRepository.overrideQuantities(materials, trx);
                 await this.resourceStockRepository.overrideQuantities(resources, trx);
             });
             session.flash('success', i18n.t('messages.admin.stocks.update.success'));

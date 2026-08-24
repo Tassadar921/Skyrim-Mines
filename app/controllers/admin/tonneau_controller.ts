@@ -105,6 +105,6 @@ export default class TonneauController {
             session.flash('error', i18n.t('messages.admin.tonneau.update.error'));
         }
 
-        return response.redirect().back();
+        return response.redirect().withQs().back();
     }
 }

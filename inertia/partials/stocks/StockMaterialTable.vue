@@ -9,7 +9,7 @@ const { t } = useI18n();
 defineProps<{
     materials: Data.Material[];
     quantities: Record<string, number>;
-    editableMaterialId?: string;
+    editable?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -33,11 +33,7 @@ const emit = defineEmits<{
                         <TableCell class="text-sm font-medium">{{ material.name }}</TableCell>
                         <TableCell class="text-sm text-muted-foreground">{{ material.buyPrice }}</TableCell>
                         <TableCell>
-                            <QuantityStepper
-                                v-if="editableMaterialId === material.id"
-                                :model-value="quantities[material.id] ?? 0"
-                                @update:model-value="(value) => emit('update-quantity', material.id, value)"
-                            />
+                            <QuantityStepper v-if="editable" :model-value="quantities[material.id] ?? 0" @update:model-value="(value) => emit('update-quantity', material.id, value)" />
                             <span v-else class="text-sm">{{ quantities[material.id] ?? 0 }}</span>
                         </TableCell>
                     </TableRow>
