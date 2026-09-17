@@ -70,7 +70,7 @@ export class CastellanyTaxSchema extends BaseModel {
 }
 
 export class CompanyCapitalSnapshotSchema extends BaseModel {
-  static $columns = ['capital', 'createdAt', 'id', 'stockValue', 'updatedAt', 'weekNumber', 'weeklyTax'] as const
+  static $columns = ['capital', 'createdAt', 'id', 'stockValue', 'taxRate', 'updatedAt', 'weekNumber', 'weeklyTax'] as const
   $columns = CompanyCapitalSnapshotSchema.$columns
   @column()
   declare capital: string
@@ -80,6 +80,8 @@ export class CompanyCapitalSnapshotSchema extends BaseModel {
   declare id: string
   @column()
   declare stockValue: string
+  @column()
+  declare taxRate: number
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
   @column()

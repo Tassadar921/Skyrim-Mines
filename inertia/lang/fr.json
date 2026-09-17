@@ -321,6 +321,7 @@
                 "profit": "Bénéfice",
                 "profitHelp": "Bénéfice des livraisons + licences + frais grosse commande − commissions livraison",
                 "weeklyTax": "Taxe hebdo",
+                "taxRate": "Taux appliqué",
                 "licenses": "Licences",
                 "capital": "Capital",
                 "stockValue": "Valeur du stock",

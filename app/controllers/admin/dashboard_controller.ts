@@ -74,10 +74,11 @@ export default class DashboardController {
             const capitalSnapshot = capitalSnapshotsByWeek.get(weekNumber);
             const capital = capitalSnapshot ? Number(capitalSnapshot.capital) : null;
             const stockValue = capitalSnapshot ? Number(capitalSnapshot.stockValue) : null;
-            // Once a week has been recorded (capital/stock snapshot), its tax is frozen at the rate
-            // in effect at that time; only un-recorded weeks (normally just the current one) reflect
-            // the live castellany tax rate, so changing the rate never rewrites past weeks.
+            // Once a week has been recorded (capital/stock snapshot), its tax and rate are frozen at
+            // the value in effect at that time; only un-recorded weeks (normally just the current one)
+            // reflect the live castellany tax rate, so changing the rate never rewrites past weeks.
             const weeklyTax = capitalSnapshot ? Number(capitalSnapshot.weeklyTax) : profit * (castellanyTax.rate / 100);
+            const taxRate = capitalSnapshot ? capitalSnapshot.taxRate : castellanyTax.rate;
             weeklyRecap.push({
                 weekNumber,
                 startDate: start.toJSDate().toISOString(),
@@ -87,6 +88,7 @@ export default class DashboardController {
                 largeOrderFeesAmount,
                 profit,
                 weeklyTax,
+                taxRate,
                 licensesAmount,
                 capital,
                 stockValue,
@@ -153,7 +155,13 @@ export default class DashboardController {
             const profit = computeProfitForWeek(weekNumber, { deliveryTotals, commissionTotals, largeOrderFeeTotals, licenseTotals });
             const weeklyTax = profit * (castellanyTax.rate / 100);
 
-            await this.companyCapitalSnapshotRepository.create({ weekNumber, capital: String(capital), stockValue: String(stockValue), weeklyTax: String(weeklyTax) });
+            await this.companyCapitalSnapshotRepository.create({
+                weekNumber,
+                capital: String(capital),
+                stockValue: String(stockValue),
+                weeklyTax: String(weeklyTax),
+                taxRate: castellanyTax.rate,
+            });
             session.flash('success', i18n.t('messages.admin.dashboard.capitalSnapshot.store.success'));
         } catch (e) {
             logger.error({ err: e }, 'dashboard.storeCapitalSnapshot failed');

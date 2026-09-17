@@ -30,6 +30,7 @@ type WeeklyRecap = {
     largeOrderFeesAmount: number;
     profit: number;
     weeklyTax: number;
+    taxRate: number;
     licensesAmount: number;
     capital: number | null;
     stockValue: number | null;
@@ -180,6 +181,7 @@ function submitCapitalSnapshot() {
                             </div>
                         </TableHead>
                         <TableHead>{{ t('admin.dashboard.weeklyRecap.weeklyTax') }}</TableHead>
+                        <TableHead>{{ t('admin.dashboard.weeklyRecap.taxRate') }}</TableHead>
                         <TableHead>{{ t('admin.dashboard.weeklyRecap.licenses') }}</TableHead>
                         <TableHead>{{ t('admin.dashboard.weeklyRecap.capital') }}</TableHead>
                         <TableHead>{{ t('admin.dashboard.weeklyRecap.stockValue') }}</TableHead>
@@ -200,13 +202,14 @@ function submitCapitalSnapshot() {
                                 {{ formatAmount(recap.profit) }}
                             </TableCell>
                             <TableCell class="text-sm">{{ formatAmount(recap.weeklyTax) }}</TableCell>
+                            <TableCell class="text-sm text-muted-foreground">{{ recap.taxRate }} %</TableCell>
                             <TableCell class="text-sm">{{ formatAmount(recap.licensesAmount) }}</TableCell>
                             <TableCell class="text-sm">{{ formatAmountOrDash(recap.capital) }}</TableCell>
                             <TableCell class="text-sm">{{ formatAmountOrDash(recap.stockValue) }}</TableCell>
                         </TableRow>
                     </template>
                     <TableRow v-else>
-                        <TableCell colspan="7" class="text-center text-sm text-muted-foreground py-6">
+                        <TableCell colspan="8" class="text-center text-sm text-muted-foreground py-6">
                             {{ t('admin.dashboard.weeklyRecap.empty') }}
                         </TableCell>
                     </TableRow>
