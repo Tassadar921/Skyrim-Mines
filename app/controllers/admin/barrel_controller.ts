@@ -5,9 +5,9 @@ import UserRepository from '#repositories/user_repository';
 import ResourceDepositRepository from '#repositories/resource_deposit_repository';
 import ResourceBuybackRepository from '#repositories/resource_buyback_repository';
 import ResourceBarrelAdjustmentRepository from '#repositories/resource_barrel_adjustment_repository';
-import { indexTonneauValidator, updateBarrelQuantityValidator } from '#validators/admin/tonneau';
+import { indexBarrelValidator, updateBarrelQuantityValidator } from '#validators/admin/barrel';
 
-export default class TonneauController {
+export default class BarrelController {
     constructor(
         private readonly resourceRepository: ResourceRepository = new ResourceRepository(),
         private readonly userRepository: UserRepository = new UserRepository(),
@@ -17,7 +17,7 @@ export default class TonneauController {
     ) {}
 
     public async index({ inertia, request }: HttpContext) {
-        const { page, sort, dir, search, resourceType } = await request.validateUsing(indexTonneauValidator);
+        const { page, sort, dir, search, resourceType } = await request.validateUsing(indexBarrelValidator);
 
         const currentSort = sort ?? 'username';
         const currentDir = dir ?? 'asc';
@@ -75,7 +75,7 @@ export default class TonneauController {
         const start = (currentPage - 1) * perPage;
         const paginated = entries.slice(start, start + perPage);
 
-        return inertia.render('admin/tonneau/index', {
+        return inertia.render('admin/barrel/index', {
             entries: paginated,
             meta: { total, currentPage, lastPage, perPage },
             filters: { search: search ?? '', sort: currentSort, dir: currentDir, resourceType: resourceType ?? 'all' },
@@ -99,10 +99,10 @@ export default class TonneauController {
                 await this.resourceBarrelAdjustmentRepository.create({ userId, resourceId, adminId: auth.user!.id, delta });
             }
 
-            session.flash('success', i18n.t('messages.admin.tonneau.update.success'));
+            session.flash('success', i18n.t('messages.admin.barrel.update.success'));
         } catch (e) {
-            logger.error({ err: e }, 'tonneau.update failed');
-            session.flash('error', i18n.t('messages.admin.tonneau.update.error'));
+            logger.error({ err: e }, 'barrel.update failed');
+            session.flash('error', i18n.t('messages.admin.barrel.update.error'));
         }
 
         return response.redirect().withQs().back();

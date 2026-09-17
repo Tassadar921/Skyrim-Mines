@@ -33,13 +33,10 @@ export default class ResourceBuybackRepository extends BaseRepository<typeof Res
         super(ResourceBuyback);
     }
 
-    public async createMany(
-        entries: { batchId: string; userId: string; resourceId: string; quantity: number; amount: number; soljundQuantity?: number }[],
-        trx?: TransactionClientContract,
-    ): Promise<void> {
+    public async createMany(entries: { batchId: string; userId: string; resourceId: string; quantity: number; amount: number }[], trx?: TransactionClientContract): Promise<void> {
         if (!entries.length) return;
 
-        const payloads = entries.map((entry) => ({ ...entry, amount: String(entry.amount), soljundQuantity: entry.soljundQuantity ?? 0 }));
+        const payloads = entries.map((entry) => ({ ...entry, amount: String(entry.amount) }));
 
         if (trx) {
             for (const payload of payloads) {
@@ -57,18 +54,6 @@ export default class ResourceBuybackRepository extends BaseRepository<typeof Res
 
     public async sumByResource(): Promise<Map<string, number>> {
         const rows = await ResourceBuyback.query().select('resourceId').sum('quantity as total').groupBy('resourceId');
-
-        return new Map(rows.map((row) => [row.resourceId, Number(row.$extras.total)]));
-    }
-
-    public async sumSoljundQuantityForResource(resourceId: string): Promise<number> {
-        const result = await ResourceBuyback.query().where('resourceId', resourceId).sum('soljund_quantity as total').first();
-
-        return Number(result?.$extras.total ?? 0);
-    }
-
-    public async sumSoljundQuantityByResource(): Promise<Map<string, number>> {
-        const rows = await ResourceBuyback.query().select('resourceId').sum('soljund_quantity as total').groupBy('resourceId');
 
         return new Map(rows.map((row) => [row.resourceId, Number(row.$extras.total)]));
     }

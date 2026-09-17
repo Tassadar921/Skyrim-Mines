@@ -60,9 +60,16 @@ function submit() {
                     {{ t('admin.resources.show.back') }}
                 </Link>
             </Button>
-            <Button v-if="isAdmin" :loading="isSubmitting" :disabled="isSubmitting" @click="submit">
-                {{ t('admin.resources.show.save') }}
-            </Button>
+            <div class="flex items-center gap-2">
+                <Button v-if="resource.type === 'lingot'" variant="outline" as-child>
+                    <Link :route="'admin.resources.recipe.edit'" :params="{ id: resource.id }">
+                        {{ t('admin.resources.recipe.title') }}
+                    </Link>
+                </Button>
+                <Button v-if="isAdmin" :loading="isSubmitting" :disabled="isSubmitting" @click="submit">
+                    {{ t('admin.resources.show.save') }}
+                </Button>
+            </div>
         </div>
 
         <div class="rounded-md border p-5 space-y-4">

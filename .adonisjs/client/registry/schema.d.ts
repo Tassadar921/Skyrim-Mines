@@ -247,30 +247,6 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/buybacks_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
-  'pickaxes.take': {
-    methods: ["POST"]
-    pattern: '/pickaxes/take'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/pickaxes_controller').default['take']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/pickaxes_controller').default['take']>>>
-    }
-  }
-  'pickaxes.deposit': {
-    methods: ["POST"]
-    pattern: '/pickaxes/deposit'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/pickaxes_controller').default['deposit']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/pickaxes_controller').default['deposit']>>>
-    }
-  }
   'organization.show': {
     methods: ["GET","HEAD"]
     pattern: '/organization'
@@ -595,6 +571,30 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/resources_controller').default['destroy']>>>
     }
   }
+  'admin.resources.recipe.edit': {
+    methods: ["GET","HEAD"]
+    pattern: '/admin/resources/:id/recipe'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/resource_recipes_controller').default['edit']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/resource_recipes_controller').default['edit']>>>
+    }
+  }
+  'admin.resources.recipe.update': {
+    methods: ["PUT"]
+    pattern: '/admin/resources/:id/recipe'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/admin/resource_recipes').updateResourceRecipeValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/admin/resource_recipes').updateResourceRecipeValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/resource_recipes_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/resource_recipes_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'admin.materials.index': {
     methods: ["GET","HEAD"]
     pattern: '/admin/materials'
@@ -775,6 +775,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/stocks_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'admin.stocks.barrel.update': {
+    methods: ["PATCH"]
+    pattern: '/admin/stocks/:resourceId/barrel'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/admin/stocks').updateBarrelTotalValidator)>>
+      paramsTuple: [ParamValue]
+      params: { resourceId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/admin/stocks').updateBarrelTotalValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/stocks_controller').default['updateBarrelTotal']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/stocks_controller').default['updateBarrelTotal']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'admin.buybacks.index': {
     methods: ["GET","HEAD"]
     pattern: '/admin/buybacks'
@@ -883,28 +895,112 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/livraisons_controller').default['destroy']>>>
     }
   }
-  'admin.tonneau.index': {
+  'admin.barrel.index': {
     methods: ["GET","HEAD"]
-    pattern: '/admin/tonneau'
+    pattern: '/admin/barrel'
     types: {
       body: {}
       paramsTuple: []
       params: {}
-      query: ExtractQueryForGet<InferInput<(typeof import('#validators/admin/tonneau').indexTonneauValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/tonneau_controller').default['index']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/tonneau_controller').default['index']>>> | { status: 422; response: { errors: SimpleError[] } }
+      query: ExtractQueryForGet<InferInput<(typeof import('#validators/admin/barrel').indexBarrelValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/barrel_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/barrel_controller').default['index']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
-  'admin.tonneau.update': {
+  'admin.barrel.update': {
     methods: ["PATCH"]
-    pattern: '/admin/tonneau'
+    pattern: '/admin/barrel'
     types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/admin/tonneau').updateBarrelQuantityValidator)>>
+      body: ExtractBody<InferInput<(typeof import('#validators/admin/barrel').updateBarrelQuantityValidator)>>
       paramsTuple: []
       params: {}
-      query: ExtractQuery<InferInput<(typeof import('#validators/admin/tonneau').updateBarrelQuantityValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/tonneau_controller').default['update']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/tonneau_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+      query: ExtractQuery<InferInput<(typeof import('#validators/admin/barrel').updateBarrelQuantityValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/barrel_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/barrel_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'admin.barrelRentals.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/admin/barrel-rentals'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: ExtractQueryForGet<InferInput<(typeof import('#validators/admin/barrel_rentals').indexBarrelRentalValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/barrel_rentals_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/barrel_rentals_controller').default['index']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'admin.barrelRentals.store': {
+    methods: ["POST"]
+    pattern: '/admin/barrel-rentals'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/admin/barrel_rentals').storeBarrelRentalValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/admin/barrel_rentals').storeBarrelRentalValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/barrel_rentals_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/barrel_rentals_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'admin.barrelRentals.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/admin/barrel-rentals/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/barrel_rentals_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/barrel_rentals_controller').default['show']>>>
+    }
+  }
+  'admin.barrelRentals.update': {
+    methods: ["PUT"]
+    pattern: '/admin/barrel-rentals/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/admin/barrel_rentals').updateBarrelRentalValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/admin/barrel_rentals').updateBarrelRentalValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/barrel_rentals_controller').default['updateRent']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/barrel_rentals_controller').default['updateRent']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'admin.barrelRentals.destroy': {
+    methods: ["DELETE"]
+    pattern: '/admin/barrel-rentals/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/barrel_rentals_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/barrel_rentals_controller').default['destroy']>>>
+    }
+  }
+  'admin.barrelRentals.payments.store': {
+    methods: ["POST"]
+    pattern: '/admin/barrel-rentals/:id/payments'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/admin/barrel_rental_payments').storeBarrelRentalPaymentValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/admin/barrel_rental_payments').storeBarrelRentalPaymentValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/barrel_rentals_controller').default['storePayment']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/barrel_rentals_controller').default['storePayment']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'admin.barrelRentals.payments.destroy': {
+    methods: ["DELETE"]
+    pattern: '/admin/barrel-rentals/payments/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/barrel_rentals_controller').default['destroyPayment']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/barrel_rentals_controller').default['destroyPayment']>>>
     }
   }
   'admin.organizations.index': {

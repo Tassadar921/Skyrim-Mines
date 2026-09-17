@@ -40,8 +40,6 @@ export default class StocksController {
                 ...new ResourceTransformer(r).toObject(),
                 quantityBarrel: computeBarrelQuantity(r.id, resourceDepositTotals, resourceBuybackTotals, resourceAdjustmentTotals),
                 quantityPurchased: resourceStockByResourceId.get(r.id)?.quantityPurchased ?? 0,
-                quantityPurchasedSoljund: resourceStockByResourceId.get(r.id)?.quantityPurchasedSoljund ?? 0,
-                soljundQuantity: resourceStockByResourceId.get(r.id)?.quantityBarrelSoljund ?? 0,
             })),
             materials: materials.map((m) => ({
                 ...new MaterialTransformer(m).toObject(),

@@ -11,8 +11,10 @@ export const updateStocksValidator = vine.create({
         vine.object({
             resourceId: vine.string(),
             quantityPurchased: vine.number().min(0),
-            quantityPurchasedSoljund: vine.number().min(0),
-            quantityBarrelSoljund: vine.number().min(0),
         }),
     ),
+});
+
+export const updateBarrelTotalValidator = vine.create({
+    quantity: vine.number().min(0),
 });

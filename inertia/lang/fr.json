@@ -11,12 +11,6 @@
             "title": "Mon tonneau",
             "totalValue": "Valeur totale de mon tonneau :"
         },
-        "pickaxes": {
-            "title": "Pioches",
-            "companyStock": "Stock de la compagnie : {count}",
-            "take": "Prendre",
-            "deposit": "Déposer"
-        },
         "toDeliver": {
             "title": "Commandes à livrer",
             "count": "commande à livrer | commande à livrer | commandes à livrer",
@@ -40,14 +34,15 @@
         "trigger": "Réaliser un dépôt",
         "title": "Réaliser un dépôt",
         "quantity": "Quantité",
-        "soljundColumn": "Dont Doline de Soljund",
         "submit": "Valider",
         "myDeposits": {
             "title": "Mes dépôts récents",
             "hint": "Modifiables pendant 1h après le dépôt",
             "empty": "Aucun dépôt récent",
             "resource": "Ressource",
-            "save": "Enregistrer"
+            "save": "Enregistrer",
+            "delete": "Supprimer",
+            "error": "Impossible de modifier ce dépôt"
         }
     },
     "buyback": {
@@ -64,13 +59,19 @@
             "buyPrice": "Prix d'achat",
             "sellPrice": "Prix de vente",
             "quantityBarrel": "Dans le tonneau",
-            "soljundQuantity": "dont {quantity} de la Doline de Soljund (à vendre au Thalmor)",
-            "soljundQuantityLabel": "dont Doline de Soljund (à vendre au Thalmor)",
             "quantityPurchased": "Acheté",
-            "quantityPurchasedSoljund": "dont Doline",
             "inStock": "En stock",
             "stockValue": "Valeur du stock",
-            "empty": "Aucun élément trouvé"
+            "empty": "Aucun élément trouvé",
+            "barrelEdit": {
+                "title": "Modifier le tonneau de « {name} »",
+                "description": "Un ajout est réparti uniformément entre tous les membres du staff. Un retrait est réparti entre eux au prorata de la quantité actuellement dans leur tonneau. Cette action modifie directement le tonneau individuel de chaque membre du staff concerné.",
+                "current": "Quantité actuelle : {quantity}",
+                "willAdd": "{quantity} sera ajouté, réparti entre tout le staff.",
+                "willRemove": "{quantity} sera retiré, réparti entre le staff au prorata de leurs quantités.",
+                "cancel": "Annuler",
+                "confirm": "Confirmer"
+            }
         }
     },
     "devis": {
@@ -274,7 +275,8 @@
                 "resources": "Ressources",
                 "materials": "Matériaux",
                 "stocks": "Stocks",
-                "tonneau": "Tonneau",
+                "barrel": "Tonneau",
+                "barrelRentals": "Location tonneau",
                 "buybacks": "Historique des rachats",
                 "devis": "Devis",
                 "commandes": "Commandes",
@@ -305,6 +307,11 @@
             "chart": {
                 "title": "Évolution hebdomadaire"
             },
+            "amountsDue": {
+                "title": "Soldes dus",
+                "employees": "Dû aux employés",
+                "executives": "Dû aux dirigeants"
+            },
             "weeklyRecap": {
                 "title": "Récap financier hebdomadaire",
                 "week": "Semaine",
@@ -315,7 +322,6 @@
                 "profitHelp": "Bénéfice des livraisons + licences + frais grosse commande − commissions livraison",
                 "weeklyTax": "Taxe hebdo",
                 "licenses": "Licences",
-                "employeeDue": "Dû aux employés",
                 "capital": "Capital",
                 "stockValue": "Valeur du stock",
                 "totalCapital": "Capital total",
@@ -332,7 +338,6 @@
                 "role": "Rôle",
                 "enabled": "Actif",
                 "balance": "Solde dû",
-                "pickaxes": "Pioches",
                 "createdAt": "Inscrit le",
                 "actions": "Actions",
                 "view": "Voir",
@@ -616,6 +621,16 @@
                 "title": "Ressource",
                 "back": "Retour à la liste",
                 "save": "Enregistrer les modifications"
+            },
+            "recipe": {
+                "title": "Recette de fabrication",
+                "back": "Retour à la ressource",
+                "save": "Enregistrer les modifications",
+                "description": "Composition de « {name} » : matériaux et minerais nécessaires à sa fabrication. Le bénéfice sur les livraisons de ce lingot est calculé à partir de ce coût de fabrication, et non plus du prix d'achat.",
+                "quantity": "Quantité nécessaire",
+                "manufacturingCost": "Coût de fabrication",
+                "sellPrice": "Prix de vente",
+                "estimatedProfit": "Bénéfice estimé"
             }
         },
         "materials": {
@@ -787,7 +802,7 @@
                 "confirm": "Supprimer"
             }
         },
-        "tonneau": {
+        "barrel": {
             "title": "Tonneau",
             "description": "Quantités actuellement au tonneau, par utilisateur et par ressource.",
             "table": {
@@ -800,9 +815,71 @@
                 "empty": "Aucune quantité au tonneau pour le moment"
             }
         },
+        "barrelRentals": {
+            "title": "Location tonneau",
+            "description": "Loyer hebdomadaire fixé individuellement par personne. Un loyer à 0 est toujours considéré comme payé.",
+            "add": "Ajouter un locataire",
+            "user": "Utilisateur",
+            "userPlaceholder": "Choisir un utilisateur",
+            "weeklyRent": "Loyer hebdomadaire",
+            "submit": "Ajouter",
+            "weekly": {
+                "title": "Totaux par semaine",
+                "weekBadge": "Semaine {week}",
+                "payments": "paiement | paiement | paiements"
+            },
+            "table": {
+                "count": "locataire | locataire | locataires",
+                "search": "Rechercher un utilisateur…",
+                "allStatuses": "Tous les statuts",
+                "upToDate": "À jour",
+                "late": "En retard",
+                "username": "Utilisateur",
+                "role": "Rôle",
+                "weeklyRent": "Loyer",
+                "status": "Statut",
+                "totalPaid": "Total payé",
+                "actions": "Actions",
+                "view": "Voir",
+                "empty": "Aucun locataire trouvé"
+            },
+            "show": {
+                "title": "Location tonneau",
+                "back": "Retour à la liste",
+                "delete": "Supprimer",
+                "deleteConfirm": {
+                    "title": "Supprimer ce locataire ?",
+                    "description": "Cette action est irréversible et supprimera définitivement la location de « {username} » ainsi que son historique de paiements.",
+                    "cancel": "Annuler",
+                    "confirm": "Supprimer"
+                },
+                "saveRent": "Enregistrer le loyer",
+                "freeHint": "Un loyer à 0 est automatiquement considéré comme toujours payé."
+            },
+            "payments": {
+                "add": "Enregistrer un paiement",
+                "week": "Semaine",
+                "alreadyPaid": "déjà payée",
+                "submit": "Marquer comme payé",
+                "table": {
+                    "week": "Semaine",
+                    "amount": "Montant",
+                    "date": "Date",
+                    "actions": "Actions",
+                    "empty": "Aucun paiement enregistré"
+                },
+                "delete": {
+                    "label": "Supprimer",
+                    "title": "Supprimer ce paiement ?",
+                    "description": "Cette action est irréversible et supprimera définitivement le paiement de la semaine {week}.",
+                    "cancel": "Annuler",
+                    "confirm": "Supprimer"
+                }
+            }
+        },
         "stocks": {
             "title": "Stocks",
-            "description": "Vue identique à la page « Stocks » publique. Les quantités « Acheté », la part de Doline dans le stock racheté et dans le tonneau de Pierre de Lune, et les quantités de tous les matériaux peuvent être modifiées ici, à la main.",
+            "description": "Vue identique à la page « Stocks » publique. Les quantités « Acheté », la quantité dans le tonneau et les quantités de tous les matériaux peuvent être modifiées ici, à la main.",
             "save": "Enregistrer les modifications"
         }
     }

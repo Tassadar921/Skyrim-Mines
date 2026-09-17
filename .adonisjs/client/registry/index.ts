@@ -126,18 +126,6 @@ const routes = {
     tokens: [{"old":"/buybacks","type":0,"val":"buybacks","end":""}],
     types: placeholder as Registry['buybacks.store']['types'],
   },
-  'pickaxes.take': {
-    methods: ["POST"],
-    pattern: '/pickaxes/take',
-    tokens: [{"old":"/pickaxes/take","type":0,"val":"pickaxes","end":""},{"old":"/pickaxes/take","type":0,"val":"take","end":""}],
-    types: placeholder as Registry['pickaxes.take']['types'],
-  },
-  'pickaxes.deposit': {
-    methods: ["POST"],
-    pattern: '/pickaxes/deposit',
-    tokens: [{"old":"/pickaxes/deposit","type":0,"val":"pickaxes","end":""},{"old":"/pickaxes/deposit","type":0,"val":"deposit","end":""}],
-    types: placeholder as Registry['pickaxes.deposit']['types'],
-  },
   'organization.show': {
     methods: ["GET","HEAD"],
     pattern: '/organization',
@@ -300,6 +288,18 @@ const routes = {
     tokens: [{"old":"/admin/resources/:id","type":0,"val":"admin","end":""},{"old":"/admin/resources/:id","type":0,"val":"resources","end":""},{"old":"/admin/resources/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['admin.resources.destroy']['types'],
   },
+  'admin.resources.recipe.edit': {
+    methods: ["GET","HEAD"],
+    pattern: '/admin/resources/:id/recipe',
+    tokens: [{"old":"/admin/resources/:id/recipe","type":0,"val":"admin","end":""},{"old":"/admin/resources/:id/recipe","type":0,"val":"resources","end":""},{"old":"/admin/resources/:id/recipe","type":1,"val":"id","end":""},{"old":"/admin/resources/:id/recipe","type":0,"val":"recipe","end":""}],
+    types: placeholder as Registry['admin.resources.recipe.edit']['types'],
+  },
+  'admin.resources.recipe.update': {
+    methods: ["PUT"],
+    pattern: '/admin/resources/:id/recipe',
+    tokens: [{"old":"/admin/resources/:id/recipe","type":0,"val":"admin","end":""},{"old":"/admin/resources/:id/recipe","type":0,"val":"resources","end":""},{"old":"/admin/resources/:id/recipe","type":1,"val":"id","end":""},{"old":"/admin/resources/:id/recipe","type":0,"val":"recipe","end":""}],
+    types: placeholder as Registry['admin.resources.recipe.update']['types'],
+  },
   'admin.materials.index': {
     methods: ["GET","HEAD"],
     pattern: '/admin/materials',
@@ -390,6 +390,12 @@ const routes = {
     tokens: [{"old":"/admin/stocks","type":0,"val":"admin","end":""},{"old":"/admin/stocks","type":0,"val":"stocks","end":""}],
     types: placeholder as Registry['admin.stocks.update']['types'],
   },
+  'admin.stocks.barrel.update': {
+    methods: ["PATCH"],
+    pattern: '/admin/stocks/:resourceId/barrel',
+    tokens: [{"old":"/admin/stocks/:resourceId/barrel","type":0,"val":"admin","end":""},{"old":"/admin/stocks/:resourceId/barrel","type":0,"val":"stocks","end":""},{"old":"/admin/stocks/:resourceId/barrel","type":1,"val":"resourceId","end":""},{"old":"/admin/stocks/:resourceId/barrel","type":0,"val":"barrel","end":""}],
+    types: placeholder as Registry['admin.stocks.barrel.update']['types'],
+  },
   'admin.buybacks.index': {
     methods: ["GET","HEAD"],
     pattern: '/admin/buybacks',
@@ -444,17 +450,59 @@ const routes = {
     tokens: [{"old":"/admin/livraisons/:id","type":0,"val":"admin","end":""},{"old":"/admin/livraisons/:id","type":0,"val":"livraisons","end":""},{"old":"/admin/livraisons/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['admin.livraisons.destroy']['types'],
   },
-  'admin.tonneau.index': {
+  'admin.barrel.index': {
     methods: ["GET","HEAD"],
-    pattern: '/admin/tonneau',
-    tokens: [{"old":"/admin/tonneau","type":0,"val":"admin","end":""},{"old":"/admin/tonneau","type":0,"val":"tonneau","end":""}],
-    types: placeholder as Registry['admin.tonneau.index']['types'],
+    pattern: '/admin/barrel',
+    tokens: [{"old":"/admin/barrel","type":0,"val":"admin","end":""},{"old":"/admin/barrel","type":0,"val":"barrel","end":""}],
+    types: placeholder as Registry['admin.barrel.index']['types'],
   },
-  'admin.tonneau.update': {
+  'admin.barrel.update': {
     methods: ["PATCH"],
-    pattern: '/admin/tonneau',
-    tokens: [{"old":"/admin/tonneau","type":0,"val":"admin","end":""},{"old":"/admin/tonneau","type":0,"val":"tonneau","end":""}],
-    types: placeholder as Registry['admin.tonneau.update']['types'],
+    pattern: '/admin/barrel',
+    tokens: [{"old":"/admin/barrel","type":0,"val":"admin","end":""},{"old":"/admin/barrel","type":0,"val":"barrel","end":""}],
+    types: placeholder as Registry['admin.barrel.update']['types'],
+  },
+  'admin.barrelRentals.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/admin/barrel-rentals',
+    tokens: [{"old":"/admin/barrel-rentals","type":0,"val":"admin","end":""},{"old":"/admin/barrel-rentals","type":0,"val":"barrel-rentals","end":""}],
+    types: placeholder as Registry['admin.barrelRentals.index']['types'],
+  },
+  'admin.barrelRentals.store': {
+    methods: ["POST"],
+    pattern: '/admin/barrel-rentals',
+    tokens: [{"old":"/admin/barrel-rentals","type":0,"val":"admin","end":""},{"old":"/admin/barrel-rentals","type":0,"val":"barrel-rentals","end":""}],
+    types: placeholder as Registry['admin.barrelRentals.store']['types'],
+  },
+  'admin.barrelRentals.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/admin/barrel-rentals/:id',
+    tokens: [{"old":"/admin/barrel-rentals/:id","type":0,"val":"admin","end":""},{"old":"/admin/barrel-rentals/:id","type":0,"val":"barrel-rentals","end":""},{"old":"/admin/barrel-rentals/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['admin.barrelRentals.show']['types'],
+  },
+  'admin.barrelRentals.update': {
+    methods: ["PUT"],
+    pattern: '/admin/barrel-rentals/:id',
+    tokens: [{"old":"/admin/barrel-rentals/:id","type":0,"val":"admin","end":""},{"old":"/admin/barrel-rentals/:id","type":0,"val":"barrel-rentals","end":""},{"old":"/admin/barrel-rentals/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['admin.barrelRentals.update']['types'],
+  },
+  'admin.barrelRentals.destroy': {
+    methods: ["DELETE"],
+    pattern: '/admin/barrel-rentals/:id',
+    tokens: [{"old":"/admin/barrel-rentals/:id","type":0,"val":"admin","end":""},{"old":"/admin/barrel-rentals/:id","type":0,"val":"barrel-rentals","end":""},{"old":"/admin/barrel-rentals/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['admin.barrelRentals.destroy']['types'],
+  },
+  'admin.barrelRentals.payments.store': {
+    methods: ["POST"],
+    pattern: '/admin/barrel-rentals/:id/payments',
+    tokens: [{"old":"/admin/barrel-rentals/:id/payments","type":0,"val":"admin","end":""},{"old":"/admin/barrel-rentals/:id/payments","type":0,"val":"barrel-rentals","end":""},{"old":"/admin/barrel-rentals/:id/payments","type":1,"val":"id","end":""},{"old":"/admin/barrel-rentals/:id/payments","type":0,"val":"payments","end":""}],
+    types: placeholder as Registry['admin.barrelRentals.payments.store']['types'],
+  },
+  'admin.barrelRentals.payments.destroy': {
+    methods: ["DELETE"],
+    pattern: '/admin/barrel-rentals/payments/:id',
+    tokens: [{"old":"/admin/barrel-rentals/payments/:id","type":0,"val":"admin","end":""},{"old":"/admin/barrel-rentals/payments/:id","type":0,"val":"barrel-rentals","end":""},{"old":"/admin/barrel-rentals/payments/:id","type":0,"val":"payments","end":""},{"old":"/admin/barrel-rentals/payments/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['admin.barrelRentals.payments.destroy']['types'],
   },
   'admin.organizations.index': {
     methods: ["GET","HEAD"],

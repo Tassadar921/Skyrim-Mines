@@ -24,8 +24,6 @@ export type ScannedRoutes = {
     'deposits.store': { paramsTuple?: []; params?: {} }
     'deposits.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'buybacks.store': { paramsTuple?: []; params?: {} }
-    'pickaxes.take': { paramsTuple?: []; params?: {} }
-    'pickaxes.deposit': { paramsTuple?: []; params?: {} }
     'organization.show': { paramsTuple?: []; params?: {} }
     'organization.members.store': { paramsTuple?: []; params?: {} }
     'organization.members.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -53,6 +51,8 @@ export type ScannedRoutes = {
     'admin.resources.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.resources.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.resources.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.resources.recipe.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.resources.recipe.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.materials.index': { paramsTuple?: []; params?: {} }
     'admin.materials.create': { paramsTuple?: []; params?: {} }
     'admin.materials.store': { paramsTuple?: []; params?: {} }
@@ -68,6 +68,7 @@ export type ScannedRoutes = {
     'admin.castellanies.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.stocks.index': { paramsTuple?: []; params?: {} }
     'admin.stocks.update': { paramsTuple?: []; params?: {} }
+    'admin.stocks.barrel.update': { paramsTuple: [ParamValue]; params: {'resourceId': ParamValue} }
     'admin.buybacks.index': { paramsTuple?: []; params?: {} }
     'admin.devis.index': { paramsTuple?: []; params?: {} }
     'admin.commandes.index': { paramsTuple?: []; params?: {} }
@@ -77,8 +78,15 @@ export type ScannedRoutes = {
     'admin.orderArchives.store': { paramsTuple?: []; params?: {} }
     'admin.livraisons.index': { paramsTuple?: []; params?: {} }
     'admin.livraisons.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'admin.tonneau.index': { paramsTuple?: []; params?: {} }
-    'admin.tonneau.update': { paramsTuple?: []; params?: {} }
+    'admin.barrel.index': { paramsTuple?: []; params?: {} }
+    'admin.barrel.update': { paramsTuple?: []; params?: {} }
+    'admin.barrelRentals.index': { paramsTuple?: []; params?: {} }
+    'admin.barrelRentals.store': { paramsTuple?: []; params?: {} }
+    'admin.barrelRentals.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.barrelRentals.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.barrelRentals.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.barrelRentals.payments.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.barrelRentals.payments.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.organizations.index': { paramsTuple?: []; params?: {} }
     'admin.organizations.create': { paramsTuple?: []; params?: {} }
     'admin.organizations.store': { paramsTuple?: []; params?: {} }
@@ -121,6 +129,7 @@ export type ScannedRoutes = {
     'admin.resources.index': { paramsTuple?: []; params?: {} }
     'admin.resources.create': { paramsTuple?: []; params?: {} }
     'admin.resources.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.resources.recipe.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.materials.index': { paramsTuple?: []; params?: {} }
     'admin.materials.create': { paramsTuple?: []; params?: {} }
     'admin.materials.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -133,7 +142,9 @@ export type ScannedRoutes = {
     'admin.commandes.index': { paramsTuple?: []; params?: {} }
     'admin.orderArchives.create': { paramsTuple?: []; params?: {} }
     'admin.livraisons.index': { paramsTuple?: []; params?: {} }
-    'admin.tonneau.index': { paramsTuple?: []; params?: {} }
+    'admin.barrel.index': { paramsTuple?: []; params?: {} }
+    'admin.barrelRentals.index': { paramsTuple?: []; params?: {} }
+    'admin.barrelRentals.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.organizations.index': { paramsTuple?: []; params?: {} }
     'admin.organizations.create': { paramsTuple?: []; params?: {} }
     'admin.organizations.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -163,6 +174,7 @@ export type ScannedRoutes = {
     'admin.resources.index': { paramsTuple?: []; params?: {} }
     'admin.resources.create': { paramsTuple?: []; params?: {} }
     'admin.resources.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.resources.recipe.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.materials.index': { paramsTuple?: []; params?: {} }
     'admin.materials.create': { paramsTuple?: []; params?: {} }
     'admin.materials.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -175,7 +187,9 @@ export type ScannedRoutes = {
     'admin.commandes.index': { paramsTuple?: []; params?: {} }
     'admin.orderArchives.create': { paramsTuple?: []; params?: {} }
     'admin.livraisons.index': { paramsTuple?: []; params?: {} }
-    'admin.tonneau.index': { paramsTuple?: []; params?: {} }
+    'admin.barrel.index': { paramsTuple?: []; params?: {} }
+    'admin.barrelRentals.index': { paramsTuple?: []; params?: {} }
+    'admin.barrelRentals.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.organizations.index': { paramsTuple?: []; params?: {} }
     'admin.organizations.create': { paramsTuple?: []; params?: {} }
     'admin.organizations.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -190,8 +204,6 @@ export type ScannedRoutes = {
     'livraisons.store': { paramsTuple: [ParamValue]; params: {'orderId': ParamValue} }
     'deposits.store': { paramsTuple?: []; params?: {} }
     'buybacks.store': { paramsTuple?: []; params?: {} }
-    'pickaxes.take': { paramsTuple?: []; params?: {} }
-    'pickaxes.deposit': { paramsTuple?: []; params?: {} }
     'organization.members.store': { paramsTuple?: []; params?: {} }
     'admin.dashboard.capitalSnapshot.store': { paramsTuple?: []; params?: {} }
     'admin.users.store': { paramsTuple?: []; params?: {} }
@@ -200,6 +212,8 @@ export type ScannedRoutes = {
     'admin.materials.store': { paramsTuple?: []; params?: {} }
     'admin.castellanies.store': { paramsTuple?: []; params?: {} }
     'admin.orderArchives.store': { paramsTuple?: []; params?: {} }
+    'admin.barrelRentals.store': { paramsTuple?: []; params?: {} }
+    'admin.barrelRentals.payments.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.organizations.store': { paramsTuple?: []; params?: {} }
     'admin.organizations.members.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.licenses.subscribers.store': { paramsTuple?: []; params?: {} }
@@ -212,9 +226,10 @@ export type ScannedRoutes = {
     'admin.resources.reorder': { paramsTuple?: []; params?: {} }
     'admin.materials.reorder': { paramsTuple?: []; params?: {} }
     'admin.stocks.update': { paramsTuple?: []; params?: {} }
+    'admin.stocks.barrel.update': { paramsTuple: [ParamValue]; params: {'resourceId': ParamValue} }
     'admin.commandes.validate': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.commandes.cancel': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'admin.tonneau.update': { paramsTuple?: []; params?: {} }
+    'admin.barrel.update': { paramsTuple?: []; params?: {} }
     'admin.organizations.members.updateRole': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'memberId': ParamValue} }
   }
   DELETE: {
@@ -225,6 +240,8 @@ export type ScannedRoutes = {
     'admin.materials.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.castellanies.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.livraisons.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.barrelRentals.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.barrelRentals.payments.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.organizations.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.organizations.members.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'memberId': ParamValue} }
     'admin.organizations.resourcePrices.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'resourceId': ParamValue} }
@@ -237,8 +254,10 @@ export type ScannedRoutes = {
     'admin.users.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.users.updateBalance': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.resources.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.resources.recipe.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.materials.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.castellanies.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.barrelRentals.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.organizations.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.organizations.resourcePrices.update': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'resourceId': ParamValue} }
     'admin.licenses.prices.update': { paramsTuple?: []; params?: {} }

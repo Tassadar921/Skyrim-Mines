@@ -31,7 +31,6 @@ type WeeklyRecap = {
     profit: number;
     weeklyTax: number;
     licensesAmount: number;
-    employeeDueAmount: number;
     capital: number | null;
     stockValue: number | null;
     totalCapital: number | null;
@@ -39,6 +38,8 @@ type WeeklyRecap = {
 
 const props = defineProps<{
     weeklyRecap: WeeklyRecap[];
+    employeeDueAmount: number;
+    adminDueAmount: number;
     castellanyTaxRate: number;
     largeOrderThresholdQuantity: number;
 }>();
@@ -111,6 +112,18 @@ function submitCapitalSnapshot() {
                 </Button>
             </div>
 
+            <div class="rounded-md border p-5 space-y-3 w-full max-w-xs">
+                <div class="text-sm font-medium">{{ t('admin.dashboard.amountsDue.title') }}</div>
+                <div class="text-sm flex items-center justify-between">
+                    <span class="text-muted-foreground">{{ t('admin.dashboard.amountsDue.employees') }}</span>
+                    <span class="font-medium">{{ formatAmount(employeeDueAmount) }}</span>
+                </div>
+                <div class="text-sm flex items-center justify-between">
+                    <span class="text-muted-foreground">{{ t('admin.dashboard.amountsDue.executives') }}</span>
+                    <span class="font-medium">{{ formatAmount(adminDueAmount) }}</span>
+                </div>
+            </div>
+
             <div class="rounded-md border p-5 space-y-4 w-full max-w-xs">
                 <div class="text-sm font-medium">{{ t('admin.dashboard.capitalSnapshot.title') }}</div>
                 <template v-if="currentWeekRecap && currentWeekRecap.capital !== null && currentWeekRecap.stockValue !== null">
@@ -168,7 +181,6 @@ function submitCapitalSnapshot() {
                         </TableHead>
                         <TableHead>{{ t('admin.dashboard.weeklyRecap.weeklyTax') }}</TableHead>
                         <TableHead>{{ t('admin.dashboard.weeklyRecap.licenses') }}</TableHead>
-                        <TableHead>{{ t('admin.dashboard.weeklyRecap.employeeDue') }}</TableHead>
                         <TableHead>{{ t('admin.dashboard.weeklyRecap.capital') }}</TableHead>
                         <TableHead>{{ t('admin.dashboard.weeklyRecap.stockValue') }}</TableHead>
                     </TableRow>
@@ -189,13 +201,12 @@ function submitCapitalSnapshot() {
                             </TableCell>
                             <TableCell class="text-sm">{{ formatAmount(recap.weeklyTax) }}</TableCell>
                             <TableCell class="text-sm">{{ formatAmount(recap.licensesAmount) }}</TableCell>
-                            <TableCell class="text-sm">{{ formatAmount(recap.employeeDueAmount) }}</TableCell>
                             <TableCell class="text-sm">{{ formatAmountOrDash(recap.capital) }}</TableCell>
                             <TableCell class="text-sm">{{ formatAmountOrDash(recap.stockValue) }}</TableCell>
                         </TableRow>
                     </template>
                     <TableRow v-else>
-                        <TableCell colspan="8" class="text-center text-sm text-muted-foreground py-6">
+                        <TableCell colspan="7" class="text-center text-sm text-muted-foreground py-6">
                             {{ t('admin.dashboard.weeklyRecap.empty') }}
                         </TableCell>
                     </TableRow>

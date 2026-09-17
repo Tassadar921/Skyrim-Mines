@@ -1,7 +1,7 @@
 import vine from '@vinejs/vine';
 import ResourceTypeEnum from '#types/enum/resource_type_enum';
 
-export const indexTonneauValidator = vine.create({
+export const indexBarrelValidator = vine.create({
     page: vine.number().min(1).optional(),
     sort: vine.enum(['username', 'resourceName']).optional(),
     dir: vine.enum(['asc', 'desc']).optional(),

@@ -32,10 +32,6 @@ export interface ApiDefinition {
   buybacks: {
     store: typeof routes['buybacks.store']
   }
-  pickaxes: {
-    take: typeof routes['pickaxes.take']
-    deposit: typeof routes['pickaxes.deposit']
-  }
   organization: {
     show: typeof routes['organization.show']
     members: {
@@ -82,6 +78,10 @@ export interface ApiDefinition {
       show: typeof routes['admin.resources.show']
       update: typeof routes['admin.resources.update']
       destroy: typeof routes['admin.resources.destroy']
+      recipe: {
+        edit: typeof routes['admin.resources.recipe.edit']
+        update: typeof routes['admin.resources.recipe.update']
+      }
     }
     materials: {
       index: typeof routes['admin.materials.index']
@@ -103,6 +103,9 @@ export interface ApiDefinition {
     stocks: {
       index: typeof routes['admin.stocks.index']
       update: typeof routes['admin.stocks.update']
+      barrel: {
+        update: typeof routes['admin.stocks.barrel.update']
+      }
     }
     buybacks: {
       index: typeof routes['admin.buybacks.index']
@@ -123,9 +126,20 @@ export interface ApiDefinition {
       index: typeof routes['admin.livraisons.index']
       destroy: typeof routes['admin.livraisons.destroy']
     }
-    tonneau: {
-      index: typeof routes['admin.tonneau.index']
-      update: typeof routes['admin.tonneau.update']
+    barrel: {
+      index: typeof routes['admin.barrel.index']
+      update: typeof routes['admin.barrel.update']
+    }
+    barrelRentals: {
+      index: typeof routes['admin.barrelRentals.index']
+      store: typeof routes['admin.barrelRentals.store']
+      show: typeof routes['admin.barrelRentals.show']
+      update: typeof routes['admin.barrelRentals.update']
+      destroy: typeof routes['admin.barrelRentals.destroy']
+      payments: {
+        store: typeof routes['admin.barrelRentals.payments.store']
+        destroy: typeof routes['admin.barrelRentals.payments.destroy']
+      }
     }
     organizations: {
       index: typeof routes['admin.organizations.index']

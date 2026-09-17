@@ -157,7 +157,6 @@ function resetFilters() {
                         <TableHead>{{ $t('admin.users.table.role') }}</TableHead>
                         <TableHead>{{ $t('admin.users.table.enabled') }}</TableHead>
                         <TableHead>{{ $t('admin.users.table.balance') }}</TableHead>
-                        <TableHead>{{ $t('admin.users.table.pickaxes') }}</TableHead>
                         <TableHead>
                             <Button variant="ghost" class="gap-1 px-2" @click="onSort('createdAt')">
                                 {{ $t('admin.users.table.createdAt') }}
@@ -183,7 +182,6 @@ function resetFilters() {
                                 <XCircle v-else class="size-4 text-muted-foreground" />
                             </TableCell>
                             <TableCell class="text-sm text-muted-foreground">{{ canHaveBalance(user.role) ? `${user.balance.toFixed(2)} s` : '—' }}</TableCell>
-                            <TableCell class="text-sm text-muted-foreground">{{ user.pickaxes }}</TableCell>
                             <TableCell class="text-sm text-muted-foreground">{{ new Date(user.createdAt).toLocaleDateString(undefined, { timeZone: 'UTC' }) }}</TableCell>
                             <TableCell>
                                 <Link :route="'admin.users.show'" :params="{ id: user.id }">
@@ -196,7 +194,7 @@ function resetFilters() {
                         </TableRow>
                     </template>
                     <TableRow v-else>
-                        <TableCell :colspan="8" class="h-24 text-center text-muted-foreground">
+                        <TableCell :colspan="7" class="h-24 text-center text-muted-foreground">
                             {{ $t('admin.users.table.empty') }}
                         </TableCell>
                     </TableRow>

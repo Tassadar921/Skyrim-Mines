@@ -9,7 +9,7 @@ import { Button } from '~/components/ui/button';
 import QuantityStepper from '~/partials/stocks/QuantityStepper.vue';
 import type { Data } from '@generated/data';
 
-type ResourceWithBarrel = Data.Resource & { quantityBarrel: number; soljundBarrel: number };
+type ResourceWithBarrel = Data.Resource & { quantityBarrel: number };
 
 const { t } = useI18n();
 
@@ -33,9 +33,6 @@ const open = ref(false);
 const isSubmitting = ref(false);
 const quantities = reactive<Record<string, number>>(buildQuantities(props.resources));
 
-const soljundResourceId = computed(() => barrelResources.value.find((r) => r.name === 'Pierre de Lune' && r.type === 'minerai')?.id);
-const soljundQuantity = ref(0);
-
 watch(
     () => props.resources,
     (value) => {
@@ -45,17 +42,11 @@ watch(
 
 function setQuantity(id: string, value: number) {
     quantities[id] = value;
-    if (id === soljundResourceId.value && soljundQuantity.value > value) {
-        soljundQuantity.value = value;
-    }
 }
 
 function setAllMax() {
     for (const resource of barrelResources.value) {
         quantities[resource.id] = resource.quantityBarrel;
-        if (resource.id === soljundResourceId.value) {
-            soljundQuantity.value = resource.soljundBarrel;
-        }
     }
 }
 
@@ -63,7 +54,6 @@ function submitBuyback() {
     const items = barrelResources.value.map((resource) => ({
         resourceId: resource.id,
         quantity: quantities[resource.id] ?? 0,
-        soljundQuantity: resource.id === soljundResourceId.value ? soljundQuantity.value : 0,
     }));
 
     isSubmitting.value = true;
@@ -74,7 +64,6 @@ function submitBuyback() {
             preserveScroll: true,
             onSuccess: () => {
                 Object.assign(quantities, buildQuantities(props.resources));
-                soljundQuantity.value = 0;
                 open.value = false;
             },
             onFinish: () => {
@@ -104,7 +93,6 @@ function submitBuyback() {
                             <TableHead></TableHead>
                             <TableHead>{{ t('stocks.table.quantityBarrel') }}</TableHead>
                             <TableHead>{{ t('deposit.quantity') }}</TableHead>
-                            <TableHead>{{ t('deposit.soljundColumn') }}</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -113,15 +101,6 @@ function submitBuyback() {
                             <TableCell class="text-sm text-muted-foreground">{{ resource.quantityBarrel }}</TableCell>
                             <TableCell>
                                 <QuantityStepper :model-value="quantities[resource.id] ?? 0" :max="resource.quantityBarrel" show-max @update:model-value="(value) => setQuantity(resource.id, value)" />
-                            </TableCell>
-                            <TableCell>
-                                <QuantityStepper
-                                    v-if="resource.id === soljundResourceId"
-                                    :model-value="soljundQuantity"
-                                    :max="Math.min(quantities[resource.id] ?? 0, resource.soljundBarrel)"
-                                    show-max
-                                    @update:model-value="(value) => (soljundQuantity = value)"
-                                />
                             </TableCell>
                         </TableRow>
                     </TableBody>

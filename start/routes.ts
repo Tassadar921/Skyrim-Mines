@@ -15,7 +15,6 @@ transmit.registerRoutes((route) => {
 router.get('/', [controllers.Home, 'index']).as('home').use(middleware.auth());
 router.get('/tarifs', [controllers.Tarifs, 'index']).as('tarifs').use(middleware.auth());
 const companyOnly = middleware.admin({ roles: [UserRoleEnum.ADMIN, UserRoleEnum.AUDITOR, UserRoleEnum.STAFF] });
-const employeeOnly = middleware.admin({ roles: [UserRoleEnum.ADMIN, UserRoleEnum.STAFF] });
 router.get('/stocks', [controllers.Stocks, 'index']).as('stocks').use(middleware.auth()).use(companyOnly);
 router.get('/organigramme', [controllers.Organigramme, 'index']).as('organigramme').use(middleware.auth());
 router.get('/devis', [controllers.Devis, 'create']).as('devis.create').use(middleware.auth());
@@ -31,8 +30,6 @@ router.post('/commandes/:orderId/livraisons', [controllers.Livraisons, 'store'])
 router.post('/deposits', [controllers.Deposits, 'store']).as('deposits.store').use(middleware.auth());
 router.patch('/deposits/:id', [controllers.Deposits, 'update']).as('deposits.update').use(middleware.auth());
 router.post('/buybacks', [controllers.Buybacks, 'store']).as('buybacks.store').use(middleware.auth()).use(middleware.admin());
-router.post('/pickaxes/take', [controllers.Pickaxes, 'take']).as('pickaxes.take').use(middleware.auth()).use(employeeOnly);
-router.post('/pickaxes/deposit', [controllers.Pickaxes, 'deposit']).as('pickaxes.deposit').use(middleware.auth()).use(employeeOnly);
 
 const organizationManage = middleware.organization({ roles: [OrganizationRoleEnum.OWNER, OrganizationRoleEnum.ADMIN] });
 const organizationOwnerOnly = middleware.organization({ roles: [OrganizationRoleEnum.OWNER] });
@@ -73,6 +70,9 @@ router
         router.put('/resources/:id', [controllers.admin.Resources, 'update']).as('admin.resources.update').use(middleware.admin());
         router.delete('/resources/:id', [controllers.admin.Resources, 'destroy']).as('admin.resources.destroy').use(middleware.admin());
 
+        router.get('/resources/:id/recipe', [controllers.admin.ResourceRecipes, 'edit']).as('admin.resources.recipe.edit').use(readOnly);
+        router.put('/resources/:id/recipe', [controllers.admin.ResourceRecipes, 'update']).as('admin.resources.recipe.update').use(middleware.admin());
+
         router.get('/materials', [controllers.admin.Materials, 'index']).as('admin.materials.index').use(readOnly);
         router.get('/materials/create', [controllers.admin.Materials, 'create']).as('admin.materials.create').use(middleware.admin());
         router.post('/materials', [controllers.admin.Materials, 'store']).as('admin.materials.store').use(middleware.admin());
@@ -90,6 +90,7 @@ router
 
         router.get('/stocks', [controllers.admin.Stocks, 'index']).as('admin.stocks.index').use(readOnly);
         router.patch('/stocks', [controllers.admin.Stocks, 'update']).as('admin.stocks.update').use(middleware.admin());
+        router.patch('/stocks/:resourceId/barrel', [controllers.admin.Stocks, 'updateBarrelTotal']).as('admin.stocks.barrel.update').use(middleware.admin());
 
         router.get('/buybacks', [controllers.admin.Buybacks, 'index']).as('admin.buybacks.index').use(readOnly);
 
@@ -104,8 +105,16 @@ router
         router.get('/livraisons', [controllers.admin.Livraisons, 'index']).as('admin.livraisons.index').use(readOnly);
         router.delete('/livraisons/:id', [controllers.admin.Livraisons, 'destroy']).as('admin.livraisons.destroy').use(middleware.admin());
 
-        router.get('/tonneau', [controllers.admin.Tonneau, 'index']).as('admin.tonneau.index').use(readOnly);
-        router.patch('/tonneau', [controllers.admin.Tonneau, 'update']).as('admin.tonneau.update').use(middleware.admin());
+        router.get('/barrel', [controllers.admin.Barrel, 'index']).as('admin.barrel.index').use(readOnly);
+        router.patch('/barrel', [controllers.admin.Barrel, 'update']).as('admin.barrel.update').use(middleware.admin());
+
+        router.get('/barrel-rentals', [controllers.admin.BarrelRentals, 'index']).as('admin.barrelRentals.index').use(readOnly);
+        router.post('/barrel-rentals', [controllers.admin.BarrelRentals, 'store']).as('admin.barrelRentals.store').use(middleware.admin());
+        router.get('/barrel-rentals/:id', [controllers.admin.BarrelRentals, 'show']).as('admin.barrelRentals.show').use(readOnly);
+        router.put('/barrel-rentals/:id', [controllers.admin.BarrelRentals, 'updateRent']).as('admin.barrelRentals.update').use(middleware.admin());
+        router.delete('/barrel-rentals/:id', [controllers.admin.BarrelRentals, 'destroy']).as('admin.barrelRentals.destroy').use(middleware.admin());
+        router.post('/barrel-rentals/:id/payments', [controllers.admin.BarrelRentals, 'storePayment']).as('admin.barrelRentals.payments.store').use(middleware.admin());
+        router.delete('/barrel-rentals/payments/:id', [controllers.admin.BarrelRentals, 'destroyPayment']).as('admin.barrelRentals.payments.destroy').use(middleware.admin());
 
         router.get('/organizations', [controllers.admin.Organizations, 'index']).as('admin.organizations.index').use(readOnly);
         router.get('/organizations/create', [controllers.admin.Organizations, 'create']).as('admin.organizations.create').use(middleware.admin());

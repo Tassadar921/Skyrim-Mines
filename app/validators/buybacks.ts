@@ -5,7 +5,6 @@ export const createBuybackValidator = vine.create({
         vine.object({
             resourceId: vine.string().uuid(),
             quantity: vine.number().min(0),
-            soljundQuantity: vine.number().min(0).optional(),
         }),
     ),
 });

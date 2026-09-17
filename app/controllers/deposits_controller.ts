@@ -1,35 +1,18 @@
 import { DateTime } from 'luxon';
 import { type HttpContext } from '@adonisjs/core/http';
-import db from '@adonisjs/lucid/services/db';
 import logger from '@adonisjs/core/services/logger';
 import ResourceDepositRepository from '#repositories/resource_deposit_repository';
-import ResourceStockRepository from '#repositories/resource_stock_repository';
 import { createDepositValidator, updateDepositValidator } from '#validators/deposits';
 import { DEPOSIT_EDIT_WINDOW_MINUTES } from '#helpers/deposit_edit_window_helper';
 
 export default class DepositsController {
-    constructor(
-        private readonly resourceDepositRepository: ResourceDepositRepository = new ResourceDepositRepository(),
-        private readonly resourceStockRepository: ResourceStockRepository = new ResourceStockRepository(),
-    ) {}
+    constructor(private readonly resourceDepositRepository: ResourceDepositRepository = new ResourceDepositRepository()) {}
 
     public async store({ request, auth, response, session, i18n }: HttpContext) {
         const { items } = await request.validateUsing(createDepositValidator);
 
-        if (items.some((item) => (item.soljundQuantity ?? 0) > item.quantity)) {
-            session.flash('error', i18n.t('messages.deposits.create.invalidSoljundQuantity'));
-            return response.redirect().back();
-        }
-
         try {
-            await db.transaction(async (trx) => {
-                await this.resourceDepositRepository.createMany(auth.user!.id, items, trx);
-                for (const item of items) {
-                    if ((item.soljundQuantity ?? 0) > 0) {
-                        await this.resourceStockRepository.incrementBarrelSoljundQuantity(item.resourceId, item.soljundQuantity!, trx);
-                    }
-                }
-            });
+            await this.resourceDepositRepository.createMany(auth.user!.id, items);
             session.flash('success', i18n.t('messages.deposits.create.success'));
         } catch (e) {
             logger.error({ err: e }, 'deposits.store failed');
@@ -56,13 +39,12 @@ export default class DepositsController {
         const { resourceId, quantity } = await request.validateUsing(updateDepositValidator);
 
         try {
-            await db.transaction(async (trx) => {
-                const { previousResourceId, soljundDelta } = await this.resourceDepositRepository.update(deposit.id, { resourceId, quantity }, trx);
-                if (soljundDelta !== 0) {
-                    await this.resourceStockRepository.incrementBarrelSoljundQuantity(previousResourceId, soljundDelta, trx);
-                }
-            });
-            session.flash('success', i18n.t('messages.deposits.update.success'));
+            if (quantity === 0) {
+                await this.resourceDepositRepository.delete(deposit.id);
+            } else {
+                await this.resourceDepositRepository.update(deposit.id, { resourceId, quantity });
+            }
+            session.flash('success', i18n.t(quantity === 0 ? 'messages.deposits.update.deleted' : 'messages.deposits.update.success'));
         } catch (e) {
             logger.error({ err: e }, 'deposits.update failed');
             session.flash('error', i18n.t('messages.deposits.update.error'));

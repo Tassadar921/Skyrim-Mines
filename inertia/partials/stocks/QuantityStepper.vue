@@ -5,6 +5,7 @@ import { Minus, Plus } from '@lucide/vue';
 
 const props = defineProps<{
     modelValue: number;
+    min?: number;
     max?: number;
     showMax?: boolean;
     disabled?: boolean;
@@ -15,7 +16,7 @@ const emit = defineEmits<{
 }>();
 
 function normalize(value: string | number): number {
-    const rounded = Math.max(0, Math.round(Number(value) || 0));
+    const rounded = Math.max(props.min ?? 0, Math.round(Number(value) || 0));
     return props.max !== undefined ? Math.min(rounded, props.max) : rounded;
 }
 

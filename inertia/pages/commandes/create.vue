@@ -5,6 +5,7 @@ import { useI18n } from 'vue-i18n';
 import { urlFor } from '~/client';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '~/components/ui/table';
 import { Button } from '~/components/ui/button';
+import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '~/components/ui/select';
 import QuantityStepper from '~/partials/stocks/QuantityStepper.vue';
@@ -21,6 +22,7 @@ const props = defineProps<{
     organizationId: string | null;
     organizationName: string | null;
     canRequestForThirdParty: boolean;
+    canNegotiatePrice: boolean;
     clients: ClientOption[];
     organizations: OrganizationOption[];
     organizationResourcePrices: Record<string, Record<string, number>>;
@@ -43,7 +45,22 @@ function setQuantity(id: string, value: number) {
     quantities[id] = value;
 }
 
-const totalAmount = computed(() => props.resources.reduce((sum, resource) => sum + priceFor(resource) * (quantities[resource.id] ?? 0), 0));
+const unitPriceInputs = reactive<Record<string, string>>({});
+
+function priceInputValue(resource: Data.Resource): string {
+    return unitPriceInputs[resource.id] ?? priceFor(resource).toFixed(2);
+}
+
+function setUnitPrice(id: string, value: string) {
+    unitPriceInputs[id] = value;
+}
+
+function effectivePrice(resource: Data.Resource): number {
+    const overridden = unitPriceInputs[resource.id];
+    return overridden !== undefined ? Math.max(0, Number(overridden) || 0) : priceFor(resource);
+}
+
+const totalAmount = computed(() => props.resources.reduce((sum, resource) => sum + effectivePrice(resource) * (quantities[resource.id] ?? 0), 0));
 const hasSelection = computed(() => Object.values(quantities).some((quantity) => quantity > 0));
 
 const recipientMode = ref<RecipientMode>(props.organizationName ? 'myOrganization' : 'myself');
@@ -79,7 +96,14 @@ const canSubmit = computed(() => {
 });
 
 function submitOrder() {
-    const items = props.resources.map((resource) => ({ resourceId: resource.id, quantity: quantities[resource.id] ?? 0 }));
+    const items = props.resources.map((resource) => {
+        const overridden = unitPriceInputs[resource.id];
+        return {
+            resourceId: resource.id,
+            quantity: quantities[resource.id] ?? 0,
+            ...(overridden !== undefined ? { unitPrice: Math.max(0, Number(overridden) || 0) } : {}),
+        };
+    });
 
     const recipient: Record<string, string> = {};
     if (recipientMode.value === 'myOrganization') {
@@ -187,7 +211,18 @@ function submitOrder() {
                         <TableBody>
                             <TableRow v-for="resource in minerais" :key="resource.id">
                                 <TableCell class="text-sm font-medium">{{ resource.name }}</TableCell>
-                                <TableCell class="text-sm text-muted-foreground">{{ priceFor(resource).toFixed(2) }} s</TableCell>
+                                <TableCell class="text-sm text-muted-foreground">
+                                    <Input
+                                        v-if="canNegotiatePrice"
+                                        type="number"
+                                        min="0"
+                                        step="0.01"
+                                        class="w-28"
+                                        :model-value="priceInputValue(resource)"
+                                        @update:model-value="(value) => setUnitPrice(resource.id, String(value))"
+                                    />
+                                    <template v-else>{{ priceFor(resource).toFixed(2) }} s</template>
+                                </TableCell>
                                 <TableCell>
                                     <QuantityStepper :model-value="quantities[resource.id] ?? 0" @update:model-value="(value) => setQuantity(resource.id, value)" />
                                 </TableCell>
@@ -211,7 +246,18 @@ function submitOrder() {
                         <TableBody>
                             <TableRow v-for="resource in lingots" :key="resource.id">
                                 <TableCell class="text-sm font-medium">{{ resource.name }}</TableCell>
-                                <TableCell class="text-sm text-muted-foreground">{{ priceFor(resource).toFixed(2) }} s</TableCell>
+                                <TableCell class="text-sm text-muted-foreground">
+                                    <Input
+                                        v-if="canNegotiatePrice"
+                                        type="number"
+                                        min="0"
+                                        step="0.01"
+                                        class="w-28"
+                                        :model-value="priceInputValue(resource)"
+                                        @update:model-value="(value) => setUnitPrice(resource.id, String(value))"
+                                    />
+                                    <template v-else>{{ priceFor(resource).toFixed(2) }} s</template>
+                                </TableCell>
                                 <TableCell>
                                     <QuantityStepper :model-value="quantities[resource.id] ?? 0" @update:model-value="(value) => setQuantity(resource.id, value)" />
                                 </TableCell>

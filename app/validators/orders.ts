@@ -5,6 +5,7 @@ export const createOrderValidator = vine.create({
         vine.object({
             resourceId: vine.string().uuid(),
             quantity: vine.number().min(0),
+            unitPrice: vine.number().min(0).optional(),
         }),
     ),
     recipientMode: vine.enum(['myOrganization', 'myself', 'thirdPartyClient', 'thirdPartyOrganization']).optional(),

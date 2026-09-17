@@ -6,8 +6,8 @@ import StockResourceTable from '~/partials/stocks/StockResourceTable.vue';
 import StockMaterialTable from '~/partials/stocks/StockMaterialTable.vue';
 import type { Data } from '@generated/data';
 
-type ResourceStockLine = { id: string; quantityBarrel: number; quantityPurchased: number; quantityPurchasedSoljund: number; soljundQuantity: number };
-type ResourceQuantities = Record<string, { quantityBarrel: number; quantityPurchased: number; quantityPurchasedSoljund: number; soljundQuantity: number }>;
+type ResourceStockLine = { id: string; quantityBarrel: number; quantityPurchased: number };
+type ResourceQuantities = Record<string, { quantityBarrel: number; quantityPurchased: number }>;
 type MaterialStockLine = { id: string; quantity: number };
 type MaterialQuantities = Record<string, number>;
 
@@ -22,12 +22,7 @@ const minerais = computed(() => props.resources.filter((r) => r.type === 'minera
 const lingots = computed(() => props.resources.filter((r) => r.type === 'lingot'));
 
 function toResourceQuantityMap(items: ResourceStockLine[]): ResourceQuantities {
-    return Object.fromEntries(
-        items.map((item) => [
-            item.id,
-            { quantityBarrel: item.quantityBarrel, quantityPurchased: item.quantityPurchased, quantityPurchasedSoljund: item.quantityPurchasedSoljund, soljundQuantity: item.soljundQuantity },
-        ]),
-    );
+    return Object.fromEntries(items.map((item) => [item.id, { quantityBarrel: item.quantityBarrel, quantityPurchased: item.quantityPurchased }]));
 }
 
 function toMaterialQuantityMap(items: MaterialStockLine[]): MaterialQuantities {

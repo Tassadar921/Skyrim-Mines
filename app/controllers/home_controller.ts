@@ -4,19 +4,15 @@ import ResourceRepository from '#repositories/resource_repository';
 import ResourceDepositRepository from '#repositories/resource_deposit_repository';
 import ResourceBuybackRepository from '#repositories/resource_buyback_repository';
 import ResourceBarrelAdjustmentRepository from '#repositories/resource_barrel_adjustment_repository';
-import ResourceStockRepository from '#repositories/resource_stock_repository';
 import OrderRepository from '#repositories/order_repository';
 import DeliveryRepository from '#repositories/delivery_repository';
 import OrganizationRepository from '#repositories/organization_repository';
 import CastellanyRepository from '#repositories/castellany_repository';
-import MaterialRepository from '#repositories/material_repository';
-import MaterialStockRepository from '#repositories/material_stock_repository';
 import ResourceTransformer from '#transformers/resource_transformer';
 import CastellanyTransformer from '#transformers/castellany_transformer';
 import { isStaffOrAdmin } from '#helpers/user_role_helper';
 import { computeBarrelQuantity } from '#helpers/resource_barrel_helper';
 import { DEPOSIT_EDIT_WINDOW_MINUTES } from '#helpers/deposit_edit_window_helper';
-import { PICKAXE_MATERIAL_NAME } from '#helpers/pickaxe_helper';
 
 export default class HomeController {
     constructor(
@@ -24,20 +20,17 @@ export default class HomeController {
         private readonly resourceDepositRepository: ResourceDepositRepository = new ResourceDepositRepository(),
         private readonly resourceBuybackRepository: ResourceBuybackRepository = new ResourceBuybackRepository(),
         private readonly resourceBarrelAdjustmentRepository: ResourceBarrelAdjustmentRepository = new ResourceBarrelAdjustmentRepository(),
-        private readonly resourceStockRepository: ResourceStockRepository = new ResourceStockRepository(),
         private readonly orderRepository: OrderRepository = new OrderRepository(),
         private readonly deliveryRepository: DeliveryRepository = new DeliveryRepository(),
         private readonly organizationRepository: OrganizationRepository = new OrganizationRepository(),
         private readonly castellanyRepository: CastellanyRepository = new CastellanyRepository(),
-        private readonly materialRepository: MaterialRepository = new MaterialRepository(),
-        private readonly materialStockRepository: MaterialStockRepository = new MaterialStockRepository(),
     ) {}
 
     public async index({ inertia, auth }: HttpContext) {
         const user = auth.user;
         const isEmployeeOrAdmin = !!user && isStaffOrAdmin(user.role);
 
-        const [resources, depositTotals, buybackTotals, adjustmentTotals, myDepositTotals, myBuybackTotals, myAdjustmentTotals, resourceStocks, pickaxeMaterial] = await Promise.all([
+        const [resources, depositTotals, buybackTotals, adjustmentTotals, myDepositTotals, myBuybackTotals, myAdjustmentTotals] = await Promise.all([
             this.resourceRepository.all(),
             this.resourceDepositRepository.sumByResource(),
             this.resourceBuybackRepository.sumByResource(),
@@ -45,14 +38,7 @@ export default class HomeController {
             user ? this.resourceDepositRepository.sumByUser(user.id) : new Map<string, number>(),
             user ? this.resourceBuybackRepository.sumByUser(user.id) : new Map<string, number>(),
             user ? this.resourceBarrelAdjustmentRepository.sumByUser(user.id) : new Map<string, number>(),
-            this.resourceStockRepository.all(),
-            isEmployeeOrAdmin ? this.materialRepository.findOneBy({ name: PICKAXE_MATERIAL_NAME }) : null,
         ]);
-
-        const resourceStockByResourceId = new Map(resourceStocks.map((s) => [s.resourceId, s]));
-
-        const pickaxeMaterialStock = pickaxeMaterial ? await this.materialStockRepository.findOneBy({ materialId: pickaxeMaterial.id }) : null;
-        const pickaxeStock = pickaxeMaterial ? (pickaxeMaterialStock?.quantity ?? 0) : null;
 
         const ordersToDeliver = isEmployeeOrAdmin ? await this.orderRepository.findToDeliver() : [];
 
@@ -89,7 +75,6 @@ export default class HomeController {
                 ...new ResourceTransformer(r).toObject(),
                 quantityBarrel: computeBarrelQuantity(r.id, depositTotals, buybackTotals, adjustmentTotals),
                 myQuantityBarrel: computeBarrelQuantity(r.id, myDepositTotals, myBuybackTotals, myAdjustmentTotals),
-                soljundBarrel: resourceStockByResourceId.get(r.id)?.quantityBarrelSoljund ?? 0,
             })),
             ordersToDeliver: ordersToDeliverWithRemaining.filter((order) => order.lines.length > 0),
             castellanies: castellanies.map((castellany) => new CastellanyTransformer(castellany).toObject()),
@@ -99,7 +84,6 @@ export default class HomeController {
                 quantity: deposit.quantity,
                 createdAt: deposit.createdAt.toISO()!,
             })),
-            pickaxeStock,
         });
     }
 }

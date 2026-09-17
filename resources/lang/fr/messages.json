@@ -72,7 +72,7 @@
                 "invalidDeliveryWeek": "La semaine de livraison doit être postérieure ou égale à la semaine de la commande, et ne peut pas dépasser la semaine en cours"
             }
         },
-        "tonneau": {
+        "barrel": {
             "update": {
                 "success": "Quantité mise à jour avec succès",
                 "error": "Erreur lors de la mise à jour de la quantité"
@@ -81,8 +81,15 @@
         "stocks": {
             "update": {
                 "success": "Quantité mise à jour avec succès",
-                "error": "Erreur lors de la mise à jour de la quantité",
-                "invalidSoljundQuantity": "La part de Doline de Soljund ne peut pas dépasser la quantité totale de Pierre de Lune de sa catégorie"
+                "error": "Erreur lors de la mise à jour de la quantité"
+            },
+            "barrel": {
+                "update": {
+                    "success": "Quantité du tonneau mise à jour et répartie avec succès",
+                    "error": "Erreur lors de la mise à jour du tonneau",
+                    "noStaff": "Aucun membre du staff n'existe pour répartir cette quantité",
+                    "insufficientStaffStock": "Le staff ne possède pas assez de cette ressource dans son tonneau pour retirer cette quantité"
+                }
             }
         },
         "resources": {
@@ -97,6 +104,12 @@
             "destroy": {
                 "success": "Ressource supprimée avec succès",
                 "error": "Erreur lors de la suppression de la ressource"
+            },
+            "recipe": {
+                "update": {
+                    "success": "Recette mise à jour avec succès",
+                    "error": "Erreur lors de la mise à jour de la recette"
+                }
             }
         },
         "materials": {
@@ -186,28 +199,43 @@
                     "error": "Erreur lors de la suppression du paiement"
                 }
             }
+        },
+        "barrelRentals": {
+            "create": {
+                "success": "Locataire ajouté avec succès",
+                "error": "Erreur lors de l'ajout du locataire"
+            },
+            "update": {
+                "success": "Loyer mis à jour avec succès",
+                "error": "Erreur lors de la mise à jour du loyer"
+            },
+            "destroy": {
+                "success": "Locataire supprimé avec succès",
+                "error": "Erreur lors de la suppression du locataire"
+            },
+            "payments": {
+                "create": {
+                    "success": "Paiement enregistré avec succès",
+                    "error": "Erreur lors de l'enregistrement du paiement"
+                },
+                "destroy": {
+                    "success": "Paiement supprimé avec succès",
+                    "error": "Erreur lors de la suppression du paiement"
+                }
+            }
         }
     },
     "deposits": {
         "create": {
             "success": "Dépôt enregistré avec succès",
-            "error": "Erreur lors de l'enregistrement du dépôt",
-            "invalidSoljundQuantity": "La quantité en provenance de la Doline de Soljund ne peut pas dépasser la quantité déposée"
+            "error": "Erreur lors de l'enregistrement du dépôt"
         },
         "update": {
             "success": "Dépôt modifié avec succès",
+            "deleted": "Dépôt supprimé avec succès",
             "error": "Erreur lors de la modification du dépôt",
             "forbidden": "Vous ne pouvez pas modifier ce dépôt",
             "expired": "Ce dépôt ne peut plus être modifié (plus d'une heure s'est écoulée)"
-        }
-    },
-    "pickaxes": {
-        "take": {
-            "empty": "Il n'y a plus aucune pioche dans le stock de la compagnie",
-            "error": "Erreur lors de la prise d'une pioche"
-        },
-        "deposit": {
-            "error": "Erreur lors du dépôt d'une pioche"
         }
     },
     "buybacks": {

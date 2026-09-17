@@ -118,6 +118,7 @@ export default class CommandesController {
             organizationId,
             organizationName,
             canRequestForThirdParty: allowThirdParty,
+            canNegotiatePrice: allowThirdParty,
             clients,
             organizations,
             organizationResourcePrices,
@@ -145,6 +146,9 @@ export default class CommandesController {
             }
             const { organizationId, organizationName, recipientUserId, requesterName } = recipient;
 
+            const user = auth.user!;
+            const canNegotiatePrice = isStaffOrAdmin(user.role);
+
             const resources = await this.resourceRepository.all();
             const resourceById = new Map(resources.map((resource) => [resource.id, resource]));
             const priceOverrides = organizationId ? await this.organizationResourcePriceRepository.findMapForOrganization(organizationId) : new Map<string, number>();
@@ -154,7 +158,8 @@ export default class CommandesController {
                     const resource = resourceById.get(item.resourceId);
                     if (!resource) return null;
 
-                    const unitPrice = priceOverrides.get(resource.id) ?? Number(resource.sellPrice);
+                    const defaultPrice = priceOverrides.get(resource.id) ?? Number(resource.sellPrice);
+                    const unitPrice = canNegotiatePrice && item.unitPrice !== undefined ? item.unitPrice : defaultPrice;
                     return {
                         resourceId: resource.id,
                         resourceName: resource.name,
@@ -171,7 +176,6 @@ export default class CommandesController {
             }
 
             const totalAmount = lines.reduce((sum, line) => sum + line.totalPrice, 0);
-            const user = auth.user!;
 
             const order = await this.orderRepository.createWithLines({
                 userId: user.id,

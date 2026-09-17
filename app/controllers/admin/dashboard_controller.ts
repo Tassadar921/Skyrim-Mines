@@ -15,6 +15,22 @@ import { storeCompanyCapitalSnapshotValidator } from '#validators/admin/company_
 
 const MAX_WEEKS_IN_RECAP = 20;
 
+type WeeklyTotalsBundle = {
+    deliveryTotals: { weekNumber: number; totalProfit: number }[];
+    commissionTotals: { weekNumber: number; totalCommission: number }[];
+    largeOrderFeeTotals: { weekNumber: number; totalFee: number }[];
+    licenseTotals: { weekNumber: number; totalAmount: number }[];
+};
+
+function computeProfitForWeek(weekNumber: number, totals: WeeklyTotalsBundle): number {
+    const deliveriesProfit = totals.deliveryTotals.find((entry) => entry.weekNumber === weekNumber)?.totalProfit ?? 0;
+    const licensesAmount = totals.licenseTotals.find((entry) => entry.weekNumber === weekNumber)?.totalAmount ?? 0;
+    const largeOrderFeesAmount = totals.largeOrderFeeTotals.find((entry) => entry.weekNumber === weekNumber)?.totalFee ?? 0;
+    const commissionsAmount = totals.commissionTotals.find((entry) => entry.weekNumber === weekNumber)?.totalCommission ?? 0;
+
+    return deliveriesProfit + licensesAmount + largeOrderFeesAmount - commissionsAmount;
+}
+
 export default class DashboardController {
     constructor(
         private readonly deliveryRepository: DeliveryRepository = new DeliveryRepository(),
@@ -28,22 +44,23 @@ export default class DashboardController {
     public async index({ inertia }: HttpContext) {
         const currentWeek = getWeekNumber(DateTime.now());
 
-        const [deliveryTotals, commissionTotals, largeOrderFeeTotals, licenseTotals, employeeDueAmount, castellanyTax, largeOrderSetting, capitalSnapshotsByWeek] = await Promise.all([
+        const [deliveryTotals, commissionTotals, largeOrderFeeTotals, licenseTotals, employeeDueAmount, adminDueAmount, castellanyTax, largeOrderSetting, capitalSnapshotsByWeek] = await Promise.all([
             this.deliveryRepository.getWeeklyTotals(),
             this.deliveryRepository.getWeeklyCommissionTotals(),
             this.deliveryRepository.getWeeklyLargeOrderFeeTotals(),
             this.licensePaymentRepository.getWeeklyTotals(),
             this.userRepository.sumBalanceByRole(UserRoleEnum.STAFF),
+            this.userRepository.sumBalanceByRole(UserRoleEnum.ADMIN),
             this.castellanyTaxRepository.get(),
             this.largeOrderSettingRepository.get(),
             this.companyCapitalSnapshotRepository.allByWeek(),
         ]);
 
         const deliveriesByWeek = new Map(deliveryTotals.map((entry) => [entry.weekNumber, entry.totalAmount]));
-        const deliveriesProfitByWeek = new Map(deliveryTotals.map((entry) => [entry.weekNumber, entry.totalProfit]));
         const commissionsByWeek = new Map(commissionTotals.map((entry) => [entry.weekNumber, entry.totalCommission]));
         const largeOrderFeesByWeek = new Map(largeOrderFeeTotals.map((entry) => [entry.weekNumber, entry.totalFee]));
         const licensesByWeek = new Map(licenseTotals.map((entry) => [entry.weekNumber, entry.totalAmount]));
+        const weeklyTotals: WeeklyTotalsBundle = { deliveryTotals, commissionTotals, largeOrderFeeTotals, licenseTotals };
 
         const oldestWeek = Math.max(1, currentWeek - MAX_WEEKS_IN_RECAP + 1);
 
@@ -53,11 +70,14 @@ export default class DashboardController {
             const licensesAmount = licensesByWeek.get(weekNumber) ?? 0;
             const commissionsAmount = commissionsByWeek.get(weekNumber) ?? 0;
             const largeOrderFeesAmount = largeOrderFeesByWeek.get(weekNumber) ?? 0;
-            const grossProfit = (deliveriesProfitByWeek.get(weekNumber) ?? 0) + licensesAmount;
-            const profit = grossProfit + largeOrderFeesAmount - commissionsAmount;
+            const profit = computeProfitForWeek(weekNumber, weeklyTotals);
             const capitalSnapshot = capitalSnapshotsByWeek.get(weekNumber);
             const capital = capitalSnapshot ? Number(capitalSnapshot.capital) : null;
             const stockValue = capitalSnapshot ? Number(capitalSnapshot.stockValue) : null;
+            // Once a week has been recorded (capital/stock snapshot), its tax is frozen at the rate
+            // in effect at that time; only un-recorded weeks (normally just the current one) reflect
+            // the live castellany tax rate, so changing the rate never rewrites past weeks.
+            const weeklyTax = capitalSnapshot ? Number(capitalSnapshot.weeklyTax) : profit * (castellanyTax.rate / 100);
             weeklyRecap.push({
                 weekNumber,
                 startDate: start.toJSDate().toISOString(),
@@ -66,9 +86,8 @@ export default class DashboardController {
                 commissionsAmount,
                 largeOrderFeesAmount,
                 profit,
-                weeklyTax: profit * (castellanyTax.rate / 100),
+                weeklyTax,
                 licensesAmount,
-                employeeDueAmount,
                 capital,
                 stockValue,
                 totalCapital: capital !== null && stockValue !== null ? capital + stockValue : null,
@@ -77,6 +96,8 @@ export default class DashboardController {
 
         return inertia.render('admin/dashboard', {
             weeklyRecap,
+            employeeDueAmount,
+            adminDueAmount,
             castellanyTaxRate: castellanyTax.rate,
             largeOrderThresholdQuantity: largeOrderSetting.thresholdQuantity,
         });
@@ -121,7 +142,18 @@ export default class DashboardController {
                 return response.redirect().back();
             }
 
-            await this.companyCapitalSnapshotRepository.create({ weekNumber, capital: String(capital), stockValue: String(stockValue) });
+            const [deliveryTotals, commissionTotals, largeOrderFeeTotals, licenseTotals, castellanyTax] = await Promise.all([
+                this.deliveryRepository.getWeeklyTotals(),
+                this.deliveryRepository.getWeeklyCommissionTotals(),
+                this.deliveryRepository.getWeeklyLargeOrderFeeTotals(),
+                this.licensePaymentRepository.getWeeklyTotals(),
+                this.castellanyTaxRepository.get(),
+            ]);
+
+            const profit = computeProfitForWeek(weekNumber, { deliveryTotals, commissionTotals, largeOrderFeeTotals, licenseTotals });
+            const weeklyTax = profit * (castellanyTax.rate / 100);
+
+            await this.companyCapitalSnapshotRepository.create({ weekNumber, capital: String(capital), stockValue: String(stockValue), weeklyTax: String(weeklyTax) });
             session.flash('success', i18n.t('messages.admin.dashboard.capitalSnapshot.store.success'));
         } catch (e) {
             logger.error({ err: e }, 'dashboard.storeCapitalSnapshot failed');

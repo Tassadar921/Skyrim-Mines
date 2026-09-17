@@ -9,7 +9,6 @@ export default class UserTransformer extends BaseTransformer<User> {
             role: this.resource.role,
             enabled: this.resource.enabled ?? false,
             balance: Number(this.resource.balance),
-            pickaxes: this.resource.pickaxes,
             organizationId: this.resource.organizationId,
             organizationRole: this.resource.organizationRole,
             createdAt: this.resource.createdAt.toISO()!,

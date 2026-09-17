@@ -9,8 +9,10 @@ import Castellany from '#models/castellany';
 import User from '#models/user';
 import UserRepository from '#repositories/user_repository';
 import LargeOrderSettingRepository from '#repositories/large_order_setting_repository';
+import ResourceRecipeLineRepository from '#repositories/resource_recipe_line_repository';
 import OrderStatusEnum from '#types/enum/order_status_enum';
 import UserRoleEnum from '#types/enum/user_role_enum';
+import ResourceTypeEnum from '#types/enum/resource_type_enum';
 import { getWeekNumber } from '#helpers/game_week_helper';
 
 export type RemainingLine = {
@@ -33,6 +35,7 @@ export default class DeliveryRepository extends BaseRepository<typeof Delivery> 
     constructor(
         private readonly userRepository: UserRepository = new UserRepository(),
         private readonly largeOrderSettingRepository: LargeOrderSettingRepository = new LargeOrderSettingRepository(),
+        private readonly resourceRecipeLineRepository: ResourceRecipeLineRepository = new ResourceRecipeLineRepository(),
     ) {
         super(Delivery);
     }
@@ -91,9 +94,12 @@ export default class DeliveryRepository extends BaseRepository<typeof Delivery> 
         const resources = resourceIds.length ? await Resource.query().whereIn('id', resourceIds) : [];
         const buyPriceById = new Map(resources.map((resource) => [resource.id, Number(resource.buyPrice)]));
 
+        const lingotIds = resources.filter((resource) => resource.type === ResourceTypeEnum.LINGOT).map((resource) => resource.id);
+        const recipeCostById = await this.resourceRecipeLineRepository.sumCostByResourceIds(lingotIds);
+
         const linesWithProfit = validLines.map((line) => {
-            const buyPrice = line.resourceId ? (buyPriceById.get(line.resourceId) ?? null) : null;
-            const profit = buyPrice === null ? null : (line.unitPrice - buyPrice) * line.quantity;
+            const cost = !line.resourceId ? null : line.resourceType === ResourceTypeEnum.LINGOT ? (recipeCostById.get(line.resourceId) ?? null) : (buyPriceById.get(line.resourceId) ?? null);
+            const profit = cost === null ? null : (line.unitPrice - cost) * line.quantity;
             return { ...line, profit };
         });
 

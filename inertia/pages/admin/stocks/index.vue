@@ -12,8 +12,8 @@ import type { Data } from '@generated/data';
 
 defineOptions({ layout: AdminLayout });
 
-type ResourceStockLine = { id: string; quantityBarrel: number; quantityPurchased: number; quantityPurchasedSoljund: number; soljundQuantity: number };
-type ResourceQuantities = Record<string, { quantityBarrel: number; quantityPurchased: number; quantityPurchasedSoljund: number; soljundQuantity: number }>;
+type ResourceStockLine = { id: string; quantityBarrel: number; quantityPurchased: number };
+type ResourceQuantities = Record<string, { quantityBarrel: number; quantityPurchased: number }>;
 type MaterialStockLine = { id: string; quantity: number };
 type MaterialQuantities = Record<string, number>;
 
@@ -24,21 +24,13 @@ pageTitle.value = t('admin.stocks.title');
 const props = defineProps<{
     resources: (Data.Resource & ResourceStockLine)[];
     materials: (Data.Material & MaterialStockLine)[];
-    moonstoneResourceName: string;
 }>();
 
 const minerais = computed(() => props.resources.filter((r) => r.type === 'minerai'));
 const lingots = computed(() => props.resources.filter((r) => r.type === 'lingot'));
 
-const moonstoneResourceId = computed(() => props.resources.find((r) => r.name === props.moonstoneResourceName && r.type === 'minerai')?.id);
-
 function toResourceQuantityMap(items: ResourceStockLine[]): ResourceQuantities {
-    return Object.fromEntries(
-        items.map((item) => [
-            item.id,
-            { quantityBarrel: item.quantityBarrel, quantityPurchased: item.quantityPurchased, quantityPurchasedSoljund: item.quantityPurchasedSoljund, soljundQuantity: item.soljundQuantity },
-        ]),
-    );
+    return Object.fromEntries(items.map((item) => [item.id, { quantityBarrel: item.quantityBarrel, quantityPurchased: item.quantityPurchased }]));
 }
 
 function toMaterialQuantityMap(items: MaterialStockLine[]): MaterialQuantities {
@@ -67,21 +59,7 @@ const totalStockValue = computed(() => props.resources.reduce((sum, resource) =>
 function updatePurchased(id: string, value: string | number) {
     const quantity = Math.max(0, Math.round(Number(value) || 0));
     const current = resourceQuantities[id];
-    if (current) resourceQuantities[id] = { ...current, quantityPurchased: quantity, quantityPurchasedSoljund: Math.min(current.quantityPurchasedSoljund, quantity) };
-}
-
-function updatePurchasedSoljund(id: string, value: string | number) {
-    const current = resourceQuantities[id];
-    if (!current) return;
-    const quantity = Math.min(current.quantityPurchased, Math.max(0, Math.round(Number(value) || 0)));
-    resourceQuantities[id] = { ...current, quantityPurchasedSoljund: quantity };
-}
-
-function updateBarrelSoljund(id: string, value: string | number) {
-    const current = resourceQuantities[id];
-    if (!current) return;
-    const quantity = Math.min(current.quantityBarrel, Math.max(0, Math.round(Number(value) || 0)));
-    resourceQuantities[id] = { ...current, soljundQuantity: quantity };
+    if (current) resourceQuantities[id] = { ...current, quantityPurchased: quantity };
 }
 
 function updateMaterialQuantity(id: string, value: string | number) {
@@ -102,8 +80,6 @@ function submit() {
             resources: props.resources.map((r) => ({
                 resourceId: r.id,
                 quantityPurchased: resourceQuantities[r.id]?.quantityPurchased ?? 0,
-                quantityPurchasedSoljund: resourceQuantities[r.id]?.quantityPurchasedSoljund ?? 0,
-                quantityBarrelSoljund: resourceQuantities[r.id]?.soljundQuantity ?? 0,
             })),
         },
         { preserveScroll: true, onFinish: () => (isSubmitting.value = false) },
@@ -120,20 +96,12 @@ function submit() {
 
         <div class="space-y-3">
             <h2 class="font-serif text-2xl font-light">{{ t('admin.resources.types.minerai') }}</h2>
-            <StockResourceTable
-                :resources="minerais"
-                :quantities="resourceQuantities"
-                editable-purchased
-                :editable-soljund-resource-id="moonstoneResourceId"
-                @update-purchased="updatePurchased"
-                @update-purchased-soljund="updatePurchasedSoljund"
-                @update-barrel-soljund="updateBarrelSoljund"
-            />
+            <StockResourceTable :resources="minerais" :quantities="resourceQuantities" editable-purchased editable-barrel-total @update-purchased="updatePurchased" />
         </div>
 
         <div class="space-y-3">
             <h2 class="font-serif text-2xl font-light">{{ t('admin.resources.types.lingot') }}</h2>
-            <StockResourceTable :resources="lingots" :quantities="resourceQuantities" editable-purchased @update-purchased="updatePurchased" />
+            <StockResourceTable :resources="lingots" :quantities="resourceQuantities" editable-purchased editable-barrel-total @update-purchased="updatePurchased" />
         </div>
 
         <div class="flex items-center justify-end gap-2 text-lg">

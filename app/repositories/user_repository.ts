@@ -2,6 +2,7 @@ import type { TransactionClientContract } from '@adonisjs/lucid/types/database';
 import BaseRepository from '#repositories/base/base_repository';
 import User from '#models/user';
 import LicenseSubscriber from '#models/license_subscriber';
+import BarrelRental from '#models/barrel_rental';
 import Quote from '#models/quote';
 import Order from '#models/order';
 import ResourceBuyback from '#models/resource_buyback';
@@ -87,11 +88,6 @@ export default class UserRepository extends BaseRepository<typeof User> {
         await query.where('id', id).increment('balance', amount);
     }
 
-    public async incrementPickaxes(id: string, amount: number, trx?: TransactionClientContract): Promise<void> {
-        const query = trx ? User.query({ client: trx }) : User.query();
-        await query.where('id', id).increment('pickaxes', amount);
-    }
-
     /**
      * Manual override of the amount owed to a user, restricted to staff/admins by the caller
      * (only they can ever legitimately be owed money by the company).
@@ -110,6 +106,10 @@ export default class UserRepository extends BaseRepository<typeof User> {
     public async sumBalanceByRole(role: UserRoleEnum): Promise<number> {
         const result = await User.query().where('role', role).sum('balance as total').first();
         return Number(result?.$extras.total ?? 0);
+    }
+
+    public async findByRole(role: UserRoleEnum): Promise<User[]> {
+        return User.query().where('role', role).orderBy('username', 'asc');
     }
 
     public async findMembersForOrganization(organizationId: string): Promise<User[]> {
@@ -153,6 +153,13 @@ export default class UserRepository extends BaseRepository<typeof User> {
      */
     public async findEligibleForLicenseSubscription(): Promise<User[]> {
         return User.query().whereIn('role', [UserRoleEnum.CONTRACTOR, UserRoleEnum.CLIENT]).whereNotIn('id', LicenseSubscriber.query().select('userId')).orderBy('username', 'asc');
+    }
+
+    /**
+     * Every user not yet renting a barrel — open to any role, unlike license eligibility.
+     */
+    public async findEligibleForBarrelRental(): Promise<User[]> {
+        return User.query().whereNotIn('id', BarrelRental.query().select('userId')).orderBy('username', 'asc');
     }
 
     /**

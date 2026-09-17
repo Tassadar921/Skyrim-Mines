@@ -19,15 +19,15 @@ defineOptions({ layout: AdminLayout });
 
 const resourceTypes = ['minerai', 'lingot'] as const;
 
-type TonneauEntry = { userId: string; username: string; resourceId: string; resourceName: string; resourceType: string; quantity: number };
+type BarrelEntry = { userId: string; username: string; resourceId: string; resourceName: string; resourceType: string; quantity: number };
 
 const { t } = useI18n();
 const { isAdmin } = useAuth();
 const { pageTitle } = useAdminLayout();
-pageTitle.value = t('admin.tonneau.title');
+pageTitle.value = t('admin.barrel.title');
 
 const props = defineProps<{
-    entries: TonneauEntry[];
+    entries: BarrelEntry[];
     meta: { total: number; currentPage: number; lastPage: number; perPage: number };
     filters: { search: string; sort: string; dir: string; resourceType: string };
 }>();
@@ -48,7 +48,7 @@ function navigate(overrides: Record<string, string | number | undefined>) {
     for (const [k, v] of Object.entries(params)) {
         if (v !== undefined && v !== '') clean[k] = v;
     }
-    router.get(urlFor('admin.tonneau.index'), clean, { preserveState: true, preserveScroll: true });
+    router.get(urlFor('admin.barrel.index'), clean, { preserveState: true, preserveScroll: true });
 }
 
 function onSearchInput(value: string | number) {
@@ -76,11 +76,11 @@ function sortIcon(column: string) {
     return props.filters.dir === 'asc' ? ArrowUp : ArrowDown;
 }
 
-function entryKey(entry: TonneauEntry): string {
+function entryKey(entry: BarrelEntry): string {
     return `${entry.userId}:${entry.resourceId}`;
 }
 
-function toQuantityMap(entries: TonneauEntry[]): Record<string, number> {
+function toQuantityMap(entries: BarrelEntry[]): Record<string, number> {
     return Object.fromEntries(entries.map((entry) => [entryKey(entry), entry.quantity]));
 }
 
@@ -95,14 +95,14 @@ watch(
 
 const debounceTimers: Record<string, ReturnType<typeof setTimeout>> = {};
 
-function updateQuantity(entry: TonneauEntry, value: number) {
+function updateQuantity(entry: BarrelEntry, value: number) {
     const key = entryKey(entry);
     const quantity = Math.max(0, Math.round(value));
     quantities[key] = quantity;
 
     if (debounceTimers[key]) clearTimeout(debounceTimers[key]);
     debounceTimers[key] = setTimeout(() => {
-        router.patch(urlFor('admin.tonneau.update'), { userId: entry.userId, resourceId: entry.resourceId, quantity }, { preserveScroll: true, preserveState: true });
+        router.patch(urlFor('admin.barrel.update'), { userId: entry.userId, resourceId: entry.resourceId, quantity }, { preserveScroll: true, preserveState: true });
     }, 500);
 }
 
@@ -110,22 +110,22 @@ const hasActiveFilters = computed(() => !!props.filters.search || !!props.filter
 
 function resetFilters() {
     searchValue.value = '';
-    router.get(urlFor('admin.tonneau.index'), {}, { preserveState: true, preserveScroll: true });
+    router.get(urlFor('admin.barrel.index'), {}, { preserveState: true, preserveScroll: true });
 }
 </script>
 
 <template>
     <div class="space-y-4">
-        <p class="text-sm text-muted-foreground max-w-2xl">{{ t('admin.tonneau.description') }}</p>
+        <p class="text-sm text-muted-foreground max-w-2xl">{{ t('admin.barrel.description') }}</p>
 
         <div class="flex items-center gap-4">
-            <Input :placeholder="t('admin.tonneau.table.search')" :model-value="searchValue" class="max-w-sm" @update:model-value="onSearchInput" />
+            <Input :placeholder="t('admin.barrel.table.search')" :model-value="searchValue" class="max-w-sm" @update:model-value="onSearchInput" />
             <Select :model-value="filters.resourceType" @update:model-value="onResourceTypeFilterChange">
                 <SelectTrigger class="w-48">
                     <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                    <SelectItem value="all">{{ t('admin.tonneau.table.allTypes') }}</SelectItem>
+                    <SelectItem value="all">{{ t('admin.barrel.table.allTypes') }}</SelectItem>
                     <SelectItem v-for="type in resourceTypes" :key="type" :value="type">{{ t(`admin.resources.types.${type}`) }}</SelectItem>
                 </SelectContent>
             </Select>
@@ -141,18 +141,18 @@ function resetFilters() {
                     <TableRow>
                         <TableHead>
                             <Button variant="ghost" class="gap-1 px-2" @click="onSort('username')">
-                                {{ t('admin.tonneau.table.user') }}
+                                {{ t('admin.barrel.table.user') }}
                                 <component :is="sortIcon('username')" class="size-4" />
                             </Button>
                         </TableHead>
                         <TableHead>
                             <Button variant="ghost" class="gap-1 px-2" @click="onSort('resourceName')">
-                                {{ t('admin.tonneau.table.resource') }}
+                                {{ t('admin.barrel.table.resource') }}
                                 <component :is="sortIcon('resourceName')" class="size-4" />
                             </Button>
                         </TableHead>
-                        <TableHead>{{ t('admin.tonneau.table.type') }}</TableHead>
-                        <TableHead>{{ t('admin.tonneau.table.quantity') }}</TableHead>
+                        <TableHead>{{ t('admin.barrel.table.type') }}</TableHead>
+                        <TableHead>{{ t('admin.barrel.table.quantity') }}</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -171,7 +171,7 @@ function resetFilters() {
                     </template>
                     <TableRow v-else>
                         <TableCell :colspan="4" class="h-24 text-center text-muted-foreground">
-                            {{ t('admin.tonneau.table.empty') }}
+                            {{ t('admin.barrel.table.empty') }}
                         </TableCell>
                     </TableRow>
                 </TableBody>

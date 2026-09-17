@@ -7,6 +7,38 @@
 import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 
+export class BarrelRentalPaymentSchema extends BaseModel {
+  static $columns = ['amountPaid', 'createdAt', 'id', 'rentalId', 'updatedAt', 'weekNumber'] as const
+  $columns = BarrelRentalPaymentSchema.$columns
+  @column()
+  declare amountPaid: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare rentalId: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare weekNumber: number
+}
+
+export class BarrelRentalSchema extends BaseModel {
+  static $columns = ['createdAt', 'id', 'updatedAt', 'userId', 'weeklyRent'] as const
+  $columns = BarrelRentalSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare userId: string
+  @column()
+  declare weeklyRent: string
+}
+
 export class CastellanySchema extends BaseModel {
   static $columns = ['commissionAmount', 'createdAt', 'id', 'largeOrderFeeRate', 'name', 'updatedAt'] as const
   $columns = CastellanySchema.$columns
@@ -38,7 +70,7 @@ export class CastellanyTaxSchema extends BaseModel {
 }
 
 export class CompanyCapitalSnapshotSchema extends BaseModel {
-  static $columns = ['capital', 'createdAt', 'id', 'stockValue', 'updatedAt', 'weekNumber'] as const
+  static $columns = ['capital', 'createdAt', 'id', 'stockValue', 'updatedAt', 'weekNumber', 'weeklyTax'] as const
   $columns = CompanyCapitalSnapshotSchema.$columns
   @column()
   declare capital: string
@@ -52,6 +84,8 @@ export class CompanyCapitalSnapshotSchema extends BaseModel {
   declare updatedAt: DateTime | null
   @column()
   declare weekNumber: number
+  @column()
+  declare weeklyTax: string
 }
 
 export class DeliverySchema extends BaseModel {
@@ -390,7 +424,7 @@ export class ResourceBuybackBatchSchema extends BaseModel {
 }
 
 export class ResourceBuybackSchema extends BaseModel {
-  static $columns = ['amount', 'batchId', 'createdAt', 'id', 'quantity', 'resourceId', 'soljundQuantity', 'updatedAt', 'userId'] as const
+  static $columns = ['amount', 'batchId', 'createdAt', 'id', 'quantity', 'resourceId', 'updatedAt', 'userId'] as const
   $columns = ResourceBuybackSchema.$columns
   @column()
   declare amount: string
@@ -404,8 +438,6 @@ export class ResourceBuybackSchema extends BaseModel {
   declare quantity: number
   @column()
   declare resourceId: string
-  @column()
-  declare soljundQuantity: number
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
   @column()
@@ -413,7 +445,7 @@ export class ResourceBuybackSchema extends BaseModel {
 }
 
 export class ResourceDepositSchema extends BaseModel {
-  static $columns = ['createdAt', 'id', 'quantity', 'resourceId', 'soljundQuantity', 'updatedAt', 'userId'] as const
+  static $columns = ['createdAt', 'id', 'quantity', 'resourceId', 'updatedAt', 'userId'] as const
   $columns = ResourceDepositSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -423,27 +455,40 @@ export class ResourceDepositSchema extends BaseModel {
   declare quantity: number
   @column()
   declare resourceId: string
-  @column()
-  declare soljundQuantity: number
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
   @column()
   declare userId: string
 }
 
+export class ResourceRecipeLineSchema extends BaseModel {
+  static $columns = ['createdAt', 'id', 'ingredientResourceId', 'materialId', 'quantity', 'resourceId', 'updatedAt'] as const
+  $columns = ResourceRecipeLineSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare ingredientResourceId: string | null
+  @column()
+  declare materialId: string | null
+  @column()
+  declare quantity: number
+  @column()
+  declare resourceId: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class ResourceStockSchema extends BaseModel {
-  static $columns = ['createdAt', 'id', 'quantityBarrelSoljund', 'quantityPurchased', 'quantityPurchasedSoljund', 'resourceId', 'updatedAt'] as const
+  static $columns = ['createdAt', 'id', 'quantityPurchased', 'resourceId', 'updatedAt'] as const
   $columns = ResourceStockSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
   @column({ isPrimary: true })
   declare id: string
   @column()
-  declare quantityBarrelSoljund: number
-  @column()
   declare quantityPurchased: number
-  @column()
-  declare quantityPurchasedSoljund: number
   @column()
   declare resourceId: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })
@@ -472,7 +517,7 @@ export class ResourceSchema extends BaseModel {
 }
 
 export class UserSchema extends BaseModel {
-  static $columns = ['avatarId', 'balance', 'createdAt', 'discordId', 'enabled', 'id', 'lastLoginAt', 'organizationId', 'organizationRole', 'pickaxes', 'role', 'updatedAt', 'username'] as const
+  static $columns = ['avatarId', 'balance', 'createdAt', 'discordId', 'enabled', 'id', 'lastLoginAt', 'organizationId', 'organizationRole', 'role', 'updatedAt', 'username'] as const
   $columns = UserSchema.$columns
   @column()
   declare avatarId: string | null
@@ -492,8 +537,6 @@ export class UserSchema extends BaseModel {
   declare organizationId: string | null
   @column()
   declare organizationRole: string | null
-  @column()
-  declare pickaxes: number
   @column()
   declare role: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })
