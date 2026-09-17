@@ -84,7 +84,7 @@ watch(
                         </SidebarMenu>
                     </SidebarFooter>
                 </Sidebar>
-                <div class="min-h-screen flex flex-col w-full">
+                <div class="min-h-screen flex flex-col w-full min-w-0">
                     <nav class="flex items-center justify-between border-b w-full h-20 py-5">
                         <div class="flex items-center px-5">
                             <SidebarTrigger :size="32" class="p-4" />
