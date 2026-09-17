@@ -17,10 +17,6 @@ router.get('/tarifs', [controllers.Tarifs, 'index']).as('tarifs').use(middleware
 const companyOnly = middleware.admin({ roles: [UserRoleEnum.ADMIN, UserRoleEnum.AUDITOR, UserRoleEnum.STAFF] });
 router.get('/stocks', [controllers.Stocks, 'index']).as('stocks').use(middleware.auth()).use(companyOnly);
 router.get('/organigramme', [controllers.Organigramme, 'index']).as('organigramme').use(middleware.auth());
-router.get('/devis', [controllers.Devis, 'create']).as('devis.create').use(middleware.auth());
-router.post('/devis', [controllers.Devis, 'store']).as('devis.store').use(middleware.auth());
-router.get('/mes-devis', [controllers.Devis, 'index']).as('devis.index').use(middleware.auth());
-router.get('/devis/:id', [controllers.Devis, 'show']).as('devis.show').use(middleware.auth());
 router.get('/commandes', [controllers.Commandes, 'create']).as('commandes.create').use(middleware.auth());
 router.post('/commandes', [controllers.Commandes, 'store']).as('commandes.store').use(middleware.auth());
 router.get('/mes-commandes', [controllers.Commandes, 'index']).as('commandes.index').use(middleware.auth());
@@ -94,7 +90,9 @@ router
 
         router.get('/buybacks', [controllers.admin.Buybacks, 'index']).as('admin.buybacks.index').use(readOnly);
 
-        router.get('/devis', [controllers.admin.Devis, 'index']).as('admin.devis.index').use(readOnly);
+        router.get('/expenses', [controllers.admin.CompanyExpenses, 'index']).as('admin.expenses.index').use(readOnly);
+        router.post('/expenses', [controllers.admin.CompanyExpenses, 'store']).as('admin.expenses.store').use(middleware.admin());
+        router.delete('/expenses/:id', [controllers.admin.CompanyExpenses, 'destroy']).as('admin.expenses.destroy').use(middleware.admin());
 
         router.get('/commandes', [controllers.admin.Commandes, 'index']).as('admin.commandes.index').use(readOnly);
         router.patch('/commandes/:id/validate', [controllers.admin.Commandes, 'validate']).as('admin.commandes.validate').use(middleware.admin());
@@ -130,14 +128,6 @@ router
             .delete('/organizations/:id/resource-prices/:resourceId', [controllers.admin.Organizations, 'destroyResourcePrice'])
             .as('admin.organizations.resourcePrices.destroy')
             .use(middleware.admin());
-
-        router.get('/licenses', [controllers.admin.Licenses, 'index']).as('admin.licenses.index').use(readOnly);
-        router.put('/licenses/prices', [controllers.admin.Licenses, 'updatePrices']).as('admin.licenses.prices.update').use(middleware.admin());
-        router.post('/licenses/subscribers', [controllers.admin.Licenses, 'storeSubscriber']).as('admin.licenses.subscribers.store').use(middleware.admin());
-        router.get('/licenses/subscribers/:id', [controllers.admin.Licenses, 'showSubscriber']).as('admin.licenses.subscribers.show').use(readOnly);
-        router.delete('/licenses/subscribers/:id', [controllers.admin.Licenses, 'destroySubscriber']).as('admin.licenses.subscribers.destroy').use(middleware.admin());
-        router.post('/licenses/subscribers/:id/payments', [controllers.admin.Licenses, 'storePayment']).as('admin.licenses.payments.store').use(middleware.admin());
-        router.delete('/licenses/payments/:id', [controllers.admin.Licenses, 'destroyPayment']).as('admin.licenses.payments.destroy').use(middleware.admin());
     })
     .prefix('/admin')
     .use(middleware.auth());

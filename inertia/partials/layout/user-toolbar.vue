@@ -4,7 +4,7 @@ import { Link } from '@adonisjs/inertia/vue';
 import { urlFor } from '~/client';
 import Theme from '~/partials/layout/theme.vue';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '~/components/ui/dropdown-menu';
-import { UserCheck, FileText, ShoppingCart, LogOut } from '@lucide/vue';
+import { UserCheck, ShoppingCart, LogOut } from '@lucide/vue';
 import type { Data } from '@generated/data';
 
 const page = usePage<Data.SharedProps>();
@@ -26,12 +26,6 @@ const logout = () => {
                     <div class="font-medium">{{ page.props.user.username }}</div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem class="gap-2 cursor-pointer" as-child>
-                    <Link :href="urlFor('devis.index')">
-                        <FileText class="size-4" aria-hidden="true" />
-                        {{ $t('devis.index.navLink') }}
-                    </Link>
-                </DropdownMenuItem>
                 <DropdownMenuItem class="gap-2 cursor-pointer" as-child>
                     <Link :href="urlFor('commandes.index')">
                         <ShoppingCart class="size-4" aria-hidden="true" />

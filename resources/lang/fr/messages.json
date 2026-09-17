@@ -60,7 +60,7 @@
             "destroy": {
                 "success": "Utilisateur supprimé avec succès",
                 "error": "Erreur lors de la suppression de l'utilisateur",
-                "linked": "Impossible de supprimer cet utilisateur : des devis, commandes ou mouvements de ressources lui sont liés. Désactivez plutôt son compte.",
+                "linked": "Impossible de supprimer cet utilisateur : des commandes ou mouvements de ressources lui sont liés. Désactivez plutôt son compte.",
                 "self": "Vous ne pouvez pas supprimer votre propre compte"
             }
         },
@@ -168,38 +168,6 @@
                 }
             }
         },
-        "licenses": {
-            "prices": {
-                "update": {
-                    "success": "Tarifs mis à jour avec succès",
-                    "error": "Erreur lors de la mise à jour des tarifs"
-                }
-            },
-            "subscribers": {
-                "create": {
-                    "success": "Inscription ajoutée avec succès",
-                    "error": "Erreur lors de l'ajout de l'inscription",
-                    "missingUser": "Veuillez sélectionner un contractor ou un client",
-                    "userNotEligible": "Cet utilisateur doit être contractor ou client, et ne pas déjà être inscrit",
-                    "missingFields": "Veuillez renseigner l'identifiant Discord, le nom d'utilisateur et le rôle",
-                    "discordIdTaken": "Cet identifiant Discord est déjà utilisé par un autre compte"
-                },
-                "destroy": {
-                    "success": "Inscription supprimée avec succès",
-                    "error": "Erreur lors de la suppression de l'inscription"
-                }
-            },
-            "payments": {
-                "create": {
-                    "success": "Paiement enregistré avec succès",
-                    "error": "Erreur lors de l'enregistrement du paiement"
-                },
-                "destroy": {
-                    "success": "Paiement supprimé avec succès",
-                    "error": "Erreur lors de la suppression du paiement"
-                }
-            }
-        },
         "barrelRentals": {
             "create": {
                 "success": "Locataire ajouté avec succès",
@@ -223,6 +191,16 @@
                     "error": "Erreur lors de la suppression du paiement"
                 }
             }
+        },
+        "expenses": {
+            "create": {
+                "success": "Dépense ajoutée avec succès",
+                "error": "Erreur lors de l'ajout de la dépense"
+            },
+            "destroy": {
+                "success": "Dépense supprimée avec succès",
+                "error": "Erreur lors de la suppression de la dépense"
+            }
         }
     },
     "deposits": {
@@ -242,15 +220,6 @@
         "create": {
             "success": "Rachat effectué avec succès",
             "error": "Erreur lors du rachat"
-        }
-    },
-    "devis": {
-        "create": {
-            "success": "Devis généré avec succès",
-            "error": "Erreur lors de la génération du devis"
-        },
-        "show": {
-            "forbidden": "L'accès à ce devis vous est interdit"
         }
     },
     "commandes": {

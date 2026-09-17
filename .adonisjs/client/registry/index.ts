@@ -48,30 +48,6 @@ const routes = {
     tokens: [{"old":"/organigramme","type":0,"val":"organigramme","end":""}],
     types: placeholder as Registry['organigramme']['types'],
   },
-  'devis.create': {
-    methods: ["GET","HEAD"],
-    pattern: '/devis',
-    tokens: [{"old":"/devis","type":0,"val":"devis","end":""}],
-    types: placeholder as Registry['devis.create']['types'],
-  },
-  'devis.store': {
-    methods: ["POST"],
-    pattern: '/devis',
-    tokens: [{"old":"/devis","type":0,"val":"devis","end":""}],
-    types: placeholder as Registry['devis.store']['types'],
-  },
-  'devis.index': {
-    methods: ["GET","HEAD"],
-    pattern: '/mes-devis',
-    tokens: [{"old":"/mes-devis","type":0,"val":"mes-devis","end":""}],
-    types: placeholder as Registry['devis.index']['types'],
-  },
-  'devis.show': {
-    methods: ["GET","HEAD"],
-    pattern: '/devis/:id',
-    tokens: [{"old":"/devis/:id","type":0,"val":"devis","end":""},{"old":"/devis/:id","type":1,"val":"id","end":""}],
-    types: placeholder as Registry['devis.show']['types'],
-  },
   'commandes.create': {
     methods: ["GET","HEAD"],
     pattern: '/commandes',
@@ -402,11 +378,23 @@ const routes = {
     tokens: [{"old":"/admin/buybacks","type":0,"val":"admin","end":""},{"old":"/admin/buybacks","type":0,"val":"buybacks","end":""}],
     types: placeholder as Registry['admin.buybacks.index']['types'],
   },
-  'admin.devis.index': {
+  'admin.expenses.index': {
     methods: ["GET","HEAD"],
-    pattern: '/admin/devis',
-    tokens: [{"old":"/admin/devis","type":0,"val":"admin","end":""},{"old":"/admin/devis","type":0,"val":"devis","end":""}],
-    types: placeholder as Registry['admin.devis.index']['types'],
+    pattern: '/admin/expenses',
+    tokens: [{"old":"/admin/expenses","type":0,"val":"admin","end":""},{"old":"/admin/expenses","type":0,"val":"expenses","end":""}],
+    types: placeholder as Registry['admin.expenses.index']['types'],
+  },
+  'admin.expenses.store': {
+    methods: ["POST"],
+    pattern: '/admin/expenses',
+    tokens: [{"old":"/admin/expenses","type":0,"val":"admin","end":""},{"old":"/admin/expenses","type":0,"val":"expenses","end":""}],
+    types: placeholder as Registry['admin.expenses.store']['types'],
+  },
+  'admin.expenses.destroy': {
+    methods: ["DELETE"],
+    pattern: '/admin/expenses/:id',
+    tokens: [{"old":"/admin/expenses/:id","type":0,"val":"admin","end":""},{"old":"/admin/expenses/:id","type":0,"val":"expenses","end":""},{"old":"/admin/expenses/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['admin.expenses.destroy']['types'],
   },
   'admin.commandes.index': {
     methods: ["GET","HEAD"],
@@ -569,48 +557,6 @@ const routes = {
     pattern: '/admin/organizations/:id/resource-prices/:resourceId',
     tokens: [{"old":"/admin/organizations/:id/resource-prices/:resourceId","type":0,"val":"admin","end":""},{"old":"/admin/organizations/:id/resource-prices/:resourceId","type":0,"val":"organizations","end":""},{"old":"/admin/organizations/:id/resource-prices/:resourceId","type":1,"val":"id","end":""},{"old":"/admin/organizations/:id/resource-prices/:resourceId","type":0,"val":"resource-prices","end":""},{"old":"/admin/organizations/:id/resource-prices/:resourceId","type":1,"val":"resourceId","end":""}],
     types: placeholder as Registry['admin.organizations.resourcePrices.destroy']['types'],
-  },
-  'admin.licenses.index': {
-    methods: ["GET","HEAD"],
-    pattern: '/admin/licenses',
-    tokens: [{"old":"/admin/licenses","type":0,"val":"admin","end":""},{"old":"/admin/licenses","type":0,"val":"licenses","end":""}],
-    types: placeholder as Registry['admin.licenses.index']['types'],
-  },
-  'admin.licenses.prices.update': {
-    methods: ["PUT"],
-    pattern: '/admin/licenses/prices',
-    tokens: [{"old":"/admin/licenses/prices","type":0,"val":"admin","end":""},{"old":"/admin/licenses/prices","type":0,"val":"licenses","end":""},{"old":"/admin/licenses/prices","type":0,"val":"prices","end":""}],
-    types: placeholder as Registry['admin.licenses.prices.update']['types'],
-  },
-  'admin.licenses.subscribers.store': {
-    methods: ["POST"],
-    pattern: '/admin/licenses/subscribers',
-    tokens: [{"old":"/admin/licenses/subscribers","type":0,"val":"admin","end":""},{"old":"/admin/licenses/subscribers","type":0,"val":"licenses","end":""},{"old":"/admin/licenses/subscribers","type":0,"val":"subscribers","end":""}],
-    types: placeholder as Registry['admin.licenses.subscribers.store']['types'],
-  },
-  'admin.licenses.subscribers.show': {
-    methods: ["GET","HEAD"],
-    pattern: '/admin/licenses/subscribers/:id',
-    tokens: [{"old":"/admin/licenses/subscribers/:id","type":0,"val":"admin","end":""},{"old":"/admin/licenses/subscribers/:id","type":0,"val":"licenses","end":""},{"old":"/admin/licenses/subscribers/:id","type":0,"val":"subscribers","end":""},{"old":"/admin/licenses/subscribers/:id","type":1,"val":"id","end":""}],
-    types: placeholder as Registry['admin.licenses.subscribers.show']['types'],
-  },
-  'admin.licenses.subscribers.destroy': {
-    methods: ["DELETE"],
-    pattern: '/admin/licenses/subscribers/:id',
-    tokens: [{"old":"/admin/licenses/subscribers/:id","type":0,"val":"admin","end":""},{"old":"/admin/licenses/subscribers/:id","type":0,"val":"licenses","end":""},{"old":"/admin/licenses/subscribers/:id","type":0,"val":"subscribers","end":""},{"old":"/admin/licenses/subscribers/:id","type":1,"val":"id","end":""}],
-    types: placeholder as Registry['admin.licenses.subscribers.destroy']['types'],
-  },
-  'admin.licenses.payments.store': {
-    methods: ["POST"],
-    pattern: '/admin/licenses/subscribers/:id/payments',
-    tokens: [{"old":"/admin/licenses/subscribers/:id/payments","type":0,"val":"admin","end":""},{"old":"/admin/licenses/subscribers/:id/payments","type":0,"val":"licenses","end":""},{"old":"/admin/licenses/subscribers/:id/payments","type":0,"val":"subscribers","end":""},{"old":"/admin/licenses/subscribers/:id/payments","type":1,"val":"id","end":""},{"old":"/admin/licenses/subscribers/:id/payments","type":0,"val":"payments","end":""}],
-    types: placeholder as Registry['admin.licenses.payments.store']['types'],
-  },
-  'admin.licenses.payments.destroy': {
-    methods: ["DELETE"],
-    pattern: '/admin/licenses/payments/:id',
-    tokens: [{"old":"/admin/licenses/payments/:id","type":0,"val":"admin","end":""},{"old":"/admin/licenses/payments/:id","type":0,"val":"licenses","end":""},{"old":"/admin/licenses/payments/:id","type":0,"val":"payments","end":""},{"old":"/admin/licenses/payments/:id","type":1,"val":"id","end":""}],
-    types: placeholder as Registry['admin.licenses.payments.destroy']['types'],
   },
 } as const satisfies Record<string, AdonisEndpoint>
 

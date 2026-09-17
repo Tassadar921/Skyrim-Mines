@@ -11,10 +11,6 @@ export type ScannedRoutes = {
     'tarifs': { paramsTuple?: []; params?: {} }
     'stocks': { paramsTuple?: []; params?: {} }
     'organigramme': { paramsTuple?: []; params?: {} }
-    'devis.create': { paramsTuple?: []; params?: {} }
-    'devis.store': { paramsTuple?: []; params?: {} }
-    'devis.index': { paramsTuple?: []; params?: {} }
-    'devis.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'commandes.create': { paramsTuple?: []; params?: {} }
     'commandes.store': { paramsTuple?: []; params?: {} }
     'commandes.index': { paramsTuple?: []; params?: {} }
@@ -70,7 +66,9 @@ export type ScannedRoutes = {
     'admin.stocks.update': { paramsTuple?: []; params?: {} }
     'admin.stocks.barrel.update': { paramsTuple: [ParamValue]; params: {'resourceId': ParamValue} }
     'admin.buybacks.index': { paramsTuple?: []; params?: {} }
-    'admin.devis.index': { paramsTuple?: []; params?: {} }
+    'admin.expenses.index': { paramsTuple?: []; params?: {} }
+    'admin.expenses.store': { paramsTuple?: []; params?: {} }
+    'admin.expenses.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.commandes.index': { paramsTuple?: []; params?: {} }
     'admin.commandes.validate': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.commandes.cancel': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -98,13 +96,6 @@ export type ScannedRoutes = {
     'admin.organizations.members.updateRole': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'memberId': ParamValue} }
     'admin.organizations.resourcePrices.update': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'resourceId': ParamValue} }
     'admin.organizations.resourcePrices.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'resourceId': ParamValue} }
-    'admin.licenses.index': { paramsTuple?: []; params?: {} }
-    'admin.licenses.prices.update': { paramsTuple?: []; params?: {} }
-    'admin.licenses.subscribers.store': { paramsTuple?: []; params?: {} }
-    'admin.licenses.subscribers.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'admin.licenses.subscribers.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'admin.licenses.payments.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'admin.licenses.payments.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   GET: {
     'event_stream': { paramsTuple?: []; params?: {} }
@@ -112,9 +103,6 @@ export type ScannedRoutes = {
     'tarifs': { paramsTuple?: []; params?: {} }
     'stocks': { paramsTuple?: []; params?: {} }
     'organigramme': { paramsTuple?: []; params?: {} }
-    'devis.create': { paramsTuple?: []; params?: {} }
-    'devis.index': { paramsTuple?: []; params?: {} }
-    'devis.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'commandes.create': { paramsTuple?: []; params?: {} }
     'commandes.index': { paramsTuple?: []; params?: {} }
     'commandes.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -138,7 +126,7 @@ export type ScannedRoutes = {
     'admin.castellanies.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.stocks.index': { paramsTuple?: []; params?: {} }
     'admin.buybacks.index': { paramsTuple?: []; params?: {} }
-    'admin.devis.index': { paramsTuple?: []; params?: {} }
+    'admin.expenses.index': { paramsTuple?: []; params?: {} }
     'admin.commandes.index': { paramsTuple?: []; params?: {} }
     'admin.orderArchives.create': { paramsTuple?: []; params?: {} }
     'admin.livraisons.index': { paramsTuple?: []; params?: {} }
@@ -148,8 +136,6 @@ export type ScannedRoutes = {
     'admin.organizations.index': { paramsTuple?: []; params?: {} }
     'admin.organizations.create': { paramsTuple?: []; params?: {} }
     'admin.organizations.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'admin.licenses.index': { paramsTuple?: []; params?: {} }
-    'admin.licenses.subscribers.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   HEAD: {
     'event_stream': { paramsTuple?: []; params?: {} }
@@ -157,9 +143,6 @@ export type ScannedRoutes = {
     'tarifs': { paramsTuple?: []; params?: {} }
     'stocks': { paramsTuple?: []; params?: {} }
     'organigramme': { paramsTuple?: []; params?: {} }
-    'devis.create': { paramsTuple?: []; params?: {} }
-    'devis.index': { paramsTuple?: []; params?: {} }
-    'devis.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'commandes.create': { paramsTuple?: []; params?: {} }
     'commandes.index': { paramsTuple?: []; params?: {} }
     'commandes.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -183,7 +166,7 @@ export type ScannedRoutes = {
     'admin.castellanies.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.stocks.index': { paramsTuple?: []; params?: {} }
     'admin.buybacks.index': { paramsTuple?: []; params?: {} }
-    'admin.devis.index': { paramsTuple?: []; params?: {} }
+    'admin.expenses.index': { paramsTuple?: []; params?: {} }
     'admin.commandes.index': { paramsTuple?: []; params?: {} }
     'admin.orderArchives.create': { paramsTuple?: []; params?: {} }
     'admin.livraisons.index': { paramsTuple?: []; params?: {} }
@@ -193,13 +176,10 @@ export type ScannedRoutes = {
     'admin.organizations.index': { paramsTuple?: []; params?: {} }
     'admin.organizations.create': { paramsTuple?: []; params?: {} }
     'admin.organizations.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'admin.licenses.index': { paramsTuple?: []; params?: {} }
-    'admin.licenses.subscribers.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   POST: {
     'subscribe': { paramsTuple?: []; params?: {} }
     'unsubscribe': { paramsTuple?: []; params?: {} }
-    'devis.store': { paramsTuple?: []; params?: {} }
     'commandes.store': { paramsTuple?: []; params?: {} }
     'livraisons.store': { paramsTuple: [ParamValue]; params: {'orderId': ParamValue} }
     'deposits.store': { paramsTuple?: []; params?: {} }
@@ -211,13 +191,12 @@ export type ScannedRoutes = {
     'admin.resources.store': { paramsTuple?: []; params?: {} }
     'admin.materials.store': { paramsTuple?: []; params?: {} }
     'admin.castellanies.store': { paramsTuple?: []; params?: {} }
+    'admin.expenses.store': { paramsTuple?: []; params?: {} }
     'admin.orderArchives.store': { paramsTuple?: []; params?: {} }
     'admin.barrelRentals.store': { paramsTuple?: []; params?: {} }
     'admin.barrelRentals.payments.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.organizations.store': { paramsTuple?: []; params?: {} }
     'admin.organizations.members.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'admin.licenses.subscribers.store': { paramsTuple?: []; params?: {} }
-    'admin.licenses.payments.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   PATCH: {
     'commandes.cancel': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -239,14 +218,13 @@ export type ScannedRoutes = {
     'admin.resources.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.materials.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.castellanies.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.expenses.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.livraisons.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.barrelRentals.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.barrelRentals.payments.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.organizations.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.organizations.members.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'memberId': ParamValue} }
     'admin.organizations.resourcePrices.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'resourceId': ParamValue} }
-    'admin.licenses.subscribers.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'admin.licenses.payments.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   PUT: {
     'admin.dashboard.castellanyTax.update': { paramsTuple?: []; params?: {} }
@@ -260,7 +238,6 @@ export type ScannedRoutes = {
     'admin.barrelRentals.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.organizations.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.organizations.resourcePrices.update': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'resourceId': ParamValue} }
-    'admin.licenses.prices.update': { paramsTuple?: []; params?: {} }
   }
 }
 declare module '@adonisjs/core/types/http' {

@@ -59,14 +59,6 @@ onUnmounted(removeSuccessListener);
                     </li>
                     <li>
                         <Link
-                            route="devis.create"
-                            class="text-[11px] tracking-widest uppercase text-slate-500 dark:text-slate-400 hover:text-amber-700 hover:dark:text-amber-400 transition-colors duration-300"
-                        >
-                            {{ $t('layout.nav.devis') }}
-                        </Link>
-                    </li>
-                    <li>
-                        <Link
                             route="commandes.create"
                             class="text-[11px] tracking-widest uppercase text-slate-500 dark:text-slate-400 hover:text-amber-700 hover:dark:text-amber-400 transition-colors duration-300"
                         >

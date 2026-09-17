@@ -31,7 +31,6 @@ type WeeklyRecap = {
     profit: number;
     weeklyTax: number;
     taxRate: number;
-    licensesAmount: number;
     capital: number | null;
     stockValue: number | null;
     totalCapital: number | null;
@@ -96,8 +95,8 @@ function submitCapitalSnapshot() {
 
 <template>
     <div class="space-y-4">
-        <div class="flex flex-wrap gap-4">
-            <div class="rounded-md border p-5 space-y-4 w-full max-w-xs">
+        <div class="flex flex-nowrap gap-4">
+            <div class="rounded-md border p-5 space-y-4 flex-1 min-w-0">
                 <div class="text-sm font-medium">{{ t('admin.dashboard.castellanyTax.title') }}</div>
                 <Input v-model="castellanyTaxRate" type="number" :label="t('admin.dashboard.castellanyTax.rate')" min="0" :max="100" step="1" :readonly="!isAdmin" />
                 <Button v-if="isAdmin" size="sm" :loading="isSubmittingCastellanyTax" :disabled="isSubmittingCastellanyTax" @click="submitCastellanyTax">
@@ -105,7 +104,7 @@ function submitCapitalSnapshot() {
                 </Button>
             </div>
 
-            <div class="rounded-md border p-5 space-y-4 w-full max-w-xs">
+            <div class="rounded-md border p-5 space-y-4 flex-1 min-w-0">
                 <div class="text-sm font-medium">{{ t('admin.dashboard.largeOrderSetting.title') }}</div>
                 <Input v-model="largeOrderThresholdQuantity" type="number" :label="t('admin.dashboard.largeOrderSetting.threshold')" min="0" step="1" :readonly="!isAdmin" />
                 <Button v-if="isAdmin" size="sm" :loading="isSubmittingLargeOrderSetting" :disabled="isSubmittingLargeOrderSetting" @click="submitLargeOrderSetting">
@@ -113,7 +112,7 @@ function submitCapitalSnapshot() {
                 </Button>
             </div>
 
-            <div class="rounded-md border p-5 space-y-3 w-full max-w-xs">
+            <div class="rounded-md border p-5 space-y-3 flex-1 min-w-0">
                 <div class="text-sm font-medium">{{ t('admin.dashboard.amountsDue.title') }}</div>
                 <div class="text-sm flex items-center justify-between">
                     <span class="text-muted-foreground">{{ t('admin.dashboard.amountsDue.employees') }}</span>
@@ -125,7 +124,7 @@ function submitCapitalSnapshot() {
                 </div>
             </div>
 
-            <div class="rounded-md border p-5 space-y-4 w-full max-w-xs">
+            <div class="rounded-md border p-5 space-y-4 flex-1 min-w-0">
                 <div class="text-sm font-medium">{{ t('admin.dashboard.capitalSnapshot.title') }}</div>
                 <template v-if="currentWeekRecap && currentWeekRecap.capital !== null && currentWeekRecap.stockValue !== null">
                     <div class="text-sm flex items-center justify-between">
@@ -182,7 +181,6 @@ function submitCapitalSnapshot() {
                         </TableHead>
                         <TableHead>{{ t('admin.dashboard.weeklyRecap.weeklyTax') }}</TableHead>
                         <TableHead>{{ t('admin.dashboard.weeklyRecap.taxRate') }}</TableHead>
-                        <TableHead>{{ t('admin.dashboard.weeklyRecap.licenses') }}</TableHead>
                         <TableHead>{{ t('admin.dashboard.weeklyRecap.capital') }}</TableHead>
                         <TableHead>{{ t('admin.dashboard.weeklyRecap.stockValue') }}</TableHead>
                     </TableRow>
@@ -203,13 +201,12 @@ function submitCapitalSnapshot() {
                             </TableCell>
                             <TableCell class="text-sm">{{ formatAmount(recap.weeklyTax) }}</TableCell>
                             <TableCell class="text-sm text-muted-foreground">{{ recap.taxRate }} %</TableCell>
-                            <TableCell class="text-sm">{{ formatAmount(recap.licensesAmount) }}</TableCell>
                             <TableCell class="text-sm">{{ formatAmountOrDash(recap.capital) }}</TableCell>
                             <TableCell class="text-sm">{{ formatAmountOrDash(recap.stockValue) }}</TableCell>
                         </TableRow>
                     </template>
                     <TableRow v-else>
-                        <TableCell colspan="8" class="text-center text-sm text-muted-foreground py-6">
+                        <TableCell colspan="7" class="text-center text-sm text-muted-foreground py-6">
                             {{ t('admin.dashboard.weeklyRecap.empty') }}
                         </TableCell>
                     </TableRow>

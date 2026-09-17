@@ -9,12 +9,6 @@ export interface ApiDefinition {
   tarifs: typeof routes['tarifs']
   stocks: typeof routes['stocks']
   organigramme: typeof routes['organigramme']
-  devis: {
-    create: typeof routes['devis.create']
-    store: typeof routes['devis.store']
-    index: typeof routes['devis.index']
-    show: typeof routes['devis.show']
-  }
   commandes: {
     create: typeof routes['commandes.create']
     store: typeof routes['commandes.store']
@@ -110,8 +104,10 @@ export interface ApiDefinition {
     buybacks: {
       index: typeof routes['admin.buybacks.index']
     }
-    devis: {
-      index: typeof routes['admin.devis.index']
+    expenses: {
+      index: typeof routes['admin.expenses.index']
+      store: typeof routes['admin.expenses.store']
+      destroy: typeof routes['admin.expenses.destroy']
     }
     commandes: {
       index: typeof routes['admin.commandes.index']
@@ -156,21 +152,6 @@ export interface ApiDefinition {
       resourcePrices: {
         update: typeof routes['admin.organizations.resourcePrices.update']
         destroy: typeof routes['admin.organizations.resourcePrices.destroy']
-      }
-    }
-    licenses: {
-      index: typeof routes['admin.licenses.index']
-      prices: {
-        update: typeof routes['admin.licenses.prices.update']
-      }
-      subscribers: {
-        store: typeof routes['admin.licenses.subscribers.store']
-        show: typeof routes['admin.licenses.subscribers.show']
-        destroy: typeof routes['admin.licenses.subscribers.destroy']
-      }
-      payments: {
-        store: typeof routes['admin.licenses.payments.store']
-        destroy: typeof routes['admin.licenses.payments.destroy']
       }
     }
   }

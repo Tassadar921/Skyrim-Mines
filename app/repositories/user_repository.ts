@@ -1,9 +1,7 @@
 import type { TransactionClientContract } from '@adonisjs/lucid/types/database';
 import BaseRepository from '#repositories/base/base_repository';
 import User from '#models/user';
-import LicenseSubscriber from '#models/license_subscriber';
 import BarrelRental from '#models/barrel_rental';
-import Quote from '#models/quote';
 import Order from '#models/order';
 import ResourceBuyback from '#models/resource_buyback';
 import ResourceDeposit from '#models/resource_deposit';
@@ -125,7 +123,7 @@ export default class UserRepository extends BaseRepository<typeof User> {
 
     /**
      * All clients and auditors, whether independent or already tied to an organization. Used by staff/admins
-     * to pick a third-party recipient when requesting a quote on someone else's behalf.
+     * to pick a third-party recipient when placing an order on someone else's behalf.
      */
     public async findAllClients(): Promise<User[]> {
         return User.query().whereIn('role', [UserRoleEnum.CLIENT, UserRoleEnum.AUDITOR]).orderBy('username', 'asc');
@@ -149,34 +147,25 @@ export default class UserRepository extends BaseRepository<typeof User> {
     }
 
     /**
-     * Contractors and clients not already enrolled in the license tracking roster.
-     */
-    public async findEligibleForLicenseSubscription(): Promise<User[]> {
-        return User.query().whereIn('role', [UserRoleEnum.CONTRACTOR, UserRoleEnum.CLIENT]).whereNotIn('id', LicenseSubscriber.query().select('userId')).orderBy('username', 'asc');
-    }
-
-    /**
-     * Every user not yet renting a barrel — open to any role, unlike license eligibility.
+     * Every user not yet renting a barrel — open to any role.
      */
     public async findEligibleForBarrelRental(): Promise<User[]> {
         return User.query().whereNotIn('id', BarrelRental.query().select('userId')).orderBy('username', 'asc');
     }
 
     /**
-     * True if deleting this user would cascade-delete business records (quotes, orders, resource
-     * buybacks/deposits, license subscription). Those relations are ON DELETE CASCADE, so deletion
-     * must be blocked whenever any of them exist to avoid silently wiping accounting history.
+     * True if deleting this user would cascade-delete business records (orders, resource
+     * buybacks/deposits). Those relations are ON DELETE CASCADE, so deletion must be blocked
+     * whenever any of them exist to avoid silently wiping accounting history.
      */
     public async hasLinkedRecords(id: string): Promise<boolean> {
-        const [quote, order, buyback, deposit, licenseSubscriber] = await Promise.all([
-            Quote.query().where('userId', id).first(),
+        const [order, buyback, deposit] = await Promise.all([
             Order.query().where('userId', id).first(),
             ResourceBuyback.query().where('userId', id).first(),
             ResourceDeposit.query().where('userId', id).first(),
-            LicenseSubscriber.query().where('userId', id).first(),
         ]);
 
-        return Boolean(quote || order || buyback || deposit || licenseSubscriber);
+        return Boolean(order || buyback || deposit);
     }
 
     public async delete(id: string): Promise<void> {

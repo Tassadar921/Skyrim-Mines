@@ -90,6 +90,25 @@ export class CompanyCapitalSnapshotSchema extends BaseModel {
   declare weeklyTax: string
 }
 
+export class CompanyExpenseSchema extends BaseModel {
+  static $columns = ['amount', 'createdAt', 'id', 'label', 'title', 'updatedAt', 'weekNumber'] as const
+  $columns = CompanyExpenseSchema.$columns
+  @column()
+  declare amount: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare label: string
+  @column()
+  declare title: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare weekNumber: number
+}
+
 export class DeliverySchema extends BaseModel {
   static $columns = ['castellanyId', 'commissionAmount', 'createdAt', 'deliveredAt', 'deliveredByUserId', 'deliveredWeekNumber', 'id', 'largeOrderFeeAmount', 'orderId', 'updatedAt'] as const
   $columns = DeliverySchema.$columns
@@ -172,53 +191,6 @@ export class LargeOrderSettingSchema extends BaseModel {
   declare thresholdQuantity: number
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
-}
-
-export class LicensePaymentSchema extends BaseModel {
-  static $columns = ['amountPaid', 'createdAt', 'id', 'isCitizen', 'subscriberId', 'updatedAt', 'weekNumber'] as const
-  $columns = LicensePaymentSchema.$columns
-  @column()
-  declare amountPaid: string
-  @column.dateTime({ autoCreate: true })
-  declare createdAt: DateTime
-  @column({ isPrimary: true })
-  declare id: string
-  @column()
-  declare isCitizen: boolean
-  @column()
-  declare subscriberId: string
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
-  declare updatedAt: DateTime | null
-  @column()
-  declare weekNumber: number
-}
-
-export class LicensePriceSchema extends BaseModel {
-  static $columns = ['citizenPrice', 'createdAt', 'id', 'nonCitizenPrice', 'updatedAt'] as const
-  $columns = LicensePriceSchema.$columns
-  @column()
-  declare citizenPrice: string
-  @column.dateTime({ autoCreate: true })
-  declare createdAt: DateTime
-  @column({ isPrimary: true })
-  declare id: string
-  @column()
-  declare nonCitizenPrice: string
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
-  declare updatedAt: DateTime | null
-}
-
-export class LicenseSubscriberSchema extends BaseModel {
-  static $columns = ['createdAt', 'id', 'updatedAt', 'userId'] as const
-  $columns = LicenseSubscriberSchema.$columns
-  @column.dateTime({ autoCreate: true })
-  declare createdAt: DateTime
-  @column({ isPrimary: true })
-  declare id: string
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
-  declare updatedAt: DateTime | null
-  @column()
-  declare userId: string
 }
 
 export class MaterialStockSchema extends BaseModel {
@@ -339,58 +311,6 @@ export class OrganizationSchema extends BaseModel {
   declare name: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
-}
-
-export class QuoteLineSchema extends BaseModel {
-  static $columns = ['createdAt', 'id', 'quantity', 'quoteId', 'resourceId', 'resourceName', 'resourceType', 'totalPrice', 'unitPrice', 'updatedAt'] as const
-  $columns = QuoteLineSchema.$columns
-  @column.dateTime({ autoCreate: true })
-  declare createdAt: DateTime
-  @column({ isPrimary: true })
-  declare id: string
-  @column()
-  declare quantity: number
-  @column()
-  declare quoteId: string
-  @column()
-  declare resourceId: string | null
-  @column()
-  declare resourceName: string
-  @column()
-  declare resourceType: string
-  @column()
-  declare totalPrice: string
-  @column()
-  declare unitPrice: string
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
-  declare updatedAt: DateTime | null
-}
-
-export class QuoteSchema extends BaseModel {
-  static $columns = ['createdAt', 'fileId', 'id', 'number', 'organizationId', 'organizationName', 'recipientUserId', 'requesterName', 'totalAmount', 'updatedAt', 'userId'] as const
-  $columns = QuoteSchema.$columns
-  @column.dateTime({ autoCreate: true })
-  declare createdAt: DateTime
-  @column()
-  declare fileId: string | null
-  @column({ isPrimary: true })
-  declare id: string
-  @column()
-  declare number: number
-  @column()
-  declare organizationId: string | null
-  @column()
-  declare organizationName: string | null
-  @column()
-  declare recipientUserId: string | null
-  @column()
-  declare requesterName: string
-  @column()
-  declare totalAmount: string
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
-  declare updatedAt: DateTime | null
-  @column()
-  declare userId: string
 }
 
 export class ResourceBarrelAdjustmentSchema extends BaseModel {
