@@ -19,7 +19,7 @@ export default class BarrelRentalsController {
     public async index({ inertia, request }: HttpContext) {
         const { page, sort, dir, search, status } = await request.validateUsing(indexBarrelRentalValidator);
 
-        const currentSort = sort ?? 'username';
+        const currentSort = sort ?? 'label';
         const currentDir = dir ?? 'asc';
         const currentPage = page ?? 1;
         const perPage = 20;
@@ -67,7 +67,7 @@ export default class BarrelRentalsController {
         const data = await request.validateUsing(storeBarrelRentalValidator);
 
         try {
-            await this.barrelRentalRepository.create({ userId: data.userId, weeklyRent: String(data.weeklyRent) });
+            await this.barrelRentalRepository.create({ label: data.label, price: String(data.price), userId: data.userId });
             session.flash('success', i18n.t('messages.admin.barrelRentals.create.success'));
         } catch (e) {
             logger.error({ err: e }, 'barrelRentals.store failed');
@@ -81,6 +81,7 @@ export default class BarrelRentalsController {
         const rental = await this.barrelRentalRepository.findOrFail(params.id);
         const payments = await this.barrelRentalPaymentRepository.findForRental(params.id);
         const currentWeek = getWeekNumber(DateTime.now());
+        const eligibleUsers = await this.userRepository.findEligibleForBarrelRental(params.id);
 
         const availableWeeks = [currentWeek, currentWeek + 1, currentWeek + 2, currentWeek + 3].map((weekNumber) => {
             const { start, end } = getWeekRange(weekNumber);
@@ -90,9 +91,11 @@ export default class BarrelRentalsController {
         return inertia.render('admin/barrel-rentals/show', {
             rental: {
                 id: rental.id,
-                username: rental.user.username,
-                role: rental.user.role,
-                weeklyRent: Number(rental.weeklyRent),
+                label: rental.label,
+                price: Number(rental.price),
+                userId: rental.userId,
+                username: rental.user?.username ?? null,
+                role: rental.user?.role ?? null,
             },
             payments: payments.map((payment) => ({
                 id: payment.id,
@@ -102,17 +105,18 @@ export default class BarrelRentalsController {
             })),
             currentWeek,
             availableWeeks,
+            eligibleUsers: eligibleUsers.map((user) => new UserTransformer(user).toObject()),
         });
     }
 
-    public async updateRent({ request, params, response, session, i18n }: HttpContext) {
-        const { weeklyRent } = await request.validateUsing(updateBarrelRentalValidator);
+    public async update({ request, params, response, session, i18n }: HttpContext) {
+        const data = await request.validateUsing(updateBarrelRentalValidator);
 
         try {
-            await this.barrelRentalRepository.updateRent(params.id, String(weeklyRent));
+            await this.barrelRentalRepository.update(params.id, { label: data.label, price: String(data.price), userId: data.userId });
             session.flash('success', i18n.t('messages.admin.barrelRentals.update.success'));
         } catch (e) {
-            logger.error({ err: e }, 'barrelRentals.updateRent failed');
+            logger.error({ err: e }, 'barrelRentals.update failed');
             session.flash('error', i18n.t('messages.admin.barrelRentals.update.error'));
         }
 
@@ -136,7 +140,12 @@ export default class BarrelRentalsController {
 
         try {
             const rental = await this.barrelRentalRepository.findOrFail(params.id);
-            await this.barrelRentalPaymentRepository.create({ rentalId: rental.id, weekNumber, amountPaid: rental.weeklyRent });
+            if (!rental.userId) {
+                session.flash('error', i18n.t('messages.admin.barrelRentals.payments.create.noTenant'));
+                return response.redirect().back();
+            }
+
+            await this.barrelRentalPaymentRepository.create({ rentalId: rental.id, weekNumber, amountPaid: rental.price });
             session.flash('success', i18n.t('messages.admin.barrelRentals.payments.create.success'));
         } catch (e) {
             logger.error({ err: e }, 'barrelRentals.storePayment failed');

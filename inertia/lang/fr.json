@@ -724,11 +724,15 @@
         },
         "barrelRentals": {
             "title": "Location tonneau",
-            "description": "Loyer hebdomadaire fixé individuellement par personne. Un loyer à 0 est toujours considéré comme payé.",
-            "add": "Ajouter un locataire",
-            "user": "Utilisateur",
-            "userPlaceholder": "Choisir un utilisateur",
-            "weeklyRent": "Loyer hebdomadaire",
+            "description": "Chaque tonneau a un prix hebdomadaire et un locataire optionnel. Un prix à 0 est toujours considéré comme payé.",
+            "add": "Ajouter un tonneau",
+            "fields": {
+                "label": "Nom / emplacement",
+                "price": "Prix hebdomadaire",
+                "tenant": "Locataire",
+                "tenantPlaceholder": "Choisir un locataire",
+                "noTenant": "Aucun locataire"
+            },
             "submit": "Ajouter",
             "weekly": {
                 "title": "Totaux par semaine",
@@ -736,32 +740,34 @@
                 "payments": "paiement | paiement | paiements"
             },
             "table": {
-                "count": "locataire | locataire | locataires",
-                "search": "Rechercher un utilisateur…",
+                "count": "tonneau | tonneau | tonneaux",
+                "search": "Rechercher un tonneau ou un locataire…",
                 "allStatuses": "Tous les statuts",
                 "upToDate": "À jour",
                 "late": "En retard",
-                "username": "Utilisateur",
-                "role": "Rôle",
-                "weeklyRent": "Loyer",
+                "vacant": "Libre",
+                "label": "Tonneau",
+                "tenant": "Locataire",
+                "price": "Prix",
                 "status": "Statut",
                 "totalPaid": "Total payé",
                 "actions": "Actions",
                 "view": "Voir",
-                "empty": "Aucun locataire trouvé"
+                "empty": "Aucun tonneau trouvé"
             },
             "show": {
-                "title": "Location tonneau",
+                "title": "Tonneau",
                 "back": "Retour à la liste",
                 "delete": "Supprimer",
                 "deleteConfirm": {
-                    "title": "Supprimer ce locataire ?",
-                    "description": "Cette action est irréversible et supprimera définitivement la location de « {username} » ainsi que son historique de paiements.",
+                    "title": "Supprimer ce tonneau ?",
+                    "description": "Cette action est irréversible et supprimera définitivement « {label} » ainsi que son historique de paiements.",
                     "cancel": "Annuler",
                     "confirm": "Supprimer"
                 },
-                "saveRent": "Enregistrer le loyer",
-                "freeHint": "Un loyer à 0 est automatiquement considéré comme toujours payé."
+                "save": "Enregistrer",
+                "freeHint": "Un prix à 0 est automatiquement considéré comme toujours payé.",
+                "noTenantHint": "Aucun locataire assigné : aucun paiement ne peut être enregistré."
             },
             "payments": {
                 "add": "Enregistrer un paiement",

@@ -395,12 +395,12 @@ export interface Registry {
     methods: ["PUT"]
     pattern: '/admin/tax-brackets'
     types: {
-      body: {}
+      body: ExtractBody<InferInput<(typeof import('#validators/admin/tax_brackets').updateTaxBracketsValidator)>>
       paramsTuple: []
       params: {}
-      query: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/admin/tax_brackets').updateTaxBracketsValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/dashboard_controller').default['updateTaxBrackets']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/dashboard_controller').default['updateTaxBrackets']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/dashboard_controller').default['updateTaxBrackets']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'admin.users.index': {
@@ -999,8 +999,8 @@ export interface Registry {
       paramsTuple: [ParamValue]
       params: { id: ParamValue }
       query: ExtractQuery<InferInput<(typeof import('#validators/admin/barrel_rentals').updateBarrelRentalValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/barrel_rentals_controller').default['updateRent']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/barrel_rentals_controller').default['updateRent']>>> | { status: 422; response: { errors: SimpleError[] } }
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/barrel_rentals_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/barrel_rentals_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'admin.barrelRentals.destroy': {

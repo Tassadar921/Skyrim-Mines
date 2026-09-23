@@ -147,10 +147,14 @@ export default class UserRepository extends BaseRepository<typeof User> {
     }
 
     /**
-     * Every user not yet renting a barrel — open to any role.
+     * Every user not yet a tenant on another barrel — open to any role. Pass `excludeRentalId`
+     * (the barrel being edited) so that barrel's own current tenant stays selectable.
      */
-    public async findEligibleForBarrelRental(): Promise<User[]> {
-        return User.query().whereNotIn('id', BarrelRental.query().select('userId')).orderBy('username', 'asc');
+    public async findEligibleForBarrelRental(excludeRentalId?: string): Promise<User[]> {
+        const tenantedQuery = BarrelRental.query().select('userId').whereNotNull('userId');
+        if (excludeRentalId) tenantedQuery.whereNot('id', excludeRentalId);
+
+        return User.query().whereNotIn('id', tenantedQuery).orderBy('username', 'asc');
     }
 
     /**

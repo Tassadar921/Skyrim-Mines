@@ -2,15 +2,19 @@ import db from '@adonisjs/lucid/services/db';
 import BaseRepository from '#repositories/base/base_repository';
 import BarrelRental from '#models/barrel_rental';
 
+export type BarrelRentalStatus = 'vacant' | 'upToDate' | 'late';
+
 export type BarrelRentalRow = {
     id: string;
-    username: string;
-    role: string;
-    weeklyRent: number;
+    label: string;
+    price: number;
+    userId: string | null;
+    username: string | null;
+    role: string | null;
     lastPaidWeek: number | null;
     totalPaid: number;
     paymentCount: number;
-    isUpToDate: boolean;
+    status: BarrelRentalStatus;
 };
 
 export default class BarrelRentalRepository extends BaseRepository<typeof BarrelRental> {
@@ -24,49 +28,51 @@ export default class BarrelRentalRepository extends BaseRepository<typeof Barrel
         sort: string;
         dir: 'asc' | 'desc';
         search?: string;
-        status?: 'upToDate' | 'late';
+        status?: BarrelRentalStatus;
         currentWeek: number;
     }): Promise<{ rows: BarrelRentalRow[]; total: number }> {
         const { page, perPage, dir, search, status, currentWeek } = params;
 
         const rawRows = await db
             .from('barrel_rentals')
-            .join('users', 'users.id', 'barrel_rentals.user_id')
+            .leftJoin('users', 'users.id', 'barrel_rentals.user_id')
             .leftJoin('barrel_rental_payments', 'barrel_rental_payments.rental_id', 'barrel_rentals.id')
-            .select('barrel_rentals.id as id', 'users.username as username', 'users.role as role', 'barrel_rentals.weekly_rent as weeklyRent')
+            .select('barrel_rentals.id as id', 'barrel_rentals.label as label', 'barrel_rentals.price as price', 'barrel_rentals.user_id as userId', 'users.username as username', 'users.role as role')
             .max('barrel_rental_payments.week_number as lastPaidWeek')
             .sum('barrel_rental_payments.amount_paid as totalPaid')
             .count('barrel_rental_payments.id as paymentCount')
-            .groupBy('barrel_rentals.id', 'users.username', 'users.role', 'barrel_rentals.weekly_rent');
+            .groupBy('barrel_rentals.id', 'barrel_rentals.label', 'barrel_rentals.price', 'barrel_rentals.user_id', 'users.username', 'users.role');
 
         let rows: BarrelRentalRow[] = rawRows.map((row) => {
-            const weeklyRent = Number(row.weeklyRent);
+            const price = Number(row.price);
             const lastPaidWeek = row.lastPaidWeek === null ? null : Number(row.lastPaidWeek);
+            const rowStatus: BarrelRentalStatus = !row.userId ? 'vacant' : price === 0 || (lastPaidWeek !== null && lastPaidWeek >= currentWeek) ? 'upToDate' : 'late';
+
             return {
                 id: row.id,
+                label: row.label,
+                price,
+                userId: row.userId,
                 username: row.username,
                 role: row.role,
-                weeklyRent,
                 lastPaidWeek,
                 totalPaid: Number(row.totalPaid ?? 0),
                 paymentCount: Number(row.paymentCount ?? 0),
-                isUpToDate: weeklyRent === 0 || (lastPaidWeek !== null && lastPaidWeek >= currentWeek),
+                status: rowStatus,
             };
         });
 
         if (search) {
             const needle = search.toLowerCase();
-            rows = rows.filter((row) => row.username.toLowerCase().includes(needle));
+            rows = rows.filter((row) => row.label.toLowerCase().includes(needle) || (row.username?.toLowerCase().includes(needle) ?? false));
         }
 
-        if (status === 'upToDate') {
-            rows = rows.filter((row) => row.isUpToDate);
-        } else if (status === 'late') {
-            rows = rows.filter((row) => !row.isUpToDate);
+        if (status) {
+            rows = rows.filter((row) => row.status === status);
         }
 
         rows.sort((a, b) => {
-            const comparison = a.username.toLowerCase().localeCompare(b.username.toLowerCase());
+            const comparison = a.label.toLowerCase().localeCompare(b.label.toLowerCase());
             return dir === 'asc' ? comparison : -comparison;
         });
 
@@ -80,13 +86,15 @@ export default class BarrelRentalRepository extends BaseRepository<typeof Barrel
         return BarrelRental.query().where('id', id).preload('user').firstOrFail();
     }
 
-    public async create(data: { userId: string; weeklyRent: string }): Promise<BarrelRental> {
+    public async create(data: { label: string; price: string; userId: string | null }): Promise<BarrelRental> {
         return BarrelRental.create(data);
     }
 
-    public async updateRent(id: string, weeklyRent: string): Promise<BarrelRental> {
+    public async update(id: string, data: { label: string; price: string; userId: string | null }): Promise<BarrelRental> {
         const rental = await BarrelRental.findOrFail(id);
-        rental.weeklyRent = weeklyRent;
+        rental.label = data.label;
+        rental.price = data.price;
+        rental.userId = data.userId;
         await rental.save();
         return rental;
     }

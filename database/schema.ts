@@ -25,18 +25,20 @@ export class BarrelRentalPaymentSchema extends BaseModel {
 }
 
 export class BarrelRentalSchema extends BaseModel {
-  static $columns = ['createdAt', 'id', 'updatedAt', 'userId', 'weeklyRent'] as const
+  static $columns = ['createdAt', 'id', 'label', 'price', 'updatedAt', 'userId'] as const
   $columns = BarrelRentalSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
   @column({ isPrimary: true })
   declare id: string
+  @column()
+  declare label: string
+  @column()
+  declare price: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
   @column()
-  declare userId: string
-  @column()
-  declare weeklyRent: string
+  declare userId: string | null
 }
 
 export class CastellanySchema extends BaseModel {

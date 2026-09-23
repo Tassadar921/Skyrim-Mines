@@ -25,7 +25,21 @@ const { pageTitle } = useAdminLayout();
 const { isAdmin } = useAuth();
 pageTitle.value = t('admin.barrelRentals.title');
 
-type RentalRow = { id: string; username: string; role: string; weeklyRent: number; lastPaidWeek: number | null; totalPaid: number; paymentCount: number; isUpToDate: boolean };
+const NO_TENANT = 'none';
+
+type BarrelRentalStatus = 'vacant' | 'upToDate' | 'late';
+type RentalRow = {
+    id: string;
+    label: string;
+    price: number;
+    userId: string | null;
+    username: string | null;
+    role: string | null;
+    lastPaidWeek: number | null;
+    totalPaid: number;
+    paymentCount: number;
+    status: BarrelRentalStatus;
+};
 type EligibleUser = Data.User;
 type WeeklyTotal = { weekNumber: number; startDate: string; endDate: string; totalAmount: number; paymentCount: number };
 
@@ -87,21 +101,30 @@ function formatWeekRange(weeklyTotal: WeeklyTotal): string {
     return `${format(weeklyTotal.startDate)} - ${format(weeklyTotal.endDate)}`;
 }
 
+function statusVariant(status: BarrelRentalStatus): 'outline' | 'destructive' | 'secondary' {
+    if (status === 'upToDate') return 'outline';
+    if (status === 'late') return 'destructive';
+    return 'secondary';
+}
+
 const open = ref(false);
 
 const rentalForm = useForm({
-    userId: '',
-    weeklyRent: '0',
+    label: '',
+    price: '0',
+    userId: NO_TENANT,
 });
 
 function submitAddRental() {
-    rentalForm.post(urlFor('admin.barrelRentals.store'), {
-        preserveScroll: true,
-        onSuccess: () => {
-            rentalForm.reset();
-            open.value = false;
-        },
-    });
+    rentalForm
+        .transform((data) => ({ ...data, userId: data.userId === NO_TENANT ? null : data.userId }))
+        .post(urlFor('admin.barrelRentals.store'), {
+            preserveScroll: true,
+            onSuccess: () => {
+                rentalForm.reset();
+                open.value = false;
+            },
+        });
 }
 
 const hasActiveFilters = computed(() => !!props.filters.search || !!props.filters.sort || !!props.filters.status || props.meta.currentPage !== 1);
@@ -148,13 +171,18 @@ function resetFilters() {
                         </DialogHeader>
 
                         <div class="space-y-4">
+                            <Input v-model="rentalForm.label" :label="t('admin.barrelRentals.fields.label')" :error="rentalForm.errors.label" maxlength="100" required />
+
+                            <Input v-model="rentalForm.price" type="number" min="0" step="0.01" :label="t('admin.barrelRentals.fields.price')" :error="rentalForm.errors.price" />
+
                             <div class="space-y-1">
-                                <Label>{{ t('admin.barrelRentals.user') }}</Label>
+                                <Label>{{ t('admin.barrelRentals.fields.tenant') }}</Label>
                                 <Select v-model="rentalForm.userId">
                                     <SelectTrigger>
-                                        <SelectValue :placeholder="t('admin.barrelRentals.userPlaceholder')" />
+                                        <SelectValue :placeholder="t('admin.barrelRentals.fields.tenantPlaceholder')" />
                                     </SelectTrigger>
                                     <SelectContent>
+                                        <SelectItem :value="NO_TENANT">{{ t('admin.barrelRentals.fields.noTenant') }}</SelectItem>
                                         <SelectItem v-for="eligibleUser in props.eligibleUsers" :key="eligibleUser.id" :value="eligibleUser.id">
                                             {{ eligibleUser.username }} ({{ t(`admin.users.show.fields.roles.${eligibleUser.role}`) }})
                                         </SelectItem>
@@ -162,8 +190,6 @@ function resetFilters() {
                                 </Select>
                                 <p v-if="rentalForm.errors.userId" class="text-sm text-destructive">{{ rentalForm.errors.userId }}</p>
                             </div>
-
-                            <Input v-model="rentalForm.weeklyRent" type="number" min="0" step="0.01" :label="t('admin.barrelRentals.weeklyRent')" :error="rentalForm.errors.weeklyRent" />
 
                             <Button class="w-full" :loading="rentalForm.processing" :disabled="rentalForm.processing" @click="submitAddRental">
                                 {{ t('admin.barrelRentals.submit') }}
@@ -183,6 +209,7 @@ function resetFilters() {
                         <SelectItem value="all">{{ t('admin.barrelRentals.table.allStatuses') }}</SelectItem>
                         <SelectItem value="upToDate">{{ t('admin.barrelRentals.table.upToDate') }}</SelectItem>
                         <SelectItem value="late">{{ t('admin.barrelRentals.table.late') }}</SelectItem>
+                        <SelectItem value="vacant">{{ t('admin.barrelRentals.table.vacant') }}</SelectItem>
                     </SelectContent>
                 </Select>
                 <Button variant="ghost" size="sm" class="gap-1" :disabled="!hasActiveFilters" @click="resetFilters">
@@ -196,13 +223,13 @@ function resetFilters() {
                     <TableHeader>
                         <TableRow>
                             <TableHead>
-                                <Button variant="ghost" class="gap-1 px-2" @click="onSort('username')">
-                                    {{ t('admin.barrelRentals.table.username') }}
-                                    <component :is="sortIcon('username')" class="size-4" />
+                                <Button variant="ghost" class="gap-1 px-2" @click="onSort('label')">
+                                    {{ t('admin.barrelRentals.table.label') }}
+                                    <component :is="sortIcon('label')" class="size-4" />
                                 </Button>
                             </TableHead>
-                            <TableHead>{{ t('admin.barrelRentals.table.role') }}</TableHead>
-                            <TableHead>{{ t('admin.barrelRentals.table.weeklyRent') }}</TableHead>
+                            <TableHead>{{ t('admin.barrelRentals.table.tenant') }}</TableHead>
+                            <TableHead>{{ t('admin.barrelRentals.table.price') }}</TableHead>
                             <TableHead>{{ t('admin.barrelRentals.table.status') }}</TableHead>
                             <TableHead>{{ t('admin.barrelRentals.table.totalPaid') }}</TableHead>
                             <TableHead>{{ t('admin.barrelRentals.table.actions') }}</TableHead>
@@ -211,14 +238,17 @@ function resetFilters() {
                     <TableBody>
                         <template v-if="props.rentals.length">
                             <TableRow v-for="rental in props.rentals" :key="rental.id">
-                                <TableCell class="text-sm font-medium">{{ rental.username }}</TableCell>
-                                <TableCell>
-                                    <Badge variant="secondary">{{ t(`admin.users.show.fields.roles.${rental.role}`) }}</Badge>
+                                <TableCell class="text-sm font-medium">{{ rental.label }}</TableCell>
+                                <TableCell class="text-sm">
+                                    <span v-if="rental.username" class="inline-flex items-center gap-2">
+                                        {{ rental.username }}
+                                        <Badge variant="secondary">{{ t(`admin.users.show.fields.roles.${rental.role}`) }}</Badge>
+                                    </span>
+                                    <span v-else class="text-muted-foreground italic">{{ t('admin.barrelRentals.fields.noTenant') }}</span>
                                 </TableCell>
-                                <TableCell class="text-sm text-muted-foreground">{{ rental.weeklyRent.toFixed(2) }} s</TableCell>
+                                <TableCell class="text-sm text-muted-foreground">{{ rental.price.toFixed(2) }} s</TableCell>
                                 <TableCell>
-                                    <Badge v-if="rental.isUpToDate" variant="outline">{{ t('admin.barrelRentals.table.upToDate') }}</Badge>
-                                    <Badge v-else variant="destructive">{{ t('admin.barrelRentals.table.late') }}</Badge>
+                                    <Badge :variant="statusVariant(rental.status)">{{ t(`admin.barrelRentals.table.${rental.status}`) }}</Badge>
                                 </TableCell>
                                 <TableCell class="text-sm text-muted-foreground">{{ rental.totalPaid.toFixed(2) }} s</TableCell>
                                 <TableCell>

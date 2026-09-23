@@ -196,21 +196,22 @@
         },
         "barrelRentals": {
             "create": {
-                "success": "Locataire ajouté avec succès",
-                "error": "Erreur lors de l'ajout du locataire"
+                "success": "Tonneau ajouté avec succès",
+                "error": "Erreur lors de l'ajout du tonneau"
             },
             "update": {
-                "success": "Loyer mis à jour avec succès",
-                "error": "Erreur lors de la mise à jour du loyer"
+                "success": "Tonneau mis à jour avec succès",
+                "error": "Erreur lors de la mise à jour du tonneau"
             },
             "destroy": {
-                "success": "Locataire supprimé avec succès",
-                "error": "Erreur lors de la suppression du locataire"
+                "success": "Tonneau supprimé avec succès",
+                "error": "Erreur lors de la suppression du tonneau"
             },
             "payments": {
                 "create": {
                     "success": "Paiement enregistré avec succès",
-                    "error": "Erreur lors de l'enregistrement du paiement"
+                    "error": "Erreur lors de l'enregistrement du paiement",
+                    "noTenant": "Impossible d'enregistrer un paiement : aucun locataire n'est assigné à ce tonneau"
                 },
                 "destroy": {
                     "success": "Paiement supprimé avec succès",

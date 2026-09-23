@@ -116,7 +116,7 @@ router
         router.get('/barrel-rentals', [controllers.admin.BarrelRentals, 'index']).as('admin.barrelRentals.index').use(readOnly);
         router.post('/barrel-rentals', [controllers.admin.BarrelRentals, 'store']).as('admin.barrelRentals.store').use(middleware.admin());
         router.get('/barrel-rentals/:id', [controllers.admin.BarrelRentals, 'show']).as('admin.barrelRentals.show').use(readOnly);
-        router.put('/barrel-rentals/:id', [controllers.admin.BarrelRentals, 'updateRent']).as('admin.barrelRentals.update').use(middleware.admin());
+        router.put('/barrel-rentals/:id', [controllers.admin.BarrelRentals, 'update']).as('admin.barrelRentals.update').use(middleware.admin());
         router.delete('/barrel-rentals/:id', [controllers.admin.BarrelRentals, 'destroy']).as('admin.barrelRentals.destroy').use(middleware.admin());
         router.post('/barrel-rentals/:id/payments', [controllers.admin.BarrelRentals, 'storePayment']).as('admin.barrelRentals.payments.store').use(middleware.admin());
         router.delete('/barrel-rentals/payments/:id', [controllers.admin.BarrelRentals, 'destroyPayment']).as('admin.barrelRentals.payments.destroy').use(middleware.admin());

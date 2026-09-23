@@ -15,6 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~
 import DeleteButton from '~/components/ui/DeleteButton.vue';
 import { Link } from '@adonisjs/inertia/vue';
 import { ArrowLeft } from '@lucide/vue';
+import type { Data } from '@generated/data';
 
 defineOptions({ layout: AdminLayout });
 
@@ -22,18 +23,22 @@ const { t } = useI18n();
 const { pageTitle } = useAdminLayout();
 const { isAdmin } = useAuth();
 
-type Rental = { id: string; username: string; role: string; weeklyRent: number };
+const NO_TENANT = 'none';
+
+type Rental = { id: string; label: string; price: number; userId: string | null; username: string | null; role: string | null };
 type Payment = { id: string; weekNumber: number; amountPaid: number; createdAt: string };
 type AvailableWeek = { weekNumber: number; startDate: string; endDate: string };
+type EligibleUser = Data.User;
 
 const props = defineProps<{
     rental: Rental;
     payments: Payment[];
     currentWeek: number;
     availableWeeks: AvailableWeek[];
+    eligibleUsers: EligibleUser[];
 }>();
 
-pageTitle.value = `${t('admin.barrelRentals.show.title')} - ${props.rental.username}`;
+pageTitle.value = `${t('admin.barrelRentals.show.title')} - ${props.rental.label}`;
 
 function destroyRental() {
     router.delete(urlFor('admin.barrelRentals.destroy', { id: props.rental.id }));
@@ -52,12 +57,18 @@ function formatWeekRange(week: AvailableWeek): string {
     return `${format(week.startDate)} - ${format(week.endDate)}`;
 }
 
-const weeklyRent = ref(String(props.rental.weeklyRent));
-const isSubmittingRent = ref(false);
+const label = ref(props.rental.label);
+const price = ref(String(props.rental.price));
+const userId = ref(props.rental.userId ?? NO_TENANT);
+const isSubmitting = ref(false);
 
-function submitRent() {
-    isSubmittingRent.value = true;
-    router.put(urlFor('admin.barrelRentals.update', { id: props.rental.id }), { weeklyRent: weeklyRent.value }, { preserveScroll: true, onFinish: () => (isSubmittingRent.value = false) });
+function submit() {
+    isSubmitting.value = true;
+    router.put(
+        urlFor('admin.barrelRentals.update', { id: props.rental.id }),
+        { label: label.value, price: price.value, userId: userId.value === NO_TENANT ? null : userId.value },
+        { preserveScroll: true, onFinish: () => (isSubmitting.value = false) },
+    );
 }
 
 const weekNumber = ref(String(props.availableWeeks.find((week) => !isWeekPaid(week.weekNumber))?.weekNumber ?? props.currentWeek));
@@ -82,7 +93,7 @@ function submitPayment() {
                 v-if="isAdmin"
                 :label="t('admin.barrelRentals.show.delete')"
                 :title="t('admin.barrelRentals.show.deleteConfirm.title')"
-                :description="t('admin.barrelRentals.show.deleteConfirm.description', { username: props.rental.username })"
+                :description="t('admin.barrelRentals.show.deleteConfirm.description', { label: props.rental.label })"
                 :cancel-label="t('admin.barrelRentals.show.deleteConfirm.cancel')"
                 :confirm-label="t('admin.barrelRentals.show.deleteConfirm.confirm')"
                 @confirm="destroyRental"
@@ -90,20 +101,40 @@ function submitPayment() {
         </div>
 
         <div class="flex items-center gap-3">
-            <h2 class="text-lg font-medium">{{ props.rental.username }}</h2>
-            <Badge variant="secondary">{{ t(`admin.users.show.fields.roles.${props.rental.role}`) }}</Badge>
+            <h2 class="text-lg font-medium">{{ props.rental.label }}</h2>
+            <span v-if="props.rental.username" class="inline-flex items-center gap-2 text-sm text-muted-foreground">
+                {{ props.rental.username }}
+                <Badge variant="secondary">{{ t(`admin.users.show.fields.roles.${props.rental.role}`) }}</Badge>
+            </span>
+            <Badge v-else variant="outline">{{ t('admin.barrelRentals.fields.noTenant') }}</Badge>
         </div>
 
         <div class="rounded-md border p-5 space-y-4 max-w-lg">
-            <div class="text-sm font-medium">{{ t('admin.barrelRentals.weeklyRent') }}</div>
-            <Input v-model="weeklyRent" type="number" min="0" step="0.01" :readonly="!isAdmin" />
+            <Input v-model="label" :label="t('admin.barrelRentals.fields.label')" maxlength="100" :readonly="!isAdmin" />
+            <Input v-model="price" type="number" min="0" step="0.01" :label="t('admin.barrelRentals.fields.price')" :readonly="!isAdmin" />
+
+            <div class="space-y-1">
+                <Label>{{ t('admin.barrelRentals.fields.tenant') }}</Label>
+                <Select v-model="userId" :disabled="!isAdmin">
+                    <SelectTrigger>
+                        <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem :value="NO_TENANT">{{ t('admin.barrelRentals.fields.noTenant') }}</SelectItem>
+                        <SelectItem v-for="eligibleUser in props.eligibleUsers" :key="eligibleUser.id" :value="eligibleUser.id">
+                            {{ eligibleUser.username }} ({{ t(`admin.users.show.fields.roles.${eligibleUser.role}`) }})
+                        </SelectItem>
+                    </SelectContent>
+                </Select>
+            </div>
+
             <p class="text-xs text-muted-foreground">{{ t('admin.barrelRentals.show.freeHint') }}</p>
-            <Button v-if="isAdmin" :loading="isSubmittingRent" :disabled="isSubmittingRent" @click="submitRent">
-                {{ t('admin.barrelRentals.show.saveRent') }}
+            <Button v-if="isAdmin" :loading="isSubmitting" :disabled="isSubmitting" @click="submit">
+                {{ t('admin.barrelRentals.show.save') }}
             </Button>
         </div>
 
-        <div v-if="isAdmin && props.rental.weeklyRent > 0" class="rounded-md border p-5 space-y-4 max-w-lg">
+        <div v-if="isAdmin && props.rental.userId && props.rental.price > 0" class="rounded-md border p-5 space-y-4 max-w-lg">
             <div class="text-sm font-medium">{{ t('admin.barrelRentals.payments.add') }}</div>
 
             <div class="space-y-1">
@@ -126,6 +157,7 @@ function submitPayment() {
                 {{ t('admin.barrelRentals.payments.submit') }}
             </Button>
         </div>
+        <p v-else-if="isAdmin && !props.rental.userId" class="text-sm text-muted-foreground">{{ t('admin.barrelRentals.show.noTenantHint') }}</p>
 
         <div class="rounded-md border">
             <Table>
