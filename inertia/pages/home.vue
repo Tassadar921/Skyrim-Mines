@@ -48,7 +48,7 @@ type MyDeposit = { id: string; resourceId: string; quantity: number; createdAt: 
 const props = defineProps<{
     resources: ResourceWithBarrel[];
     ordersToDeliver: OrderToDeliver[];
-    castellanies: { id: string; name: string; commissionAmount: number }[];
+    castellanies: { id: string; name: string }[];
     myDeposits: MyDeposit[];
 }>();
 
@@ -145,8 +145,8 @@ onUnmounted(() => {
     <Head :title="t('title')" />
     <div class="min-h-screen pt-32 pb-24 px-[8%] space-y-16">
         <div class="flex flex-col items-center text-center gap-6">
-            <img :src="'/logo.png'" alt="Compagnie Minière de la Crevasse" class="size-20" />
             <h1 class="font-serif text-4xl font-light text-slate-800 dark:text-slate-100">{{ t('home.title') }}</h1>
+            <p v-if="page.props.subtitle" class="max-w-2xl font-serif text-xl font-light text-slate-500 dark:text-slate-400">{{ page.props.subtitle }}</p>
             <p v-if="page.props.user && canHaveBalance(page.props.user.role)" class="text-sm text-slate-600 dark:text-slate-300">
                 {{ t('home.balance', { amount: page.props.user.balance.toFixed(2) }) }}
             </p>

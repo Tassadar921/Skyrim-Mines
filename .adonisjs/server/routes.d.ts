@@ -30,8 +30,10 @@ export type ScannedRoutes = {
     'auth.logout': { paramsTuple?: []; params?: {} }
     'admin.dashboard': { paramsTuple?: []; params?: {} }
     'admin.dashboard.castellanyTax.update': { paramsTuple?: []; params?: {} }
-    'admin.dashboard.largeOrderSetting.update': { paramsTuple?: []; params?: {} }
     'admin.dashboard.capitalSnapshot.store': { paramsTuple?: []; params?: {} }
+    'admin.siteSettings.updateLogo': { paramsTuple?: []; params?: {} }
+    'admin.siteSettings.destroyLogo': { paramsTuple?: []; params?: {} }
+    'admin.siteSettings.updateSubtitle': { paramsTuple?: []; params?: {} }
     'admin.users.index': { paramsTuple?: []; params?: {} }
     'admin.users.create': { paramsTuple?: []; params?: {} }
     'admin.users.store': { paramsTuple?: []; params?: {} }
@@ -186,6 +188,7 @@ export type ScannedRoutes = {
     'buybacks.store': { paramsTuple?: []; params?: {} }
     'organization.members.store': { paramsTuple?: []; params?: {} }
     'admin.dashboard.capitalSnapshot.store': { paramsTuple?: []; params?: {} }
+    'admin.siteSettings.updateLogo': { paramsTuple?: []; params?: {} }
     'admin.users.store': { paramsTuple?: []; params?: {} }
     'admin.users.updateAvatar': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.resources.store': { paramsTuple?: []; params?: {} }
@@ -214,6 +217,7 @@ export type ScannedRoutes = {
   DELETE: {
     'organization.members.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'auth.logout': { paramsTuple?: []; params?: {} }
+    'admin.siteSettings.destroyLogo': { paramsTuple?: []; params?: {} }
     'admin.users.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.resources.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.materials.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -228,7 +232,7 @@ export type ScannedRoutes = {
   }
   PUT: {
     'admin.dashboard.castellanyTax.update': { paramsTuple?: []; params?: {} }
-    'admin.dashboard.largeOrderSetting.update': { paramsTuple?: []; params?: {} }
+    'admin.siteSettings.updateSubtitle': { paramsTuple?: []; params?: {} }
     'admin.users.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.users.updateBalance': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.resources.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }

@@ -12,8 +12,6 @@ ChartJS.register(CategoryScale, LinearScale, LineElement, PointElement, Filler, 
 type WeeklyRecap = {
     weekNumber: number;
     deliveriesAmount: number;
-    commissionsAmount: number;
-    largeOrderFeesAmount: number;
     profit: number;
     weeklyTax: number;
     capital: number | null;

@@ -2,6 +2,10 @@ import db from '@adonisjs/lucid/services/db';
 import type { TransactionClientContract } from '@adonisjs/lucid/types/database';
 import BaseRepository from '#repositories/base/base_repository';
 import ResourceBuyback from '#models/resource_buyback';
+import ResourceDepositRepository from '#repositories/resource_deposit_repository';
+import ResourceBarrelAdjustmentRepository from '#repositories/resource_barrel_adjustment_repository';
+import UserRepository from '#repositories/user_repository';
+import { allocateProportionally } from '#helpers/buyback_allocation_helper';
 
 export type BuybackResourceLine = {
     resourceId: string;
@@ -29,8 +33,52 @@ export type BuybackDetail = {
 };
 
 export default class ResourceBuybackRepository extends BaseRepository<typeof ResourceBuyback> {
-    constructor() {
+    constructor(
+        private readonly resourceDepositRepository: ResourceDepositRepository = new ResourceDepositRepository(),
+        private readonly resourceBarrelAdjustmentRepository: ResourceBarrelAdjustmentRepository = new ResourceBarrelAdjustmentRepository(),
+        private readonly userRepository: UserRepository = new UserRepository(),
+    ) {
         super(ResourceBuyback);
+    }
+
+    /**
+     * Buys back up to `requestedQuantity` of a resource from whatever players have outstanding
+     * in the barrel, allocated proportionally to their holdings and paid out immediately.
+     * Returns the quantity actually bought back (may be less than requested if the barrel
+     * doesn't hold enough).
+     */
+    public async buybackResourceFromBarrel(params: { resourceId: string; requestedQuantity: number; buyPrice: number; batchId: string; trx: TransactionClientContract }): Promise<number> {
+        const { resourceId, requestedQuantity, buyPrice, batchId, trx } = params;
+        if (requestedQuantity <= 0) return 0;
+
+        const [depositedByUser, boughtBackByUser, adjustedByUser] = await Promise.all([
+            this.resourceDepositRepository.sumByUserForResource(resourceId),
+            this.sumByUserForResource(resourceId),
+            this.resourceBarrelAdjustmentRepository.sumByUserForResource(resourceId),
+        ]);
+
+        const userIds = new Set([...depositedByUser.keys(), ...boughtBackByUser.keys(), ...adjustedByUser.keys()]);
+        const outstandingByUser = new Map<string, number>();
+        for (const userId of userIds) {
+            const outstanding = (depositedByUser.get(userId) ?? 0) - (boughtBackByUser.get(userId) ?? 0) + (adjustedByUser.get(userId) ?? 0);
+            if (outstanding > 0) outstandingByUser.set(userId, outstanding);
+        }
+
+        const totalOutstanding = [...outstandingByUser.values()].reduce((sum, qty) => sum + qty, 0);
+        const quantity = Math.min(requestedQuantity, totalOutstanding);
+        if (quantity <= 0) return 0;
+
+        const allocations = allocateProportionally(quantity, outstandingByUser);
+        const buybackEntries: { batchId: string; userId: string; resourceId: string; quantity: number; amount: number }[] = [];
+        for (const [userId, allocatedQuantity] of allocations) {
+            if (allocatedQuantity <= 0) continue;
+            const amount = allocatedQuantity * buyPrice;
+            buybackEntries.push({ batchId, userId, resourceId, quantity: allocatedQuantity, amount });
+            await this.userRepository.incrementBalance(userId, amount, trx);
+        }
+
+        await this.createMany(buybackEntries, trx);
+        return quantity;
     }
 
     public async createMany(entries: { batchId: string; userId: string; resourceId: string; quantity: number; amount: number }[], trx?: TransactionClientContract): Promise<void> {

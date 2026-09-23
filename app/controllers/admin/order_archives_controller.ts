@@ -1,5 +1,6 @@
 import { type HttpContext } from '@adonisjs/core/http';
 import { DateTime } from 'luxon';
+import db from '@adonisjs/lucid/services/db';
 import logger from '@adonisjs/core/services/logger';
 import ResourceRepository from '#repositories/resource_repository';
 import OrderRepository from '#repositories/order_repository';
@@ -8,6 +9,9 @@ import OrganizationRepository from '#repositories/organization_repository';
 import OrganizationResourcePriceRepository from '#repositories/organization_resource_price_repository';
 import UserRepository from '#repositories/user_repository';
 import CastellanyRepository from '#repositories/castellany_repository';
+import ResourceStockRepository from '#repositories/resource_stock_repository';
+import ResourceBuybackRepository from '#repositories/resource_buyback_repository';
+import ResourceBuybackBatchRepository from '#repositories/resource_buyback_batch_repository';
 import ResourceTransformer from '#transformers/resource_transformer';
 import CastellanyTransformer from '#transformers/castellany_transformer';
 import OrganizationRoleEnum from '#types/enum/organization_role_enum';
@@ -26,6 +30,9 @@ export default class OrderArchivesController {
         private readonly organizationResourcePriceRepository: OrganizationResourcePriceRepository = new OrganizationResourcePriceRepository(),
         private readonly userRepository: UserRepository = new UserRepository(),
         private readonly castellanyRepository: CastellanyRepository = new CastellanyRepository(),
+        private readonly resourceStockRepository: ResourceStockRepository = new ResourceStockRepository(),
+        private readonly resourceBuybackRepository: ResourceBuybackRepository = new ResourceBuybackRepository(),
+        private readonly resourceBuybackBatchRepository: ResourceBuybackBatchRepository = new ResourceBuybackBatchRepository(),
     ) {}
 
     public async create({ inertia }: HttpContext) {
@@ -64,7 +71,7 @@ export default class OrderArchivesController {
     }
 
     public async store({ request, auth, response, session, i18n }: HttpContext) {
-        const { items, orderWeek, deliveryWeek, castellanyId, ...recipientData } = await request.validateUsing(createOrderArchiveValidator);
+        const { items, orderWeek, deliveryWeek, castellanyId, deductFromStock, ...recipientData } = await request.validateUsing(createOrderArchiveValidator);
         const requestedItems = items.filter((item) => item.quantity > 0);
 
         if (!requestedItems.length) {
@@ -106,7 +113,8 @@ export default class OrderArchivesController {
                     const resource = resourceById.get(item.resourceId);
                     if (!resource) return null;
 
-                    const unitPrice = priceOverrides.get(resource.id) ?? Number(resource.sellPrice);
+                    const defaultPrice = priceOverrides.get(resource.id) ?? Number(resource.sellPrice);
+                    const unitPrice = item.unitPrice ?? defaultPrice;
                     return {
                         resourceId: resource.id,
                         resourceName: resource.name,
@@ -121,6 +129,38 @@ export default class OrderArchivesController {
             if (!lines.length) {
                 session.flash('error', i18n.t('messages.admin.orderArchives.create.error'));
                 return response.redirect().back();
+            }
+
+            const buybackSummary: { resourceName: string; quantity: number }[] = [];
+
+            if (deductFromStock) {
+                await db.transaction(async (trx) => {
+                    let batchId: string | null = null;
+
+                    for (const line of lines) {
+                        if (line.quantity <= 0) continue;
+
+                        const takenFromStock = await this.resourceStockRepository.decrementPurchasedQuantity(line.resourceId, line.quantity, trx);
+                        const shortfall = line.quantity - takenFromStock;
+                        if (shortfall <= 0) continue;
+
+                        if (!batchId) {
+                            const batch = await this.resourceBuybackBatchRepository.createBatch(trx);
+                            batchId = batch.id;
+                        }
+                        const resource = resourceById.get(line.resourceId)!;
+                        const boughtBack = await this.resourceBuybackRepository.buybackResourceFromBarrel({
+                            resourceId: line.resourceId,
+                            requestedQuantity: shortfall,
+                            buyPrice: Number(resource.buyPrice),
+                            batchId,
+                            trx,
+                        });
+                        if (boughtBack > 0) {
+                            buybackSummary.push({ resourceName: line.resourceName, quantity: boughtBack });
+                        }
+                    }
+                });
             }
 
             const totalAmount = lines.reduce((sum, line) => sum + line.totalPrice, 0);
@@ -143,7 +183,13 @@ export default class OrderArchivesController {
 
             await this.deliveryRepository.createForOrder(order.id, admin.id, deliveryLines, { deliveredAt, castellanyId: castellanyId ?? null });
 
-            session.flash('success', i18n.t('messages.admin.orderArchives.create.success'));
+            const successMessage = buybackSummary.length
+                ? `${i18n.t('messages.admin.orderArchives.create.success')} ${i18n.t('messages.admin.orderArchives.create.buybackSummary', {
+                      details: buybackSummary.map((entry) => `${entry.quantity} ${entry.resourceName}`).join(', '),
+                  })}`
+                : i18n.t('messages.admin.orderArchives.create.success');
+
+            session.flash('success', successMessage);
             return response.redirect().toRoute('admin.commandes.index');
         } catch (e) {
             logger.error({ err: e }, 'orderArchives.store failed');

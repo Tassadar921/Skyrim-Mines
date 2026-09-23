@@ -1,9 +1,14 @@
 import type { HttpContext } from '@adonisjs/core/http';
 import type { NextFn } from '@adonisjs/core/types/http';
 import UserTransformer from '#transformers/user_transformer';
+import SiteSettingRepository from '#repositories/site_setting_repository';
 import BaseInertiaMiddleware from '@adonisjs/inertia/inertia_middleware';
 
+const DEFAULT_LOGO_URL = '/logo.png';
+
 export default class InertiaMiddleware extends BaseInertiaMiddleware {
+    private readonly siteSettingRepository = new SiteSettingRepository();
+
     async share(ctx: HttpContext) {
         /**
          * The share method is called everytime an Inertia page is rendered. In
@@ -23,6 +28,8 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
             .filter((code: string): boolean => code !== 'E_VALIDATION_ERROR')
             .map((code: string) => errorsBag[code])[0];
 
+        const siteSetting = await this.siteSettingRepository.getWithLogo();
+
         /**
          * Data shared with all Inertia pages. Make sure you are using
          * transformers for rich data-types like Models.
@@ -34,6 +41,8 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
                 success: session?.flashMessages.get('success'),
             }),
             user: ctx.inertia.always(auth?.user ? new UserTransformer(auth.user).toObject() : undefined),
+            logoUrl: ctx.inertia.always(siteSetting.logoFile?.path ?? DEFAULT_LOGO_URL),
+            subtitle: ctx.inertia.always(siteSetting.subtitle ?? undefined),
         };
     }
 

@@ -26,8 +26,6 @@ type DeliveryRow = {
     requesterName: string;
     organizationName: string | null;
     castellanyName: string | null;
-    commissionAmount: number;
-    largeOrderFeeAmount: number;
     lines: DeliveryLine[];
     totalProfit: number;
 };
@@ -205,8 +203,6 @@ function resetFilters() {
                         <TableHead>{{ t('admin.livraisons.table.organization') }}</TableHead>
                         <TableHead>{{ t('admin.livraisons.table.amount') }}</TableHead>
                         <TableHead>{{ t('admin.livraisons.table.profit') }}</TableHead>
-                        <TableHead>{{ t('admin.livraisons.table.commission') }}</TableHead>
-                        <TableHead>{{ t('admin.livraisons.table.largeOrderFee') }}</TableHead>
                         <TableHead>{{ t('admin.livraisons.table.actions') }}</TableHead>
                     </TableRow>
                 </TableHeader>
@@ -230,8 +226,6 @@ function resetFilters() {
                                 </TableCell>
                                 <TableCell class="text-sm font-medium">{{ deliveryTotal(delivery).toFixed(2) }} s</TableCell>
                                 <TableCell class="text-sm font-medium" :class="delivery.totalProfit >= 0 ? 'text-green-600' : 'text-destructive'">{{ delivery.totalProfit.toFixed(2) }} s</TableCell>
-                                <TableCell class="text-sm text-muted-foreground">{{ delivery.commissionAmount.toFixed(2) }} s</TableCell>
-                                <TableCell class="text-sm text-muted-foreground">{{ delivery.largeOrderFeeAmount.toFixed(2) }} s</TableCell>
                                 <TableCell @click.stop>
                                     <DeleteButton
                                         v-if="isAdmin"
@@ -246,7 +240,7 @@ function resetFilters() {
                             </TableRow>
                             <TableRow v-if="expanded.has(delivery.id)">
                                 <TableCell />
-                                <TableCell :colspan="10" class="bg-muted/30 p-3">
+                                <TableCell :colspan="8" class="bg-muted/30 p-3">
                                     <Table>
                                         <TableHeader>
                                             <TableRow>

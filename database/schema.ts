@@ -40,16 +40,12 @@ export class BarrelRentalSchema extends BaseModel {
 }
 
 export class CastellanySchema extends BaseModel {
-  static $columns = ['commissionAmount', 'createdAt', 'id', 'largeOrderFeeRate', 'name', 'updatedAt'] as const
+  static $columns = ['createdAt', 'id', 'name', 'updatedAt'] as const
   $columns = CastellanySchema.$columns
-  @column()
-  declare commissionAmount: number
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
   @column({ isPrimary: true })
   declare id: string
-  @column()
-  declare largeOrderFeeRate: number
   @column()
   declare name: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })
@@ -110,12 +106,10 @@ export class CompanyExpenseSchema extends BaseModel {
 }
 
 export class DeliverySchema extends BaseModel {
-  static $columns = ['castellanyId', 'commissionAmount', 'createdAt', 'deliveredAt', 'deliveredByUserId', 'deliveredWeekNumber', 'id', 'largeOrderFeeAmount', 'orderId', 'updatedAt'] as const
+  static $columns = ['castellanyId', 'createdAt', 'deliveredAt', 'deliveredByUserId', 'deliveredWeekNumber', 'id', 'orderId', 'updatedAt'] as const
   $columns = DeliverySchema.$columns
   @column()
   declare castellanyId: string | null
-  @column()
-  declare commissionAmount: string
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
   @column.dateTime()
@@ -126,8 +120,6 @@ export class DeliverySchema extends BaseModel {
   declare deliveredWeekNumber: number
   @column({ isPrimary: true })
   declare id: string
-  @column()
-  declare largeOrderFeeAmount: string
   @column()
   declare orderId: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })
@@ -176,19 +168,6 @@ export class FileSchema extends BaseModel {
   declare path: string
   @column()
   declare size: number
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
-  declare updatedAt: DateTime | null
-}
-
-export class LargeOrderSettingSchema extends BaseModel {
-  static $columns = ['createdAt', 'id', 'thresholdQuantity', 'updatedAt'] as const
-  $columns = LargeOrderSettingSchema.$columns
-  @column.dateTime({ autoCreate: true })
-  declare createdAt: DateTime
-  @column({ isPrimary: true })
-  declare id: string
-  @column()
-  declare thresholdQuantity: number
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
 }
@@ -434,6 +413,21 @@ export class ResourceSchema extends BaseModel {
   declare sellPrice: string
   @column()
   declare type: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
+export class SiteSettingSchema extends BaseModel {
+  static $columns = ['createdAt', 'id', 'logoFileId', 'subtitle', 'updatedAt'] as const
+  $columns = SiteSettingSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare logoFileId: string | null
+  @column()
+  declare subtitle: string | null
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
 }

@@ -15,12 +15,15 @@ import type { Data } from '@generated/data';
 const { t } = useI18n();
 const { isAdmin } = useAuth();
 
+type ResourceWithCost = Data.Resource & { manufacturingCost?: number | null };
+
 const props = defineProps<{
-    resources: Data.Resource[];
+    resources: ResourceWithCost[];
     meta: { total: number; currentPage: number; lastPage: number; perPage: number };
     sort: string;
     dir: string;
     isDefaultView: boolean;
+    showManufacturingCost?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -66,18 +69,22 @@ function sortIcon(column: string) {
                             </Button>
                         </TableHead>
                         <TableHead>{{ t('admin.resources.table.buyPrice') }}</TableHead>
+                        <TableHead v-if="showManufacturingCost">{{ t('admin.resources.table.manufacturingCost') }}</TableHead>
                         <TableHead>{{ t('admin.resources.table.sellPrice') }}</TableHead>
                         <TableHead>{{ t('admin.resources.table.actions') }}</TableHead>
                     </TableRow>
                 </TableHeader>
                 <draggable v-model="items" tag="tbody" item-key="id" handle=".drag-handle" :disabled="!draggingEnabled" @end="onDragEnd">
-                    <template #item="{ element: resource }: { element: Data.Resource }">
+                    <template #item="{ element: resource }: { element: ResourceWithCost }">
                         <TableRow>
                             <TableCell v-if="isDefaultView" :class="draggingEnabled ? 'drag-handle cursor-grab active:cursor-grabbing' : ''">
                                 <GripVertical v-if="draggingEnabled" class="size-4 text-muted-foreground" />
                             </TableCell>
                             <TableCell class="text-sm font-medium">{{ resource.name }}</TableCell>
                             <TableCell class="text-sm text-muted-foreground">{{ resource.buyPrice }}</TableCell>
+                            <TableCell v-if="showManufacturingCost" class="text-sm text-muted-foreground">
+                                {{ resource.manufacturingCost !== null && resource.manufacturingCost !== undefined ? resource.manufacturingCost.toFixed(2) : '—' }}
+                            </TableCell>
                             <TableCell class="text-sm text-muted-foreground">{{ resource.sellPrice }}</TableCell>
                             <TableCell>
                                 <div class="flex items-center gap-2">
@@ -102,7 +109,7 @@ function sortIcon(column: string) {
                     </template>
                     <template #footer>
                         <TableRow v-if="!items.length">
-                            <TableCell :colspan="isDefaultView ? 5 : 4" class="h-24 text-center text-muted-foreground">
+                            <TableCell :colspan="(isDefaultView ? 5 : 4) + (showManufacturingCost ? 1 : 0)" class="h-24 text-center text-muted-foreground">
                                 {{ t('admin.resources.table.empty') }}
                             </TableCell>
                         </TableRow>

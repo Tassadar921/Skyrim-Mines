@@ -44,12 +44,6 @@ function setQuantity(id: string, value: number) {
     quantities[id] = value;
 }
 
-function setAllMax() {
-    for (const resource of barrelResources.value) {
-        quantities[resource.id] = resource.quantityBarrel;
-    }
-}
-
 function submitBuyback() {
     const items = barrelResources.value.map((resource) => ({
         resourceId: resource.id,
@@ -83,8 +77,6 @@ function submitBuyback() {
             <DialogHeader>
                 <DialogTitle>{{ t('buyback.title') }}</DialogTitle>
             </DialogHeader>
-
-            <Button class="w-full" @click="setAllMax">{{ t('buyback.buyAll') }}</Button>
 
             <div class="overflow-x-auto rounded-md border">
                 <Table>

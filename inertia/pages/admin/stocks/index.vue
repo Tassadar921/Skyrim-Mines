@@ -5,8 +5,10 @@ import { router } from '@inertiajs/vue3';
 import { urlFor } from '~/client';
 import AdminLayout from '~/layouts/admin.vue';
 import { useAdminLayout } from '~/composables/use_admin_layout';
+import { useAuth } from '~/composables/use_auth';
 import StockResourceTable from '~/partials/stocks/StockResourceTable.vue';
 import StockMaterialTable from '~/partials/stocks/StockMaterialTable.vue';
+import BuybackModal from '~/partials/buyback/BuybackModal.vue';
 import { Button } from '~/components/ui/button';
 import type { Data } from '@generated/data';
 
@@ -19,6 +21,7 @@ type MaterialQuantities = Record<string, number>;
 
 const { t } = useI18n();
 const { pageTitle } = useAdminLayout();
+const { isAdmin } = useAuth();
 pageTitle.value = t('admin.stocks.title');
 
 const props = defineProps<{
@@ -91,7 +94,10 @@ function submit() {
     <div class="space-y-10">
         <div class="flex items-start justify-between gap-4">
             <p class="text-sm text-muted-foreground max-w-2xl">{{ t('admin.stocks.description') }}</p>
-            <Button :loading="isSubmitting" :disabled="isSubmitting" @click="submit">{{ t('admin.stocks.save') }}</Button>
+            <div class="flex items-center gap-2 shrink-0">
+                <BuybackModal v-if="isAdmin" :resources="props.resources" />
+                <Button :loading="isSubmitting" :disabled="isSubmitting" @click="submit">{{ t('admin.stocks.save') }}</Button>
+            </div>
         </div>
 
         <div class="space-y-3">

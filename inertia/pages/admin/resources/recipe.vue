@@ -27,7 +27,9 @@ const props = defineProps<{
     ingredientResources: IngredientLine[];
 }>();
 
-pageTitle.value = `${t('admin.resources.recipe.title')} - ${props.resource.name}`;
+const lingotLabel = computed(() => t('admin.resources.recipe.lingotLabel', { name: props.resource.name }));
+
+pageTitle.value = `${t('admin.resources.recipe.title')} - ${lingotLabel.value}`;
 
 function buildQuantities(items: IngredientLine[]): Record<string, number> {
     return Object.fromEntries(items.map((item) => [item.id, item.quantity]));
@@ -73,7 +75,7 @@ function submit() {
             </Button>
         </div>
 
-        <p class="text-sm text-muted-foreground">{{ t('admin.resources.recipe.description', { name: resource.name }) }}</p>
+        <p class="text-sm text-muted-foreground">{{ t('admin.resources.recipe.description', { name: lingotLabel }) }}</p>
 
         <div class="space-y-3">
             <h2 class="text-lg font-medium">{{ t('admin.materials.title') }}</h2>

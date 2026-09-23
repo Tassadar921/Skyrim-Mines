@@ -48,7 +48,6 @@
     "buyback": {
         "trigger": "Racheter",
         "title": "Racheter des ressources",
-        "buyAll": "Tout racheter",
         "submit": "Racheter"
     },
     "stocks": {
@@ -233,7 +232,7 @@
                 "expenses": "Dépenses",
                 "commandes": "Commandes",
                 "livraisons": "Livraisons",
-                "castellanies": "Commission livraison"
+                "castellanies": "Châtelleries"
             }
         },
         "dashboard": {
@@ -241,11 +240,6 @@
             "castellanyTax": {
                 "title": "Taxe de la châtellerie",
                 "rate": "Taux (%)",
-                "save": "Mettre à jour"
-            },
-            "largeOrderSetting": {
-                "title": "Seuil grosse commande",
-                "threshold": "Quantité seuil",
                 "save": "Mettre à jour"
             },
             "capitalSnapshot": {
@@ -259,6 +253,14 @@
             "chart": {
                 "title": "Évolution hebdomadaire"
             },
+            "landingPage": {
+                "title": "Page d'accueil",
+                "logoUpload": "Changer le logo",
+                "logoReset": "Réinitialiser",
+                "logoHint": "JPG, PNG ou WEBP, 5 Mo max.",
+                "subtitle": "Sous-titre (optionnel)",
+                "subtitleSave": "Enregistrer"
+            },
             "amountsDue": {
                 "title": "Soldes dus",
                 "employees": "Dû aux employés",
@@ -268,10 +270,8 @@
                 "title": "Récap financier hebdomadaire",
                 "week": "Semaine",
                 "deliveries": "Livraisons",
-                "commissions": "Commissions livraison",
-                "largeOrderFees": "Frais grosse commande",
                 "profit": "Bénéfice",
-                "profitHelp": "Bénéfice des livraisons + frais grosse commande − commissions livraison − dépenses",
+                "profitHelp": "Bénéfice des livraisons − dépenses",
                 "weeklyTax": "Taxe hebdo",
                 "taxRate": "Taux appliqué",
                 "capital": "Capital",
@@ -367,12 +367,10 @@
             }
         },
         "castellanies": {
-            "title": "Commission livraison",
+            "title": "Châtelleries",
             "new": "Nouvelle châtellerie",
             "table": {
                 "name": "Châtellerie",
-                "commissionAmount": "Commission",
-                "largeOrderFeeRate": "Frais grosse commande",
                 "empty": "Aucune châtellerie enregistrée"
             },
             "create": {
@@ -380,9 +378,7 @@
                 "back": "Retour à la liste",
                 "submit": "Créer",
                 "fields": {
-                    "name": "Nom de la châtellerie",
-                    "commissionAmount": "Commission (s)",
-                    "largeOrderFeeRate": "Frais grosse commande (%)"
+                    "name": "Nom de la châtellerie"
                 }
             },
             "show": {
@@ -465,6 +461,7 @@
             "table": {
                 "name": "Nom",
                 "buyPrice": "Prix d'achat",
+                "manufacturingCost": "Coût fabrication",
                 "sellPrice": "Prix de vente",
                 "actions": "Actions",
                 "edit": "Modifier",
@@ -499,6 +496,7 @@
                 "title": "Recette de fabrication",
                 "back": "Retour à la ressource",
                 "save": "Enregistrer les modifications",
+                "lingotLabel": "Lingot de {name}",
                 "description": "Composition de « {name} » : matériaux et minerais nécessaires à sa fabrication. Le bénéfice sur les livraisons de ce lingot est calculé à partir de ce coût de fabrication, et non plus du prix d'achat.",
                 "quantity": "Quantité nécessaire",
                 "manufacturingCost": "Coût de fabrication",
@@ -638,7 +636,9 @@
                     "recipient": "Client ou organisation",
                     "recipientPlaceholder": "Sélectionner un destinataire",
                     "orderWeek": "Semaine de la commande",
-                    "deliveryWeek": "Semaine de la livraison"
+                    "deliveryWeek": "Semaine de la livraison",
+                    "deductFromStock": "Déduire les quantités du stock",
+                    "deductFromStockHelp": "Prend en priorité sur le stock racheté, puis rachète le manquant sur le tonneau des mineurs si besoin. Le récapitulatif du rachat sera affiché après l'archivage."
                 }
             }
         },
@@ -661,8 +661,6 @@
                 "quantity": "Quantité",
                 "amount": "Montant",
                 "profit": "Bénéfice",
-                "commission": "Commission",
-                "largeOrderFee": "Frais grosse commande",
                 "actions": "Actions",
                 "empty": "Aucune livraison trouvée"
             },
@@ -695,7 +693,7 @@
                 "type": "Type",
                 "quantity": "Quantité",
                 "search": "Rechercher un utilisateur ou une ressource…",
-                "allTypes": "Tous les types",
+                "allResources": "Toutes les ressources",
                 "empty": "Aucune quantité au tonneau pour le moment"
             }
         },

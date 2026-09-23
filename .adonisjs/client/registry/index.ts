@@ -162,17 +162,29 @@ const routes = {
     tokens: [{"old":"/admin/castellany-tax","type":0,"val":"admin","end":""},{"old":"/admin/castellany-tax","type":0,"val":"castellany-tax","end":""}],
     types: placeholder as Registry['admin.dashboard.castellanyTax.update']['types'],
   },
-  'admin.dashboard.largeOrderSetting.update': {
-    methods: ["PUT"],
-    pattern: '/admin/large-order-threshold',
-    tokens: [{"old":"/admin/large-order-threshold","type":0,"val":"admin","end":""},{"old":"/admin/large-order-threshold","type":0,"val":"large-order-threshold","end":""}],
-    types: placeholder as Registry['admin.dashboard.largeOrderSetting.update']['types'],
-  },
   'admin.dashboard.capitalSnapshot.store': {
     methods: ["POST"],
     pattern: '/admin/capital-snapshot',
     tokens: [{"old":"/admin/capital-snapshot","type":0,"val":"admin","end":""},{"old":"/admin/capital-snapshot","type":0,"val":"capital-snapshot","end":""}],
     types: placeholder as Registry['admin.dashboard.capitalSnapshot.store']['types'],
+  },
+  'admin.siteSettings.updateLogo': {
+    methods: ["POST"],
+    pattern: '/admin/logo',
+    tokens: [{"old":"/admin/logo","type":0,"val":"admin","end":""},{"old":"/admin/logo","type":0,"val":"logo","end":""}],
+    types: placeholder as Registry['admin.siteSettings.updateLogo']['types'],
+  },
+  'admin.siteSettings.destroyLogo': {
+    methods: ["DELETE"],
+    pattern: '/admin/logo',
+    tokens: [{"old":"/admin/logo","type":0,"val":"admin","end":""},{"old":"/admin/logo","type":0,"val":"logo","end":""}],
+    types: placeholder as Registry['admin.siteSettings.destroyLogo']['types'],
+  },
+  'admin.siteSettings.updateSubtitle': {
+    methods: ["PUT"],
+    pattern: '/admin/subtitle',
+    tokens: [{"old":"/admin/subtitle","type":0,"val":"admin","end":""},{"old":"/admin/subtitle","type":0,"val":"subtitle","end":""}],
+    types: placeholder as Registry['admin.siteSettings.updateSubtitle']['types'],
   },
   'admin.users.index': {
     methods: ["GET","HEAD"],

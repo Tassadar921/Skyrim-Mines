@@ -6,8 +6,6 @@ export default class CastellanyTransformer extends BaseTransformer<Castellany> {
         return {
             id: this.resource.id,
             name: this.resource.name,
-            commissionAmount: this.resource.commissionAmount,
-            largeOrderFeeRate: this.resource.largeOrderFeeRate,
         };
     }
 }

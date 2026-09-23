@@ -21,7 +21,7 @@ const { isAdmin } = useAuth();
 pageTitle.value = t('admin.castellanies.title');
 
 const props = defineProps<{
-    castellanies: { id: string; name: string; commissionAmount: number; largeOrderFeeRate: number }[];
+    castellanies: { id: string; name: string }[];
     meta: { total: number; currentPage: number; lastPage: number; perPage: number };
     filters: { search: string; sort: string; dir: string };
 }>();
@@ -103,20 +103,16 @@ function resetFilters() {
                                 <component :is="sortIcon('name')" class="size-4" />
                             </Button>
                         </TableHead>
-                        <TableHead>{{ t('admin.castellanies.table.commissionAmount') }}</TableHead>
-                        <TableHead>{{ t('admin.castellanies.table.largeOrderFeeRate') }}</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                     <template v-if="castellanies.length">
                         <TableRow v-for="castellany in castellanies" :key="castellany.id" class="cursor-pointer" @click="router.visit(urlFor('admin.castellanies.show', { id: castellany.id }))">
                             <TableCell class="text-sm font-medium">{{ castellany.name }}</TableCell>
-                            <TableCell class="text-sm text-muted-foreground">{{ castellany.commissionAmount }} s</TableCell>
-                            <TableCell class="text-sm text-muted-foreground">{{ castellany.largeOrderFeeRate }} %</TableCell>
                         </TableRow>
                     </template>
                     <TableRow v-else>
-                        <TableCell :colspan="3" class="h-24 text-center text-muted-foreground">
+                        <TableCell :colspan="1" class="h-24 text-center text-muted-foreground">
                             {{ t('admin.castellanies.table.empty') }}
                         </TableCell>
                     </TableRow>

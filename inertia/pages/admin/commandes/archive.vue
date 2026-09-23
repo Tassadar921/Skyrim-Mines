@@ -10,6 +10,7 @@ import { Label } from '~/components/ui/label';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '~/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '~/components/ui/table';
 import { Input } from '~/components/ui/input';
+import { Checkbox } from '~/components/ui/checkbox';
 import { Link } from '@adonisjs/inertia/vue';
 import { ArrowLeft } from '@lucide/vue';
 import QuantityStepper from '~/partials/stocks/QuantityStepper.vue';
@@ -79,6 +80,21 @@ function setQuantity(id: string, value: number) {
     quantities[id] = value;
 }
 
+const unitPriceInputs = reactive<Record<string, string>>({});
+
+function priceInputValue(resource: Data.Resource): string {
+    return unitPriceInputs[resource.id] ?? priceFor(resource).toFixed(2);
+}
+
+function setUnitPrice(id: string, value: string) {
+    unitPriceInputs[id] = value;
+}
+
+function effectivePrice(resource: Data.Resource): number {
+    const overridden = unitPriceInputs[resource.id];
+    return overridden !== undefined ? Math.max(0, Number(overridden) || 0) : priceFor(resource);
+}
+
 const recipientSelection = ref('');
 const recipientScope = ref<'organization' | 'personal'>('organization');
 
@@ -103,7 +119,7 @@ function priceFor(resource: Data.Resource): number {
 }
 
 const hasSelection = computed(() => Object.values(quantities).some((quantity) => quantity > 0));
-const totalAmount = computed(() => props.resources.reduce((sum, resource) => sum + priceFor(resource) * (quantities[resource.id] ?? 0), 0));
+const totalAmount = computed(() => props.resources.reduce((sum, resource) => sum + effectivePrice(resource) * (quantities[resource.id] ?? 0), 0));
 
 const form = useForm({
     orderWeek: props.currentWeek,
@@ -111,6 +127,7 @@ const form = useForm({
     recipientClientId: '',
     recipientOrganizationId: '',
     castellanyId: PICKUP,
+    deductFromStock: false,
 });
 
 watch(effectiveOrganizationId, (organizationId) => {
@@ -146,7 +163,14 @@ const canSubmit = computed(() => {
 });
 
 function submit() {
-    const items = props.resources.map((resource) => ({ resourceId: resource.id, quantity: quantities[resource.id] ?? 0 }));
+    const items = props.resources.map((resource) => {
+        const overridden = unitPriceInputs[resource.id];
+        return {
+            resourceId: resource.id,
+            quantity: quantities[resource.id] ?? 0,
+            ...(overridden !== undefined ? { unitPrice: Math.max(0, Number(overridden) || 0) } : {}),
+        };
+    });
 
     const recipient: Record<string, string> = {};
     if (selectedRecipientType.value === 'client') {
@@ -268,6 +292,11 @@ function submit() {
                         </SelectContent>
                     </Select>
                 </div>
+                <div class="flex items-center gap-2 pt-1">
+                    <Checkbox id="deductFromStock" :model-value="form.deductFromStock" @update:model-value="(v) => (form.deductFromStock = !!v)" />
+                    <Label for="deductFromStock" class="cursor-pointer font-normal">{{ t('admin.orderArchives.create.fields.deductFromStock') }}</Label>
+                </div>
+                <p class="text-xs text-muted-foreground">{{ t('admin.orderArchives.create.fields.deductFromStockHelp') }}</p>
             </div>
         </div>
 
@@ -285,7 +314,16 @@ function submit() {
                     <TableBody>
                         <TableRow v-for="resource in minerais" :key="resource.id">
                             <TableCell class="text-sm font-medium">{{ resource.name }}</TableCell>
-                            <TableCell class="text-sm text-muted-foreground">{{ priceFor(resource).toFixed(2) }} s</TableCell>
+                            <TableCell class="text-sm text-muted-foreground">
+                                <Input
+                                    type="number"
+                                    min="0"
+                                    step="0.01"
+                                    class="w-28"
+                                    :model-value="priceInputValue(resource)"
+                                    @update:model-value="(value) => setUnitPrice(resource.id, String(value))"
+                                />
+                            </TableCell>
                             <TableCell>
                                 <QuantityStepper :model-value="quantities[resource.id] ?? 0" @update:model-value="(value) => setQuantity(resource.id, value)" />
                             </TableCell>
@@ -309,7 +347,16 @@ function submit() {
                     <TableBody>
                         <TableRow v-for="resource in lingots" :key="resource.id">
                             <TableCell class="text-sm font-medium">{{ resource.name }}</TableCell>
-                            <TableCell class="text-sm text-muted-foreground">{{ priceFor(resource).toFixed(2) }} s</TableCell>
+                            <TableCell class="text-sm text-muted-foreground">
+                                <Input
+                                    type="number"
+                                    min="0"
+                                    step="0.01"
+                                    class="w-28"
+                                    :model-value="priceInputValue(resource)"
+                                    @update:model-value="(value) => setUnitPrice(resource.id, String(value))"
+                                />
+                            </TableCell>
                             <TableCell>
                                 <QuantityStepper :model-value="quantities[resource.id] ?? 0" @update:model-value="(value) => setQuantity(resource.id, value)" />
                             </TableCell>

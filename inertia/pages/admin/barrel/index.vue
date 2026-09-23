@@ -10,16 +10,15 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '~
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Badge } from '~/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '~/components/ui/select';
 import type { AcceptableValue } from 'reka-ui';
 import { ArrowUp, ArrowDown, ArrowUpDown, FilterX } from '@lucide/vue';
 import QuantityStepper from '~/partials/stocks/QuantityStepper.vue';
 
 defineOptions({ layout: AdminLayout });
 
-const resourceTypes = ['minerai', 'lingot'] as const;
-
 type BarrelEntry = { userId: string; username: string; resourceId: string; resourceName: string; resourceType: string; quantity: number };
+type ResourceOption = { id: string; name: string; type: string };
 
 const { t } = useI18n();
 const { isAdmin } = useAuth();
@@ -29,8 +28,12 @@ pageTitle.value = t('admin.barrel.title');
 const props = defineProps<{
     entries: BarrelEntry[];
     meta: { total: number; currentPage: number; lastPage: number; perPage: number };
-    filters: { search: string; sort: string; dir: string; resourceType: string };
+    filters: { search: string; sort: string; dir: string; resourceId: string | null };
+    resourceOptions: ResourceOption[];
 }>();
+
+const mineraiOptions = computed(() => props.resourceOptions.filter((resource) => resource.type === 'minerai'));
+const lingotOptions = computed(() => props.resourceOptions.filter((resource) => resource.type === 'lingot'));
 
 const searchValue = ref(props.filters.search);
 let debounceTimer: ReturnType<typeof setTimeout> | null = null;
@@ -40,7 +43,7 @@ function navigate(overrides: Record<string, string | number | undefined>) {
         search: searchValue.value || undefined,
         sort: props.filters.sort,
         dir: props.filters.dir,
-        resourceType: props.filters.resourceType !== 'all' ? props.filters.resourceType : undefined,
+        resourceId: props.filters.resourceId ?? undefined,
         page: 1,
         ...overrides,
     };
@@ -59,8 +62,8 @@ function onSearchInput(value: string | number) {
     }, 300);
 }
 
-function onResourceTypeFilterChange(value: AcceptableValue) {
-    navigate({ resourceType: value === 'all' ? undefined : String(value), page: 1 });
+function onResourceFilterChange(value: AcceptableValue) {
+    navigate({ resourceId: value === 'all' ? undefined : String(value), page: 1 });
 }
 
 function onSort(column: string) {
@@ -106,7 +109,7 @@ function updateQuantity(entry: BarrelEntry, value: number) {
     }, 500);
 }
 
-const hasActiveFilters = computed(() => !!props.filters.search || !!props.filters.sort || props.filters.resourceType !== 'all' || props.meta.currentPage !== 1);
+const hasActiveFilters = computed(() => !!props.filters.search || !!props.filters.sort || !!props.filters.resourceId || props.meta.currentPage !== 1);
 
 function resetFilters() {
     searchValue.value = '';
@@ -120,13 +123,20 @@ function resetFilters() {
 
         <div class="flex items-center gap-4">
             <Input :placeholder="t('admin.barrel.table.search')" :model-value="searchValue" class="max-w-sm" @update:model-value="onSearchInput" />
-            <Select :model-value="filters.resourceType" @update:model-value="onResourceTypeFilterChange">
-                <SelectTrigger class="w-48">
+            <Select :model-value="filters.resourceId ?? 'all'" @update:model-value="onResourceFilterChange">
+                <SelectTrigger class="w-56">
                     <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                    <SelectItem value="all">{{ t('admin.barrel.table.allTypes') }}</SelectItem>
-                    <SelectItem v-for="type in resourceTypes" :key="type" :value="type">{{ t(`admin.resources.types.${type}`) }}</SelectItem>
+                    <SelectItem value="all">{{ t('admin.barrel.table.allResources') }}</SelectItem>
+                    <SelectGroup v-if="mineraiOptions.length">
+                        <SelectLabel>{{ t('admin.resources.types.minerai') }}</SelectLabel>
+                        <SelectItem v-for="resource in mineraiOptions" :key="resource.id" :value="resource.id">{{ resource.name }}</SelectItem>
+                    </SelectGroup>
+                    <SelectGroup v-if="lingotOptions.length">
+                        <SelectLabel>{{ t('admin.resources.types.lingot') }}</SelectLabel>
+                        <SelectItem v-for="resource in lingotOptions" :key="resource.id" :value="resource.id">{{ resource.name }}</SelectItem>
+                    </SelectGroup>
                 </SelectContent>
             </Select>
             <Button variant="ghost" size="sm" class="gap-1" :disabled="!hasActiveFilters" @click="resetFilters">

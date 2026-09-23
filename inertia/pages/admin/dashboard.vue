@@ -4,7 +4,7 @@ import { useAdminLayout } from '~/composables/use_admin_layout';
 import { useAuth } from '~/composables/use_auth';
 import { useI18n } from 'vue-i18n';
 import { computed, ref } from 'vue';
-import { router } from '@inertiajs/vue3';
+import { router, useForm, usePage } from '@inertiajs/vue3';
 import { urlFor } from '~/client';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '~/components/ui/table';
 import { Badge } from '~/components/ui/badge';
@@ -13,10 +13,12 @@ import { Input } from '~/components/ui/input';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '~/components/ui/tooltip';
 import { HelpCircle } from '@lucide/vue';
 import WeeklyMetricChart from '~/partials/admin/WeeklyMetricChart.vue';
+import type { Data } from '@generated/data';
 
 defineOptions({ layout: AdminLayout });
 const { t } = useI18n();
 const { isAdmin } = useAuth();
+const page = usePage<Data.SharedProps>();
 
 const { pageTitle } = useAdminLayout();
 pageTitle.value = t('admin.dashboard.title');
@@ -26,8 +28,6 @@ type WeeklyRecap = {
     startDate: string;
     endDate: string;
     deliveriesAmount: number;
-    commissionsAmount: number;
-    largeOrderFeesAmount: number;
     profit: number;
     weeklyTax: number;
     taxRate: number;
@@ -41,7 +41,6 @@ const props = defineProps<{
     employeeDueAmount: number;
     adminDueAmount: number;
     castellanyTaxRate: number;
-    largeOrderThresholdQuantity: number;
 }>();
 
 function formatWeekRange(recap: WeeklyRecap): string {
@@ -65,18 +64,6 @@ function submitCastellanyTax() {
     router.put(urlFor('admin.dashboard.castellanyTax.update'), { rate: castellanyTaxRate.value }, { preserveScroll: true, onFinish: () => (isSubmittingCastellanyTax.value = false) });
 }
 
-const largeOrderThresholdQuantity = ref(String(props.largeOrderThresholdQuantity));
-const isSubmittingLargeOrderSetting = ref(false);
-
-function submitLargeOrderSetting() {
-    isSubmittingLargeOrderSetting.value = true;
-    router.put(
-        urlFor('admin.dashboard.largeOrderSetting.update'),
-        { thresholdQuantity: largeOrderThresholdQuantity.value },
-        { preserveScroll: true, onFinish: () => (isSubmittingLargeOrderSetting.value = false) },
-    );
-}
-
 const currentWeekRecap = computed(() => props.weeklyRecap[0]);
 
 const capitalInput = ref('');
@@ -91,6 +78,37 @@ function submitCapitalSnapshot() {
         { preserveScroll: true, onFinish: () => (isSubmittingCapitalSnapshot.value = false) },
     );
 }
+
+const logoInputRef = ref<HTMLInputElement | null>(null);
+const logoForm = useForm<{ logo: File | null }>({ logo: null });
+const isRemovingLogo = ref(false);
+
+function onLogoChange(event: Event) {
+    const target = event.target as HTMLInputElement;
+    logoForm.logo = target.files?.[0] ?? null;
+    if (!logoForm.logo) return;
+
+    logoForm.post(urlFor('admin.siteSettings.updateLogo'), {
+        preserveScroll: true,
+        onFinish: () => {
+            logoForm.reset();
+            if (logoInputRef.value) logoInputRef.value.value = '';
+        },
+    });
+}
+
+function removeLogo() {
+    isRemovingLogo.value = true;
+    router.delete(urlFor('admin.siteSettings.destroyLogo'), { preserveScroll: true, onFinish: () => (isRemovingLogo.value = false) });
+}
+
+const subtitleInput = ref(page.props.subtitle ?? '');
+const isSubmittingSubtitle = ref(false);
+
+function submitSubtitle() {
+    isSubmittingSubtitle.value = true;
+    router.put(urlFor('admin.siteSettings.updateSubtitle'), { subtitle: subtitleInput.value }, { preserveScroll: true, onFinish: () => (isSubmittingSubtitle.value = false) });
+}
 </script>
 
 <template>
@@ -101,14 +119,6 @@ function submitCapitalSnapshot() {
                 <Input v-model="castellanyTaxRate" type="number" :label="t('admin.dashboard.castellanyTax.rate')" min="0" :max="100" step="1" :readonly="!isAdmin" />
                 <Button v-if="isAdmin" size="sm" :loading="isSubmittingCastellanyTax" :disabled="isSubmittingCastellanyTax" @click="submitCastellanyTax">
                     {{ t('admin.dashboard.castellanyTax.save') }}
-                </Button>
-            </div>
-
-            <div class="rounded-md border p-5 space-y-4 flex-1 min-w-0">
-                <div class="text-sm font-medium">{{ t('admin.dashboard.largeOrderSetting.title') }}</div>
-                <Input v-model="largeOrderThresholdQuantity" type="number" :label="t('admin.dashboard.largeOrderSetting.threshold')" min="0" step="1" :readonly="!isAdmin" />
-                <Button v-if="isAdmin" size="sm" :loading="isSubmittingLargeOrderSetting" :disabled="isSubmittingLargeOrderSetting" @click="submitLargeOrderSetting">
-                    {{ t('admin.dashboard.largeOrderSetting.save') }}
                 </Button>
             </div>
 
@@ -150,6 +160,32 @@ function submitCapitalSnapshot() {
                         </Button>
                     </template>
                 </template>
+            </div>
+
+            <div class="rounded-md border p-5 space-y-4 flex-1 min-w-0">
+                <div class="text-sm font-medium">{{ t('admin.dashboard.landingPage.title') }}</div>
+                <div class="flex items-center gap-4">
+                    <img :src="page.props.logoUrl" alt="Logo" class="size-16 rounded border bg-muted/30 object-contain p-1" />
+                    <div v-if="isAdmin" class="space-y-1">
+                        <div class="flex gap-2">
+                            <Button variant="outline" size="sm" type="button" :loading="logoForm.processing" :disabled="logoForm.processing" @click="logoInputRef?.click()">
+                                {{ t('admin.dashboard.landingPage.logoUpload') }}
+                            </Button>
+                            <Button variant="ghost" size="sm" type="button" :loading="isRemovingLogo" :disabled="isRemovingLogo" @click="removeLogo">
+                                {{ t('admin.dashboard.landingPage.logoReset') }}
+                            </Button>
+                        </div>
+                        <p class="text-xs text-muted-foreground">{{ t('admin.dashboard.landingPage.logoHint') }}</p>
+                        <p v-if="logoForm.errors.logo" class="text-xs text-destructive">{{ logoForm.errors.logo }}</p>
+                        <input ref="logoInputRef" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" class="hidden" @change="onLogoChange" />
+                    </div>
+                </div>
+                <div class="space-y-1 border-t pt-3">
+                    <Input v-model="subtitleInput" :label="t('admin.dashboard.landingPage.subtitle')" maxlength="255" :readonly="!isAdmin" />
+                    <Button v-if="isAdmin" size="sm" :loading="isSubmittingSubtitle" :disabled="isSubmittingSubtitle" @click="submitSubtitle">
+                        {{ t('admin.dashboard.landingPage.subtitleSave') }}
+                    </Button>
+                </div>
             </div>
         </div>
 

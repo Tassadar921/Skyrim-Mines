@@ -319,18 +319,6 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/dashboard_controller').default['updateCastellanyTax']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
-  'admin.dashboard.largeOrderSetting.update': {
-    methods: ["PUT"]
-    pattern: '/admin/large-order-threshold'
-    types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/admin/large_order_setting').updateLargeOrderSettingValidator)>>
-      paramsTuple: []
-      params: {}
-      query: ExtractQuery<InferInput<(typeof import('#validators/admin/large_order_setting').updateLargeOrderSettingValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/dashboard_controller').default['updateLargeOrderSetting']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/dashboard_controller').default['updateLargeOrderSetting']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
   'admin.dashboard.capitalSnapshot.store': {
     methods: ["POST"]
     pattern: '/admin/capital-snapshot'
@@ -341,6 +329,42 @@ export interface Registry {
       query: ExtractQuery<InferInput<(typeof import('#validators/admin/company_capital_snapshot').storeCompanyCapitalSnapshotValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/dashboard_controller').default['storeCapitalSnapshot']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/dashboard_controller').default['storeCapitalSnapshot']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'admin.siteSettings.updateLogo': {
+    methods: ["POST"]
+    pattern: '/admin/logo'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/admin/site_settings').updateLogoValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/admin/site_settings').updateLogoValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/site_settings_controller').default['updateLogo']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/site_settings_controller').default['updateLogo']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'admin.siteSettings.destroyLogo': {
+    methods: ["DELETE"]
+    pattern: '/admin/logo'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/site_settings_controller').default['destroyLogo']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/site_settings_controller').default['destroyLogo']>>>
+    }
+  }
+  'admin.siteSettings.updateSubtitle': {
+    methods: ["PUT"]
+    pattern: '/admin/subtitle'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/admin/site_settings').updateSubtitleValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/admin/site_settings').updateSubtitleValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/site_settings_controller').default['updateSubtitle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/site_settings_controller').default['updateSubtitle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'admin.users.index': {

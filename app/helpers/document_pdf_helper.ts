@@ -26,6 +26,8 @@ export type DocumentPdfData = {
     createdAt: DateTime;
     lines: DocumentPdfLine[];
     totalAmount: number;
+    /** Absolute filesystem path to the logo image. Defaults to the built-in `public/logo.png`. */
+    logoPath?: string;
 };
 
 function formatAmount(amount: number): string {
@@ -50,7 +52,7 @@ export async function generateDocumentPdf(data: DocumentPdfData): Promise<Buffer
         doc.registerFont('Body-Italic', app.makePath('resources/fonts/Almendra-Italic.ttf'));
         doc.font('Body');
 
-        const logoPath = app.publicPath('logo.png');
+        const logoPath = data.logoPath ?? app.publicPath('logo.png');
         const marginLeft = doc.page.margins.left;
         const pageWidth = doc.page.width - marginLeft - doc.page.margins.right;
         const halfWidth = pageWidth / 2;

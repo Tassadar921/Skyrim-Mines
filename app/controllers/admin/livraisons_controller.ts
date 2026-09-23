@@ -66,8 +66,6 @@ export default class LivraisonsController {
                     requesterName: delivery.order.requesterName,
                     organizationName: delivery.order.organizationName,
                     castellanyName: delivery.castellany?.name ?? null,
-                    commissionAmount: Number(delivery.commissionAmount),
-                    largeOrderFeeAmount: Number(delivery.largeOrderFeeAmount),
                     lines,
                     totalProfit: lines.reduce((sum, line) => sum + (line.profit ?? 0), 0),
                 };

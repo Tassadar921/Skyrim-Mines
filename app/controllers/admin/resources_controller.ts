@@ -1,12 +1,16 @@
 import { type HttpContext } from '@adonisjs/core/http';
 import logger from '@adonisjs/core/services/logger';
 import ResourceRepository from '#repositories/resource_repository';
+import ResourceRecipeLineRepository from '#repositories/resource_recipe_line_repository';
 import ResourceTransformer from '#transformers/resource_transformer';
 import ResourceTypeEnum from '#types/enum/resource_type_enum';
 import { createResourceValidator, updateResourceValidator, reorderResourcesValidator, indexResourceValidator } from '#validators/admin/resources';
 
 export default class ResourcesController {
-    constructor(private readonly resourceRepository: ResourceRepository = new ResourceRepository()) {}
+    constructor(
+        private readonly resourceRepository: ResourceRepository = new ResourceRepository(),
+        private readonly resourceRecipeLineRepository: ResourceRecipeLineRepository = new ResourceRecipeLineRepository(),
+    ) {}
 
     public async index({ inertia, request }: HttpContext) {
         const { mineraiPage, lingotPage, sort, dir, search } = await request.validateUsing(indexResourceValidator);
@@ -20,13 +24,16 @@ export default class ResourcesController {
             this.resourceRepository.paginate({ type: ResourceTypeEnum.LINGOT, page: lingotCurrentPage, perPage: 20, sort, dir: currentDir, search }),
         ]);
 
+        const lingotResources = lingots.all();
+        const manufacturingCostByResourceId = await this.resourceRecipeLineRepository.sumCostByResourceIds(lingotResources.map((r) => r.id));
+
         return inertia.render('admin/resources/index', {
             minerais: {
                 resources: minerais.all().map((r) => new ResourceTransformer(r).toObject()),
                 meta: { total: minerais.total, currentPage: minerais.currentPage, lastPage: minerais.lastPage, perPage: minerais.perPage },
             },
             lingots: {
-                resources: lingots.all().map((r) => new ResourceTransformer(r).toObject()),
+                resources: lingotResources.map((r) => ({ ...new ResourceTransformer(r).toObject(), manufacturingCost: manufacturingCostByResourceId.get(r.id) ?? null })),
                 meta: { total: lingots.total, currentPage: lingots.currentPage, lastPage: lingots.lastPage, perPage: lingots.perPage },
             },
             filters: { search: search ?? '', sort: sort ?? '', dir: currentDir },

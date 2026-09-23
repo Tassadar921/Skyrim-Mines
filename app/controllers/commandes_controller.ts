@@ -1,4 +1,5 @@
 import { type HttpContext } from '@adonisjs/core/http';
+import app from '@adonisjs/core/services/app';
 import logger from '@adonisjs/core/services/logger';
 import transmit from '@adonisjs/transmit/services/main';
 import ResourceRepository from '#repositories/resource_repository';
@@ -8,6 +9,7 @@ import OrganizationRepository from '#repositories/organization_repository';
 import OrganizationResourcePriceRepository from '#repositories/organization_resource_price_repository';
 import UserRepository from '#repositories/user_repository';
 import FileRepository from '#repositories/file_repository';
+import SiteSettingRepository from '#repositories/site_setting_repository';
 import type Order from '#models/order';
 import ResourceTransformer from '#transformers/resource_transformer';
 import OrganizationRoleEnum from '#types/enum/organization_role_enum';
@@ -30,6 +32,7 @@ export default class CommandesController {
         private readonly organizationResourcePriceRepository: OrganizationResourcePriceRepository = new OrganizationResourcePriceRepository(),
         private readonly userRepository: UserRepository = new UserRepository(),
         private readonly fileRepository: FileRepository = new FileRepository(),
+        private readonly siteSettingRepository: SiteSettingRepository = new SiteSettingRepository(),
     ) {}
 
     private async buildLines(order: Order) {
@@ -187,6 +190,9 @@ export default class CommandesController {
                 lines,
             });
 
+            const siteSetting = await this.siteSettingRepository.getWithLogo();
+            const logoPath = siteSetting.logoFile ? app.publicPath(siteSetting.logoFile.path.replace(/^\//, '')) : undefined;
+
             const pdfBuffer = await generateDocumentPdf({
                 documentLabel: 'Commande',
                 footerText: `Commande réalisée par la ${COMPANY_NAME}`,
@@ -196,6 +202,7 @@ export default class CommandesController {
                 createdAt: order.createdAt,
                 lines,
                 totalAmount,
+                logoPath,
             });
 
             const filename = `cmc_commande_${order.number}.pdf`;

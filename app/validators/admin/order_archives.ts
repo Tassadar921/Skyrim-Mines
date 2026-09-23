@@ -5,6 +5,7 @@ export const createOrderArchiveValidator = vine.create({
         vine.object({
             resourceId: vine.string().uuid(),
             quantity: vine.number().min(0),
+            unitPrice: vine.number().min(0).optional(),
         }),
     ),
     recipientMode: vine.enum(['thirdPartyClient', 'thirdPartyOrganization']),
@@ -14,4 +15,5 @@ export const createOrderArchiveValidator = vine.create({
     orderWeek: vine.number().min(1),
     deliveryWeek: vine.number().min(1),
     castellanyId: vine.string().uuid().nullable().optional(),
+    deductFromStock: vine.boolean().optional(),
 });

@@ -17,7 +17,7 @@ export default class BarrelController {
     ) {}
 
     public async index({ inertia, request }: HttpContext) {
-        const { page, sort, dir, search, resourceType } = await request.validateUsing(indexBarrelValidator);
+        const { page, sort, dir, search, resourceId } = await request.validateUsing(indexBarrelValidator);
 
         const currentSort = sort ?? 'username';
         const currentDir = dir ?? 'asc';
@@ -38,8 +38,8 @@ export default class BarrelController {
 
         let entries = [...keys]
             .map((key) => {
-                const [userId, resourceId] = key.split(':');
-                const resource = resourceById.get(resourceId);
+                const [userId, entryResourceId] = key.split(':');
+                const resource = resourceById.get(entryResourceId);
                 const user = userById.get(userId);
                 if (!resource || !user) return null;
 
@@ -48,7 +48,7 @@ export default class BarrelController {
                 return {
                     userId,
                     username: user.username,
-                    resourceId,
+                    resourceId: entryResourceId,
                     resourceName: resource.name,
                     resourceType: resource.type,
                     quantity,
@@ -61,8 +61,8 @@ export default class BarrelController {
             entries = entries.filter((entry) => entry.username.toLowerCase().includes(needle) || entry.resourceName.toLowerCase().includes(needle));
         }
 
-        if (resourceType) {
-            entries = entries.filter((entry) => entry.resourceType === resourceType);
+        if (resourceId) {
+            entries = entries.filter((entry) => entry.resourceId === resourceId);
         }
 
         entries.sort((a, b) => {
@@ -78,7 +78,8 @@ export default class BarrelController {
         return inertia.render('admin/barrel/index', {
             entries: paginated,
             meta: { total, currentPage, lastPage, perPage },
-            filters: { search: search ?? '', sort: currentSort, dir: currentDir, resourceType: resourceType ?? 'all' },
+            filters: { search: search ?? '', sort: currentSort, dir: currentDir, resourceId: resourceId ?? null },
+            resourceOptions: resources.map((resource) => ({ id: resource.id, name: resource.name, type: resource.type })),
         });
     }
 

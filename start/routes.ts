@@ -46,8 +46,11 @@ router
     .group((): void => {
         router.get('/', [controllers.admin.Dashboard, 'index']).as('admin.dashboard').use(readOnly);
         router.put('/castellany-tax', [controllers.admin.Dashboard, 'updateCastellanyTax']).as('admin.dashboard.castellanyTax.update').use(middleware.admin());
-        router.put('/large-order-threshold', [controllers.admin.Dashboard, 'updateLargeOrderSetting']).as('admin.dashboard.largeOrderSetting.update').use(middleware.admin());
         router.post('/capital-snapshot', [controllers.admin.Dashboard, 'storeCapitalSnapshot']).as('admin.dashboard.capitalSnapshot.store').use(middleware.admin());
+
+        router.post('/logo', [controllers.admin.SiteSettings, 'updateLogo']).as('admin.siteSettings.updateLogo').use(middleware.admin());
+        router.delete('/logo', [controllers.admin.SiteSettings, 'destroyLogo']).as('admin.siteSettings.destroyLogo').use(middleware.admin());
+        router.put('/subtitle', [controllers.admin.SiteSettings, 'updateSubtitle']).as('admin.siteSettings.updateSubtitle').use(middleware.admin());
 
         router.get('/users', [controllers.admin.Users, 'index']).as('admin.users.index').use(readOnly);
         router.get('/users/create', [controllers.admin.Users, 'create']).as('admin.users.create').use(middleware.admin());

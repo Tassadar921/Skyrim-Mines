@@ -28,15 +28,13 @@ export default class CastellanyRepository extends BaseRepository<typeof Castella
         return Castellany.findOrFail(id);
     }
 
-    public async create(data: { name: string; commissionAmount: number; largeOrderFeeRate: number }): Promise<Castellany> {
-        return Castellany.create({ name: data.name, commissionAmount: data.commissionAmount, largeOrderFeeRate: data.largeOrderFeeRate });
+    public async create(data: { name: string }): Promise<Castellany> {
+        return Castellany.create({ name: data.name });
     }
 
-    public async update(id: string, data: { name: string; commissionAmount: number; largeOrderFeeRate: number }): Promise<Castellany> {
+    public async update(id: string, data: { name: string }): Promise<Castellany> {
         const castellany = await Castellany.findOrFail(id);
         castellany.name = data.name;
-        castellany.commissionAmount = data.commissionAmount;
-        castellany.largeOrderFeeRate = data.largeOrderFeeRate;
         await castellany.save();
         return castellany;
     }

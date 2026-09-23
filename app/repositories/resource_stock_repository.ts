@@ -19,6 +19,15 @@ export default class ResourceStockRepository extends BaseRepository<typeof Resou
         await stock.save();
     }
 
+    /** Decrements the purchased stock by up to `quantity`, clamped at 0. Returns the amount actually taken. */
+    public async decrementPurchasedQuantity(resourceId: string, quantity: number, trx?: TransactionClientContract): Promise<number> {
+        const stock = await this.firstOrNew({ resourceId }, { resourceId, ...ResourceStockRepository.EMPTY_STOCK }, trx);
+        const taken = Math.min(quantity, stock.quantityPurchased);
+        stock.quantityPurchased -= taken;
+        await stock.save();
+        return taken;
+    }
+
     public async overrideQuantities(overrides: { resourceId: string; quantityPurchased: number }[], trx?: TransactionClientContract): Promise<void> {
         for (const { resourceId, quantityPurchased } of overrides) {
             const stock = await this.firstOrNew({ resourceId }, { resourceId, ...ResourceStockRepository.EMPTY_STOCK }, trx);

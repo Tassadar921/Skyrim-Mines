@@ -5,13 +5,8 @@ import Delivery from '#models/delivery';
 import DeliveryLine from '#models/delivery_line';
 import Order from '#models/order';
 import Resource from '#models/resource';
-import Castellany from '#models/castellany';
-import User from '#models/user';
-import UserRepository from '#repositories/user_repository';
-import LargeOrderSettingRepository from '#repositories/large_order_setting_repository';
 import ResourceRecipeLineRepository from '#repositories/resource_recipe_line_repository';
 import OrderStatusEnum from '#types/enum/order_status_enum';
-import UserRoleEnum from '#types/enum/user_role_enum';
 import ResourceTypeEnum from '#types/enum/resource_type_enum';
 import { getWeekNumber } from '#helpers/game_week_helper';
 
@@ -32,11 +27,7 @@ export type DeliveryLineInput = {
 };
 
 export default class DeliveryRepository extends BaseRepository<typeof Delivery> {
-    constructor(
-        private readonly userRepository: UserRepository = new UserRepository(),
-        private readonly largeOrderSettingRepository: LargeOrderSettingRepository = new LargeOrderSettingRepository(),
-        private readonly resourceRecipeLineRepository: ResourceRecipeLineRepository = new ResourceRecipeLineRepository(),
-    ) {
+    constructor(private readonly resourceRecipeLineRepository: ResourceRecipeLineRepository = new ResourceRecipeLineRepository()) {
         super(Delivery);
     }
 
@@ -104,24 +95,6 @@ export default class DeliveryRepository extends BaseRepository<typeof Delivery> 
         });
 
         const castellanyId = options.castellanyId ?? null;
-        let commissionAmount = 0;
-        let largeOrderFeeAmount = 0;
-
-        if (castellanyId) {
-            const [deliverer, castellany, largeOrderSetting] = await Promise.all([User.find(deliveredByUserId), Castellany.find(castellanyId), this.largeOrderSettingRepository.get()]);
-            const totalProfit = linesWithProfit.reduce((sum, line) => sum + (line.profit ?? 0), 0);
-
-            if (deliverer?.role === UserRoleEnum.STAFF && castellany) {
-                commissionAmount = castellany.commissionAmount;
-            }
-
-            if (castellany) {
-                const totalQuantity = linesWithProfit.reduce((sum, line) => sum + line.quantity, 0);
-                if (totalQuantity >= largeOrderSetting.thresholdQuantity) {
-                    largeOrderFeeAmount = Math.round(totalProfit * (castellany.largeOrderFeeRate / 100) * 100) / 100;
-                }
-            }
-        }
 
         const deliveredAt = options.deliveredAt ?? DateTime.now();
         const delivery = await db.transaction(async (trx) => {
@@ -132,8 +105,6 @@ export default class DeliveryRepository extends BaseRepository<typeof Delivery> 
                     deliveredAt,
                     deliveredWeekNumber: getWeekNumber(deliveredAt),
                     castellanyId,
-                    commissionAmount: String(commissionAmount),
-                    largeOrderFeeAmount: String(largeOrderFeeAmount),
                 },
                 { client: trx },
             );
@@ -152,10 +123,6 @@ export default class DeliveryRepository extends BaseRepository<typeof Delivery> 
                     },
                     { client: trx },
                 );
-            }
-
-            if (commissionAmount > 0) {
-                await this.userRepository.incrementBalance(deliveredByUserId, commissionAmount, trx);
             }
 
             return created;
@@ -228,24 +195,6 @@ export default class DeliveryRepository extends BaseRepository<typeof Delivery> 
             deliveryCount: Number(row.deliveryCount),
             totalAmount: Number(row.totalAmount ?? 0),
             totalProfit: Number(row.totalProfit ?? 0),
-        }));
-    }
-
-    public async getWeeklyCommissionTotals(): Promise<{ weekNumber: number; totalCommission: number }[]> {
-        const rows = await db.from('deliveries').select('delivered_week_number as weekNumber').sum('commission_amount as totalCommission').groupBy('delivered_week_number');
-
-        return rows.map((row) => ({
-            weekNumber: row.weekNumber,
-            totalCommission: Number(row.totalCommission ?? 0),
-        }));
-    }
-
-    public async getWeeklyLargeOrderFeeTotals(): Promise<{ weekNumber: number; totalFee: number }[]> {
-        const rows = await db.from('deliveries').select('delivered_week_number as weekNumber').sum('large_order_fee_amount as totalFee').groupBy('delivered_week_number');
-
-        return rows.map((row) => ({
-            weekNumber: row.weekNumber,
-            totalFee: Number(row.totalFee ?? 0),
         }));
     }
 }

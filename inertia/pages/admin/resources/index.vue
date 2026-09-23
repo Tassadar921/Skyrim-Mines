@@ -25,9 +25,14 @@ type PaginatedResources = {
     meta: { total: number; currentPage: number; lastPage: number; perPage: number };
 };
 
+type PaginatedLingots = {
+    resources: (Data.Resource & { manufacturingCost: number | null })[];
+    meta: { total: number; currentPage: number; lastPage: number; perPage: number };
+};
+
 const props = defineProps<{
     minerais: PaginatedResources;
-    lingots: PaginatedResources;
+    lingots: PaginatedLingots;
     filters: { search: string; sort: string; dir: string };
 }>();
 
@@ -124,6 +129,7 @@ function resetFilters() {
                 :sort="filters.sort"
                 :dir="filters.dir"
                 :is-default-view="lingotIsDefaultView"
+                show-manufacturing-cost
                 @sort="onSort"
                 @page="onLingotPage"
             />

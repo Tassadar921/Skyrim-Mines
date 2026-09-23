@@ -3,50 +3,17 @@ import logger from '@adonisjs/core/services/logger';
 import db from '@adonisjs/lucid/services/db';
 import transmit from '@adonisjs/transmit/services/main';
 import ResourceRepository from '#repositories/resource_repository';
-import ResourceDepositRepository from '#repositories/resource_deposit_repository';
 import ResourceBuybackRepository from '#repositories/resource_buyback_repository';
-import ResourceBarrelAdjustmentRepository from '#repositories/resource_barrel_adjustment_repository';
 import ResourceBuybackBatchRepository from '#repositories/resource_buyback_batch_repository';
 import ResourceStockRepository from '#repositories/resource_stock_repository';
-import UserRepository from '#repositories/user_repository';
 import { createBuybackValidator } from '#validators/buybacks';
-
-function allocateProportionally(total: number, weights: Map<string, number>): Map<string, number> {
-    const totalWeight = [...weights.values()].reduce((sum, weight) => sum + weight, 0);
-    const result = new Map<string, number>();
-    if (total <= 0 || totalWeight <= 0) return result;
-
-    const remainders: { key: string; remainder: number }[] = [];
-    let allocated = 0;
-
-    for (const [key, weight] of weights) {
-        const raw = (total * weight) / totalWeight;
-        const floor = Math.floor(raw);
-        result.set(key, floor);
-        remainders.push({ key, remainder: raw - floor });
-        allocated += floor;
-    }
-
-    remainders.sort((a, b) => b.remainder - a.remainder);
-    let remaining = total - allocated;
-    for (const { key } of remainders) {
-        if (remaining <= 0) break;
-        result.set(key, (result.get(key) ?? 0) + 1);
-        remaining -= 1;
-    }
-
-    return result;
-}
 
 export default class BuybacksController {
     constructor(
         private readonly resourceRepository: ResourceRepository = new ResourceRepository(),
-        private readonly resourceDepositRepository: ResourceDepositRepository = new ResourceDepositRepository(),
         private readonly resourceBuybackRepository: ResourceBuybackRepository = new ResourceBuybackRepository(),
-        private readonly resourceBarrelAdjustmentRepository: ResourceBarrelAdjustmentRepository = new ResourceBarrelAdjustmentRepository(),
         private readonly resourceBuybackBatchRepository: ResourceBuybackBatchRepository = new ResourceBuybackBatchRepository(),
         private readonly resourceStockRepository: ResourceStockRepository = new ResourceStockRepository(),
-        private readonly userRepository: UserRepository = new UserRepository(),
     ) {}
 
     public async store({ request, response, session, i18n }: HttpContext) {
@@ -68,35 +35,15 @@ export default class BuybacksController {
                     const resource = resourceById.get(item.resourceId);
                     if (!resource) continue;
 
-                    const [depositedByUser, boughtBackByUser, adjustedByUser] = await Promise.all([
-                        this.resourceDepositRepository.sumByUserForResource(item.resourceId),
-                        this.resourceBuybackRepository.sumByUserForResource(item.resourceId),
-                        this.resourceBarrelAdjustmentRepository.sumByUserForResource(item.resourceId),
-                    ]);
-
-                    const userIds = new Set([...depositedByUser.keys(), ...boughtBackByUser.keys(), ...adjustedByUser.keys()]);
-                    const outstandingByUser = new Map<string, number>();
-                    for (const userId of userIds) {
-                        const outstanding = (depositedByUser.get(userId) ?? 0) - (boughtBackByUser.get(userId) ?? 0) + (adjustedByUser.get(userId) ?? 0);
-                        if (outstanding > 0) outstandingByUser.set(userId, outstanding);
-                    }
-
-                    const totalOutstanding = [...outstandingByUser.values()].reduce((sum, qty) => sum + qty, 0);
-                    const quantity = Math.min(item.quantity, totalOutstanding);
+                    const quantity = await this.resourceBuybackRepository.buybackResourceFromBarrel({
+                        resourceId: item.resourceId,
+                        requestedQuantity: item.quantity,
+                        buyPrice: Number(resource.buyPrice),
+                        batchId: batch.id,
+                        trx,
+                    });
                     if (quantity <= 0) continue;
 
-                    const allocations = allocateProportionally(quantity, outstandingByUser);
-                    const buyPrice = Number(resource.buyPrice);
-
-                    const buybackEntries: { batchId: string; userId: string; resourceId: string; quantity: number; amount: number }[] = [];
-                    for (const [userId, allocatedQuantity] of allocations) {
-                        if (allocatedQuantity <= 0) continue;
-                        const amount = allocatedQuantity * buyPrice;
-                        buybackEntries.push({ batchId: batch.id, userId, resourceId: item.resourceId, quantity: allocatedQuantity, amount });
-                        await this.userRepository.incrementBalance(userId, amount, trx);
-                    }
-
-                    await this.resourceBuybackRepository.createMany(buybackEntries, trx);
                     await this.resourceStockRepository.incrementPurchasedQuantity(item.resourceId, quantity, trx);
                 }
             });

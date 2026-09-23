@@ -47,12 +47,14 @@ export interface ApiDefinition {
       castellanyTax: {
         update: typeof routes['admin.dashboard.castellanyTax.update']
       }
-      largeOrderSetting: {
-        update: typeof routes['admin.dashboard.largeOrderSetting.update']
-      }
       capitalSnapshot: {
         store: typeof routes['admin.dashboard.capitalSnapshot.store']
       }
+    }
+    siteSettings: {
+      updateLogo: typeof routes['admin.siteSettings.updateLogo']
+      destroyLogo: typeof routes['admin.siteSettings.destroyLogo']
+      updateSubtitle: typeof routes['admin.siteSettings.updateSubtitle']
     }
     users: {
       index: typeof routes['admin.users.index']
