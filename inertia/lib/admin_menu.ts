@@ -14,7 +14,6 @@ export type MenuItem = {
 
 export const getItems = (t: ReturnType<typeof useI18n>['t']): MenuItem[] => [
     { title: t('admin.layout.menu.dashboard'), route: 'admin.dashboard', icon: BarChart2, exact: true },
-    { title: t('admin.layout.menu.siteSettings'), route: 'admin.siteSettings.index', icon: Settings },
     { title: t('admin.layout.menu.users'), route: 'admin.users.index', icon: Users },
     { title: t('admin.layout.menu.organizations'), route: 'admin.organizations.index', icon: Building2 },
     { title: t('admin.layout.menu.resources'), route: 'admin.resources.index', icon: Pickaxe },
@@ -29,4 +28,7 @@ export const getItems = (t: ReturnType<typeof useI18n>['t']): MenuItem[] => [
     { title: t('admin.layout.menu.castellanies'), route: 'admin.castellanies.index', icon: Landmark },
 ];
 
-export const getFooterItems = (t: ReturnType<typeof useI18n>['t']): MenuItem[] => [{ title: t('admin.layout.menu.home'), route: 'home', icon: Home }];
+export const getFooterItems = (t: ReturnType<typeof useI18n>['t']): MenuItem[] => [
+    { title: t('admin.layout.menu.siteSettings'), route: 'admin.siteSettings.index', icon: Settings },
+    { title: t('admin.layout.menu.home'), route: 'home', icon: Home },
+];

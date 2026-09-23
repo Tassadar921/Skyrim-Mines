@@ -88,9 +88,6 @@ watch(
                     <nav class="flex items-center justify-between border-b w-full h-20 py-5">
                         <div class="flex items-center px-5">
                             <SidebarTrigger :size="32" class="p-4" />
-                            <Link route="home">
-                                <img :src="page.props.logoUrl" alt="Logo" class="size-12" />
-                            </Link>
                         </div>
 
                         <h1 class="text-xl text-amber-700 dark:text-amber-400">{{ $t('admin.title') }} {{ pageTitle ? `- ${pageTitle}` : '' }}</h1>
