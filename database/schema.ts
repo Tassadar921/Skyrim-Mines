@@ -418,7 +418,7 @@ export class ResourceSchema extends BaseModel {
 }
 
 export class SiteSettingSchema extends BaseModel {
-  static $columns = ['createdAt', 'id', 'logoFileId', 'subtitle', 'updatedAt'] as const
+  static $columns = ['createdAt', 'id', 'logoFileId', 'subtitle', 'taxSystem', 'updatedAt'] as const
   $columns = SiteSettingSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -428,8 +428,27 @@ export class SiteSettingSchema extends BaseModel {
   declare logoFileId: string | null
   @column()
   declare subtitle: string | null
+  @column()
+  declare taxSystem: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
+}
+
+export class TaxBracketSchema extends BaseModel {
+  static $columns = ['createdAt', 'id', 'order', 'rate', 'updatedAt', 'upperBound'] as const
+  $columns = TaxBracketSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare order: number
+  @column()
+  declare rate: number
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare upperBound: string | null
 }
 
 export class UserSchema extends BaseModel {

@@ -2,7 +2,8 @@ import { type HttpContext } from '@adonisjs/core/http';
 import logger from '@adonisjs/core/services/logger';
 import SiteSettingRepository from '#repositories/site_setting_repository';
 import FileRepository from '#repositories/file_repository';
-import { updateLogoValidator, updateSubtitleValidator } from '#validators/admin/site_settings';
+import type TaxSystemEnum from '#types/enum/tax_system_enum';
+import { updateLogoValidator, updateSubtitleValidator, updateTaxSystemValidator } from '#validators/admin/site_settings';
 import { storeUploadedFile, deleteStoredFile } from '#helpers/file_storage_helper';
 
 export default class SiteSettingsController {
@@ -10,6 +11,14 @@ export default class SiteSettingsController {
         private readonly siteSettingRepository: SiteSettingRepository = new SiteSettingRepository(),
         private readonly fileRepository: FileRepository = new FileRepository(),
     ) {}
+
+    public async index({ inertia }: HttpContext) {
+        const siteSetting = await this.siteSettingRepository.get();
+
+        return inertia.render('admin/site-settings/index', {
+            taxSystem: siteSetting.taxSystem as TaxSystemEnum,
+        });
+    }
 
     public async updateLogo({ request, response, session, i18n }: HttpContext) {
         const { logo } = await request.validateUsing(updateLogoValidator);
@@ -72,6 +81,20 @@ export default class SiteSettingsController {
         } catch (e) {
             logger.error({ err: e }, 'siteSettings.updateSubtitle failed');
             session.flash('error', i18n.t('messages.admin.siteSettings.subtitle.update.error'));
+        }
+
+        return response.redirect().back();
+    }
+
+    public async updateTaxSystem({ request, response, session, i18n }: HttpContext) {
+        const { taxSystem } = await request.validateUsing(updateTaxSystemValidator);
+
+        try {
+            await this.siteSettingRepository.updateTaxSystem(taxSystem as TaxSystemEnum);
+            session.flash('success', i18n.t('messages.admin.siteSettings.taxSystem.update.success'));
+        } catch (e) {
+            logger.error({ err: e }, 'siteSettings.updateTaxSystem failed');
+            session.flash('error', i18n.t('messages.admin.siteSettings.taxSystem.update.error'));
         }
 
         return response.redirect().back();

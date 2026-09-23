@@ -31,9 +31,12 @@ export type ScannedRoutes = {
     'admin.dashboard': { paramsTuple?: []; params?: {} }
     'admin.dashboard.castellanyTax.update': { paramsTuple?: []; params?: {} }
     'admin.dashboard.capitalSnapshot.store': { paramsTuple?: []; params?: {} }
+    'admin.siteSettings.index': { paramsTuple?: []; params?: {} }
     'admin.siteSettings.updateLogo': { paramsTuple?: []; params?: {} }
     'admin.siteSettings.destroyLogo': { paramsTuple?: []; params?: {} }
     'admin.siteSettings.updateSubtitle': { paramsTuple?: []; params?: {} }
+    'admin.siteSettings.updateTaxSystem': { paramsTuple?: []; params?: {} }
+    'admin.dashboard.taxBrackets.update': { paramsTuple?: []; params?: {} }
     'admin.users.index': { paramsTuple?: []; params?: {} }
     'admin.users.create': { paramsTuple?: []; params?: {} }
     'admin.users.store': { paramsTuple?: []; params?: {} }
@@ -113,6 +116,7 @@ export type ScannedRoutes = {
     'auth.discord.redirect': { paramsTuple?: []; params?: {} }
     'auth.discord.callback': { paramsTuple?: []; params?: {} }
     'admin.dashboard': { paramsTuple?: []; params?: {} }
+    'admin.siteSettings.index': { paramsTuple?: []; params?: {} }
     'admin.users.index': { paramsTuple?: []; params?: {} }
     'admin.users.create': { paramsTuple?: []; params?: {} }
     'admin.users.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -153,6 +157,7 @@ export type ScannedRoutes = {
     'auth.discord.redirect': { paramsTuple?: []; params?: {} }
     'auth.discord.callback': { paramsTuple?: []; params?: {} }
     'admin.dashboard': { paramsTuple?: []; params?: {} }
+    'admin.siteSettings.index': { paramsTuple?: []; params?: {} }
     'admin.users.index': { paramsTuple?: []; params?: {} }
     'admin.users.create': { paramsTuple?: []; params?: {} }
     'admin.users.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -233,6 +238,8 @@ export type ScannedRoutes = {
   PUT: {
     'admin.dashboard.castellanyTax.update': { paramsTuple?: []; params?: {} }
     'admin.siteSettings.updateSubtitle': { paramsTuple?: []; params?: {} }
+    'admin.siteSettings.updateTaxSystem': { paramsTuple?: []; params?: {} }
+    'admin.dashboard.taxBrackets.update': { paramsTuple?: []; params?: {} }
     'admin.users.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.users.updateBalance': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.resources.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }

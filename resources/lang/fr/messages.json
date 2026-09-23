@@ -23,6 +23,13 @@
                     "error": "Erreur lors de la mise à jour de la taxe de la châtellerie"
                 }
             },
+            "taxBrackets": {
+                "update": {
+                    "success": "Tranches fiscales mises à jour avec succès",
+                    "error": "Erreur lors de la mise à jour des tranches fiscales",
+                    "invalid": "Les tranches doivent avoir des seuils croissants, seule la dernière pouvant être illimitée"
+                }
+            },
             "capitalSnapshot": {
                 "store": {
                     "success": "Capital et stock enregistrés avec succès",
@@ -46,6 +53,12 @@
                 "update": {
                     "success": "Sous-titre mis à jour avec succès",
                     "error": "Erreur lors de la mise à jour du sous-titre"
+                }
+            },
+            "taxSystem": {
+                "update": {
+                    "success": "Système fiscal mis à jour avec succès",
+                    "error": "Erreur lors de la mise à jour du système fiscal"
                 }
             }
         },

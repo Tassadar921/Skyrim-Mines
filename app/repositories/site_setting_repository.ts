@@ -1,5 +1,6 @@
 import BaseRepository from '#repositories/base/base_repository';
 import SiteSetting from '#models/site_setting';
+import type TaxSystemEnum from '#types/enum/tax_system_enum';
 
 export default class SiteSettingRepository extends BaseRepository<typeof SiteSetting> {
     constructor() {
@@ -26,6 +27,13 @@ export default class SiteSettingRepository extends BaseRepository<typeof SiteSet
     public async updateSubtitle(subtitle: string | null): Promise<SiteSetting> {
         const setting = await this.get();
         setting.subtitle = subtitle;
+        await setting.save();
+        return setting;
+    }
+
+    public async updateTaxSystem(taxSystem: TaxSystemEnum): Promise<SiteSetting> {
+        const setting = await this.get();
+        setting.taxSystem = taxSystem;
         await setting.save();
         return setting;
     }

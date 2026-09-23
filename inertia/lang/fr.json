@@ -221,6 +221,7 @@
             "menu": {
                 "home": "Page d'accueil",
                 "dashboard": "Tableau de bord",
+                "siteSettings": "Paramètres",
                 "users": "Utilisateurs",
                 "organizations": "Organisations",
                 "resources": "Ressources",
@@ -237,10 +238,20 @@
         },
         "dashboard": {
             "title": "Tableau de bord",
+            "tax": {
+                "title": "Fiscalité"
+            },
             "castellanyTax": {
                 "title": "Taxe de la châtellerie",
                 "rate": "Taux (%)",
                 "save": "Mettre à jour"
+            },
+            "taxBrackets": {
+                "upperBound": "Jusqu'à (s)",
+                "beyond": "Au-delà",
+                "rate": "Taux (%)",
+                "add": "Ajouter une tranche",
+                "save": "Enregistrer"
             },
             "capitalSnapshot": {
                 "title": "Capital & stock de la semaine",
@@ -252,14 +263,6 @@
             },
             "chart": {
                 "title": "Évolution hebdomadaire"
-            },
-            "landingPage": {
-                "title": "Page d'accueil",
-                "logoUpload": "Changer le logo",
-                "logoReset": "Réinitialiser",
-                "logoHint": "JPG, PNG ou WEBP, 5 Mo max.",
-                "subtitle": "Sous-titre (optionnel)",
-                "subtitleSave": "Enregistrer"
             },
             "amountsDue": {
                 "title": "Soldes dus",
@@ -279,6 +282,28 @@
                 "totalCapital": "Capital total",
                 "empty": "Aucune donnée pour le moment",
                 "notAvailable": "—"
+            }
+        },
+        "siteSettings": {
+            "title": "Paramètres",
+            "description": "Paramètres globaux de l'application : identité de la page d'accueil et système fiscal.",
+            "logo": {
+                "title": "Logo",
+                "upload": "Changer le logo",
+                "reset": "Réinitialiser",
+                "hint": "JPG, PNG ou WEBP, 5 Mo max."
+            },
+            "subtitle": {
+                "title": "Sous-titre",
+                "field": "Sous-titre (optionnel)",
+                "hint": "Affiché sous le titre de la page d'accueil. Laisser vide pour ne rien afficher.",
+                "save": "Enregistrer"
+            },
+            "taxSystem": {
+                "title": "Système fiscal",
+                "hint": "Le taux fixe s'applique uniformément sur tout le bénéfice. Les tranches progressives se paramètrent depuis le tableau de bord.",
+                "flat": "Pourcentage fixe",
+                "progressive": "Tranches progressives"
             }
         },
         "users": {

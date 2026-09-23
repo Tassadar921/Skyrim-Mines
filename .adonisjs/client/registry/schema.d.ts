@@ -331,9 +331,21 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/dashboard_controller').default['storeCapitalSnapshot']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'admin.siteSettings.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/admin/site-settings'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/site_settings_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/site_settings_controller').default['index']>>>
+    }
+  }
   'admin.siteSettings.updateLogo': {
     methods: ["POST"]
-    pattern: '/admin/logo'
+    pattern: '/admin/site-settings/logo'
     types: {
       body: ExtractBody<InferInput<(typeof import('#validators/admin/site_settings').updateLogoValidator)>>
       paramsTuple: []
@@ -345,7 +357,7 @@ export interface Registry {
   }
   'admin.siteSettings.destroyLogo': {
     methods: ["DELETE"]
-    pattern: '/admin/logo'
+    pattern: '/admin/site-settings/logo'
     types: {
       body: {}
       paramsTuple: []
@@ -357,7 +369,7 @@ export interface Registry {
   }
   'admin.siteSettings.updateSubtitle': {
     methods: ["PUT"]
-    pattern: '/admin/subtitle'
+    pattern: '/admin/site-settings/subtitle'
     types: {
       body: ExtractBody<InferInput<(typeof import('#validators/admin/site_settings').updateSubtitleValidator)>>
       paramsTuple: []
@@ -365,6 +377,30 @@ export interface Registry {
       query: ExtractQuery<InferInput<(typeof import('#validators/admin/site_settings').updateSubtitleValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/site_settings_controller').default['updateSubtitle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/site_settings_controller').default['updateSubtitle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'admin.siteSettings.updateTaxSystem': {
+    methods: ["PUT"]
+    pattern: '/admin/site-settings/tax-system'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/admin/site_settings').updateTaxSystemValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/admin/site_settings').updateTaxSystemValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/site_settings_controller').default['updateTaxSystem']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/site_settings_controller').default['updateTaxSystem']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'admin.dashboard.taxBrackets.update': {
+    methods: ["PUT"]
+    pattern: '/admin/tax-brackets'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/dashboard_controller').default['updateTaxBrackets']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/dashboard_controller').default['updateTaxBrackets']>>>
     }
   }
   'admin.users.index': {

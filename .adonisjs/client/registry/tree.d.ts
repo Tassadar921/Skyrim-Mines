@@ -50,11 +50,16 @@ export interface ApiDefinition {
       capitalSnapshot: {
         store: typeof routes['admin.dashboard.capitalSnapshot.store']
       }
+      taxBrackets: {
+        update: typeof routes['admin.dashboard.taxBrackets.update']
+      }
     }
     siteSettings: {
+      index: typeof routes['admin.siteSettings.index']
       updateLogo: typeof routes['admin.siteSettings.updateLogo']
       destroyLogo: typeof routes['admin.siteSettings.destroyLogo']
       updateSubtitle: typeof routes['admin.siteSettings.updateSubtitle']
+      updateTaxSystem: typeof routes['admin.siteSettings.updateTaxSystem']
     }
     users: {
       index: typeof routes['admin.users.index']
