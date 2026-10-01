@@ -59,7 +59,11 @@ export default class UserRepository extends BaseRepository<typeof User> {
      * (owners, employees and extras). Auditors and clients are not part of the org chart.
      */
     public async findForOrgChart(): Promise<User[]> {
-        return User.query().whereIn('role', [UserRoleEnum.ADMIN, UserRoleEnum.STAFF, UserRoleEnum.CONTRACTOR]).where('enabled', true).preload('avatar').orderBy('username', 'asc');
+        return User.query()
+            .whereIn('role', [UserRoleEnum.ADMIN, UserRoleEnum.FOREMAN, UserRoleEnum.STAFF, UserRoleEnum.CONTRACTOR])
+            .where('enabled', true)
+            .preload('avatar')
+            .orderBy('username', 'asc');
     }
 
     public async create(data: { discordId: string; username: string; role: UserRoleEnum; organizationId?: string | null; organizationRole?: OrganizationRoleEnum | null }): Promise<User> {

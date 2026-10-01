@@ -122,6 +122,7 @@
     "organigramme": {
         "title": "Organigramme",
         "owners": "Propriétaires",
+        "foremen": "Contremaîtres",
         "employees": "Mineurs",
         "extras": "Extras"
     },

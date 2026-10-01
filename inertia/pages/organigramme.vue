@@ -10,12 +10,14 @@ const { t } = useI18n();
 
 const props = defineProps<{
     owners: Member[];
+    foremen: Member[];
     employees: Member[];
     extras: Member[];
 }>();
 
 const groups = computed(() => [
     { key: 'owners', title: t('organigramme.owners'), members: props.owners },
+    { key: 'foremen', title: t('organigramme.foremen'), members: props.foremen },
     { key: 'employees', title: t('organigramme.employees'), members: props.employees },
     { key: 'extras', title: t('organigramme.extras'), members: props.extras },
 ]);

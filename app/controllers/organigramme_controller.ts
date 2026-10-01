@@ -12,6 +12,7 @@ export default class OrganigrammeController {
 
         return inertia.render('organigramme', {
             owners: members.filter((user) => user.role === UserRoleEnum.ADMIN).map(toCard),
+            foremen: members.filter((user) => user.role === UserRoleEnum.FOREMAN).map(toCard),
             employees: members.filter((user) => user.role === UserRoleEnum.STAFF).map(toCard),
             extras: members.filter((user) => user.role === UserRoleEnum.CONTRACTOR).map(toCard),
         });
