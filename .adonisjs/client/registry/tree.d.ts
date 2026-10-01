@@ -53,6 +53,9 @@ export interface ApiDefinition {
       taxBrackets: {
         update: typeof routes['admin.dashboard.taxBrackets.update']
       }
+      taxTiers: {
+        update: typeof routes['admin.dashboard.taxTiers.update']
+      }
     }
     siteSettings: {
       index: typeof routes['admin.siteSettings.index']
@@ -128,6 +131,8 @@ export interface ApiDefinition {
     livraisons: {
       index: typeof routes['admin.livraisons.index']
       destroy: typeof routes['admin.livraisons.destroy']
+      deductStock: typeof routes['admin.livraisons.deductStock']
+      deductStockAll: typeof routes['admin.livraisons.deductStockAll']
     }
     barrel: {
       index: typeof routes['admin.barrel.index']

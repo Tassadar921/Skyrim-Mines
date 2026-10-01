@@ -8,16 +8,19 @@ import CompanyExpenseRepository from '#repositories/company_expense_repository';
 import UserRepository from '#repositories/user_repository';
 import SiteSettingRepository from '#repositories/site_setting_repository';
 import TaxBracketRepository from '#repositories/tax_bracket_repository';
+import TaxTierRepository from '#repositories/tax_tier_repository';
 import UserRoleEnum from '#types/enum/user_role_enum';
 import TaxSystemEnum from '#types/enum/tax_system_enum';
 import { getWeekNumber, getWeekRange } from '#helpers/game_week_helper';
-import { computeProgressiveTax } from '#helpers/progressive_tax_helper';
+import { computeProgressiveTax, computeFullProgressiveTax, type TaxBracketInput } from '#helpers/progressive_tax_helper';
 import { updateCastellanyTaxValidator } from '#validators/admin/castellany_tax';
 import { storeCompanyCapitalSnapshotValidator } from '#validators/admin/company_capital_snapshot';
 import { updateTaxBracketsValidator } from '#validators/admin/tax_brackets';
+import { updateTaxTiersValidator } from '#validators/admin/tax_tiers';
 import type CastellanyTax from '#models/castellany_tax';
 import type SiteSetting from '#models/site_setting';
 import type TaxBracket from '#models/tax_bracket';
+import type TaxTier from '#models/tax_tier';
 
 const MAX_WEEKS_IN_RECAP = 20;
 
@@ -33,17 +36,35 @@ function computeProfitForWeek(weekNumber: number, totals: WeeklyTotalsBundle): n
     return deliveriesProfit - expensesAmount;
 }
 
-function computeLiveTax(profit: number, siteSetting: SiteSetting, castellanyTax: CastellanyTax, taxBrackets: TaxBracket[]): { weeklyTax: number; taxRate: number } {
+function toTaxBracketInputs(rows: { upperBound: string | null; rate: number }[]): TaxBracketInput[] {
+    return rows.map((row) => ({ upperBound: row.upperBound === null ? null : Number(row.upperBound), rate: row.rate }));
+}
+
+function computeLiveTax(profit: number, siteSetting: SiteSetting, castellanyTax: CastellanyTax, taxBrackets: TaxBracket[], taxTiers: TaxTier[]): { weeklyTax: number; taxRate: number } {
+    let weeklyTax: number;
+
     if (siteSetting.taxSystem === TaxSystemEnum.PROGRESSIVE) {
-        const weeklyTax = computeProgressiveTax(
-            profit,
-            taxBrackets.map((bracket) => ({ upperBound: bracket.upperBound === null ? null : Number(bracket.upperBound), rate: bracket.rate })),
-        );
-        const taxRate = profit > 0 ? Math.round((weeklyTax / profit) * 100) : 0;
-        return { weeklyTax, taxRate };
+        weeklyTax = computeProgressiveTax(profit, toTaxBracketInputs(taxBrackets));
+    } else if (siteSetting.taxSystem === TaxSystemEnum.PROGRESSIVE_FULL) {
+        weeklyTax = computeFullProgressiveTax(profit, toTaxBracketInputs(taxTiers));
+    } else {
+        return { weeklyTax: profit * (castellanyTax.rate / 100), taxRate: castellanyTax.rate };
     }
 
-    return { weeklyTax: profit * (castellanyTax.rate / 100), taxRate: castellanyTax.rate };
+    const taxRate = profit > 0 ? Math.round((weeklyTax / profit) * 100) : 0;
+    return { weeklyTax, taxRate };
+}
+
+/** Shared validation for ordered tranche/tier lists: bounds must strictly increase, and only the last entry may be unbounded (null). */
+function validateBracketOrdering(rows: { upperBound: number | null }[]): boolean {
+    const hasInvalidNullPlacement = rows.some((row, index) => row.upperBound === null && index !== rows.length - 1);
+    const isStrictlyIncreasing = rows.every((row, index) => {
+        if (index === 0) return true;
+        const previous = rows[index - 1];
+        return previous.upperBound !== null && row.upperBound !== null ? row.upperBound > previous.upperBound : row.upperBound === null;
+    });
+
+    return !hasInvalidNullPlacement && isStrictlyIncreasing;
 }
 
 export default class DashboardController {
@@ -55,12 +76,13 @@ export default class DashboardController {
         private readonly userRepository: UserRepository = new UserRepository(),
         private readonly siteSettingRepository: SiteSettingRepository = new SiteSettingRepository(),
         private readonly taxBracketRepository: TaxBracketRepository = new TaxBracketRepository(),
+        private readonly taxTierRepository: TaxTierRepository = new TaxTierRepository(),
     ) {}
 
     public async index({ inertia }: HttpContext) {
         const currentWeek = getWeekNumber(DateTime.now());
 
-        const [deliveryTotals, expenseTotals, employeeDueAmount, adminDueAmount, castellanyTax, siteSetting, taxBrackets, capitalSnapshotsByWeek] = await Promise.all([
+        const [deliveryTotals, expenseTotals, employeeDueAmount, adminDueAmount, castellanyTax, siteSetting, taxBrackets, taxTiers, capitalSnapshotsByWeek] = await Promise.all([
             this.deliveryRepository.getWeeklyTotals(),
             this.companyExpenseRepository.getWeeklyTotals(),
             this.userRepository.sumBalanceByRole(UserRoleEnum.STAFF),
@@ -68,6 +90,7 @@ export default class DashboardController {
             this.castellanyTaxRepository.get(),
             this.siteSettingRepository.get(),
             this.taxBracketRepository.all(),
+            this.taxTierRepository.all(),
             this.companyCapitalSnapshotRepository.allByWeek(),
         ]);
 
@@ -85,10 +108,10 @@ export default class DashboardController {
             const stockValue = capitalSnapshot ? Number(capitalSnapshot.stockValue) : null;
             // Once a week has been recorded (capital/stock snapshot), its tax and rate are frozen at
             // the value in effect at that time; only un-recorded weeks (normally just the current one)
-            // reflect the live tax system, so changing the rate/brackets never rewrites past weeks.
+            // reflect the live tax system, so changing the rate/brackets/tiers never rewrites past weeks.
             const { weeklyTax, taxRate } = capitalSnapshot
                 ? { weeklyTax: Number(capitalSnapshot.weeklyTax), taxRate: capitalSnapshot.taxRate }
-                : computeLiveTax(profit, siteSetting, castellanyTax, taxBrackets);
+                : computeLiveTax(profit, siteSetting, castellanyTax, taxBrackets, taxTiers);
             weeklyRecap.push({
                 weekNumber,
                 startDate: start.toJSDate().toISOString(),
@@ -110,6 +133,7 @@ export default class DashboardController {
             castellanyTaxRate: castellanyTax.rate,
             taxSystem: siteSetting.taxSystem as TaxSystemEnum,
             taxBrackets: taxBrackets.map((bracket) => ({ upperBound: bracket.upperBound === null ? null : Number(bracket.upperBound), rate: bracket.rate })),
+            taxTiers: taxTiers.map((tier) => ({ upperBound: tier.upperBound === null ? null : Number(tier.upperBound), rate: tier.rate })),
         });
     }
 
@@ -130,14 +154,7 @@ export default class DashboardController {
     public async updateTaxBrackets({ request, response, session, i18n }: HttpContext) {
         const { brackets } = await request.validateUsing(updateTaxBracketsValidator);
 
-        const hasInvalidNullPlacement = brackets.some((bracket, index) => bracket.upperBound === null && index !== brackets.length - 1);
-        const isStrictlyIncreasing = brackets.every((bracket, index) => {
-            if (index === 0) return true;
-            const previous = brackets[index - 1];
-            return previous.upperBound !== null && bracket.upperBound !== null ? bracket.upperBound > previous.upperBound : bracket.upperBound === null;
-        });
-
-        if (hasInvalidNullPlacement || !isStrictlyIncreasing) {
+        if (!validateBracketOrdering(brackets)) {
             session.flash('error', i18n.t('messages.admin.dashboard.taxBrackets.update.invalid'));
             return response.redirect().back();
         }
@@ -148,6 +165,25 @@ export default class DashboardController {
         } catch (e) {
             logger.error({ err: e }, 'dashboard.updateTaxBrackets failed');
             session.flash('error', i18n.t('messages.admin.dashboard.taxBrackets.update.error'));
+        }
+
+        return response.redirect().back();
+    }
+
+    public async updateTaxTiers({ request, response, session, i18n }: HttpContext) {
+        const { tiers } = await request.validateUsing(updateTaxTiersValidator);
+
+        if (!validateBracketOrdering(tiers)) {
+            session.flash('error', i18n.t('messages.admin.dashboard.taxTiers.update.invalid'));
+            return response.redirect().back();
+        }
+
+        try {
+            await this.taxTierRepository.replaceAll(tiers);
+            session.flash('success', i18n.t('messages.admin.dashboard.taxTiers.update.success'));
+        } catch (e) {
+            logger.error({ err: e }, 'dashboard.updateTaxTiers failed');
+            session.flash('error', i18n.t('messages.admin.dashboard.taxTiers.update.error'));
         }
 
         return response.redirect().back();
@@ -164,16 +200,17 @@ export default class DashboardController {
                 return response.redirect().back();
             }
 
-            const [deliveryTotals, expenseTotals, castellanyTax, siteSetting, taxBrackets] = await Promise.all([
+            const [deliveryTotals, expenseTotals, castellanyTax, siteSetting, taxBrackets, taxTiers] = await Promise.all([
                 this.deliveryRepository.getWeeklyTotals(),
                 this.companyExpenseRepository.getWeeklyTotals(),
                 this.castellanyTaxRepository.get(),
                 this.siteSettingRepository.get(),
                 this.taxBracketRepository.all(),
+                this.taxTierRepository.all(),
             ]);
 
             const profit = computeProfitForWeek(weekNumber, { deliveryTotals, expenseTotals });
-            const { weeklyTax, taxRate } = computeLiveTax(profit, siteSetting, castellanyTax, taxBrackets);
+            const { weeklyTax, taxRate } = computeLiveTax(profit, siteSetting, castellanyTax, taxBrackets, taxTiers);
 
             await this.companyCapitalSnapshotRepository.create({
                 weekNumber,

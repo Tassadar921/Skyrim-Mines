@@ -22,3 +22,15 @@ export function computeProgressiveTax(profit: number, brackets: TaxBracketInput[
 
     return tax;
 }
+
+/**
+ * Full-slab tax computation ("taxation progressive intégrale"): the whole `profit` is taxed at
+ * the single rate of the tier it falls into, not split across tiers like `computeProgressiveTax`.
+ * `tiers` must be ordered ascending, with only the last tier allowed a null `upperBound` (unbounded).
+ */
+export function computeFullProgressiveTax(profit: number, tiers: TaxBracketInput[]): number {
+    if (profit <= 0 || !tiers.length) return 0;
+
+    const matchingTier = tiers.find((tier) => tier.upperBound === null || profit <= tier.upperBound) ?? tiers[tiers.length - 1];
+    return profit * (matchingTier.rate / 100);
+}

@@ -204,6 +204,12 @@ const routes = {
     tokens: [{"old":"/admin/tax-brackets","type":0,"val":"admin","end":""},{"old":"/admin/tax-brackets","type":0,"val":"tax-brackets","end":""}],
     types: placeholder as Registry['admin.dashboard.taxBrackets.update']['types'],
   },
+  'admin.dashboard.taxTiers.update': {
+    methods: ["PUT"],
+    pattern: '/admin/tax-tiers',
+    tokens: [{"old":"/admin/tax-tiers","type":0,"val":"admin","end":""},{"old":"/admin/tax-tiers","type":0,"val":"tax-tiers","end":""}],
+    types: placeholder as Registry['admin.dashboard.taxTiers.update']['types'],
+  },
   'admin.users.index': {
     methods: ["GET","HEAD"],
     pattern: '/admin/users',
@@ -467,6 +473,18 @@ const routes = {
     pattern: '/admin/livraisons/:id',
     tokens: [{"old":"/admin/livraisons/:id","type":0,"val":"admin","end":""},{"old":"/admin/livraisons/:id","type":0,"val":"livraisons","end":""},{"old":"/admin/livraisons/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['admin.livraisons.destroy']['types'],
+  },
+  'admin.livraisons.deductStock': {
+    methods: ["PATCH"],
+    pattern: '/admin/livraisons/:id/deduct-stock',
+    tokens: [{"old":"/admin/livraisons/:id/deduct-stock","type":0,"val":"admin","end":""},{"old":"/admin/livraisons/:id/deduct-stock","type":0,"val":"livraisons","end":""},{"old":"/admin/livraisons/:id/deduct-stock","type":1,"val":"id","end":""},{"old":"/admin/livraisons/:id/deduct-stock","type":0,"val":"deduct-stock","end":""}],
+    types: placeholder as Registry['admin.livraisons.deductStock']['types'],
+  },
+  'admin.livraisons.deductStockAll': {
+    methods: ["POST"],
+    pattern: '/admin/livraisons/deduct-stock-all',
+    tokens: [{"old":"/admin/livraisons/deduct-stock-all","type":0,"val":"admin","end":""},{"old":"/admin/livraisons/deduct-stock-all","type":0,"val":"livraisons","end":""},{"old":"/admin/livraisons/deduct-stock-all","type":0,"val":"deduct-stock-all","end":""}],
+    types: placeholder as Registry['admin.livraisons.deductStockAll']['types'],
   },
   'admin.barrel.index': {
     methods: ["GET","HEAD"],

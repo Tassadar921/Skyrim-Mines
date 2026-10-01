@@ -12,8 +12,19 @@ import { Input } from '~/components/ui/input';
 import { Badge } from '~/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select';
 import DeleteButton from '~/components/ui/DeleteButton.vue';
+import {
+    AlertDialog,
+    AlertDialogTrigger,
+    AlertDialogContent,
+    AlertDialogHeader,
+    AlertDialogFooter,
+    AlertDialogTitle,
+    AlertDialogDescription,
+    AlertDialogCancel,
+    AlertDialogAction,
+} from '~/components/ui/alert-dialog';
 import type { AcceptableValue } from 'reka-ui';
-import { ArrowUp, ArrowDown, ArrowUpDown, ChevronDown, ChevronRight, FilterX } from '@lucide/vue';
+import { ArrowUp, ArrowDown, ArrowUpDown, ChevronDown, ChevronRight, FilterX, PackageMinus } from '@lucide/vue';
 
 defineOptions({ layout: AdminLayout });
 
@@ -26,6 +37,7 @@ type DeliveryRow = {
     requesterName: string;
     organizationName: string | null;
     castellanyName: string | null;
+    stockDeducted: boolean;
     lines: DeliveryLine[];
     totalProfit: number;
 };
@@ -48,6 +60,7 @@ const props = defineProps<{
     meta: { total: number; currentPage: number; lastPage: number; perPage: number };
     filters: { search: string; sort: string; dir: string; week: number | null };
     weeklyTotals: WeeklyTotal[];
+    pendingStockDeductionCount: number;
 }>();
 
 const searchValue = ref(props.filters.search);
@@ -121,6 +134,20 @@ function deleteDelivery(delivery: DeliveryRow) {
     router.delete(urlFor('admin.livraisons.destroy', { id: delivery.id }), { preserveScroll: true });
 }
 
+const deductingId = ref<string | null>(null);
+
+function deductStock(delivery: DeliveryRow) {
+    deductingId.value = delivery.id;
+    router.patch(urlFor('admin.livraisons.deductStock', { id: delivery.id }), {}, { preserveScroll: true, preserveState: true, onFinish: () => (deductingId.value = null) });
+}
+
+const isDeductingAll = ref(false);
+
+function deductStockAll() {
+    isDeductingAll.value = true;
+    router.post(urlFor('admin.livraisons.deductStockAll'), {}, { preserveScroll: true, preserveState: true, onFinish: () => (isDeductingAll.value = false) });
+}
+
 const hasActiveFilters = computed(() => !!props.filters.search || !!props.filters.sort || props.filters.week !== null || props.meta.currentPage !== 1);
 
 function resetFilters() {
@@ -133,6 +160,25 @@ function resetFilters() {
     <div class="space-y-4">
         <div class="flex items-center justify-between">
             <Badge variant="outline">{{ meta.total }} {{ t('admin.livraisons.table.count', meta.total) }}</Badge>
+
+            <AlertDialog v-if="isAdmin && pendingStockDeductionCount > 0">
+                <AlertDialogTrigger as-child>
+                    <Button variant="outline" size="sm" class="gap-2" :loading="isDeductingAll" :disabled="isDeductingAll">
+                        <PackageMinus class="size-4" />
+                        {{ t('admin.livraisons.deductStock.allButton', { count: pendingStockDeductionCount }) }}
+                    </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>{{ t('admin.livraisons.deductStock.allConfirm.title') }}</AlertDialogTitle>
+                        <AlertDialogDescription>{{ t('admin.livraisons.deductStock.allConfirm.description', { count: pendingStockDeductionCount }) }}</AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>{{ t('admin.livraisons.deductStock.allConfirm.cancel') }}</AlertDialogCancel>
+                        <AlertDialogAction @click="deductStockAll">{{ t('admin.livraisons.deductStock.allConfirm.confirm') }}</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
 
         <div class="rounded-md border p-3 space-y-2">
@@ -194,15 +240,10 @@ function resetFilters() {
                             </Button>
                         </TableHead>
                         <TableHead>{{ t('admin.livraisons.table.order') }}</TableHead>
-                        <TableHead>
-                            <Button variant="ghost" class="gap-1 px-2" @click="onSort('requesterName')">
-                                {{ t('admin.livraisons.table.requester') }}
-                                <component :is="sortIcon('requesterName')" class="size-4" />
-                            </Button>
-                        </TableHead>
                         <TableHead>{{ t('admin.livraisons.table.organization') }}</TableHead>
                         <TableHead>{{ t('admin.livraisons.table.amount') }}</TableHead>
                         <TableHead>{{ t('admin.livraisons.table.profit') }}</TableHead>
+                        <TableHead>{{ t('admin.livraisons.deductStock.column') }}</TableHead>
                         <TableHead>{{ t('admin.livraisons.table.actions') }}</TableHead>
                     </TableRow>
                 </TableHeader>
@@ -219,13 +260,28 @@ function resetFilters() {
                                     <Badge variant="secondary">{{ t('admin.livraisons.table.weekBadge', { week: delivery.weekNumber }) }}</Badge>
                                 </TableCell>
                                 <TableCell class="text-sm font-medium">{{ formatOrderNumber(delivery.orderNumber) }}</TableCell>
-                                <TableCell class="text-sm font-medium">{{ delivery.requesterName }}</TableCell>
                                 <TableCell class="text-sm text-muted-foreground">
                                     <span v-if="delivery.organizationName">{{ delivery.organizationName }}</span>
                                     <span v-else class="italic">{{ t('admin.livraisons.table.noOrganization') }}</span>
                                 </TableCell>
                                 <TableCell class="text-sm font-medium">{{ deliveryTotal(delivery).toFixed(2) }} s</TableCell>
                                 <TableCell class="text-sm font-medium" :class="delivery.totalProfit >= 0 ? 'text-green-600' : 'text-destructive'">{{ delivery.totalProfit.toFixed(2) }} s</TableCell>
+                                <TableCell @click.stop>
+                                    <Badge v-if="delivery.stockDeducted" variant="outline">{{ t('admin.livraisons.deductStock.deducted') }}</Badge>
+                                    <Button
+                                        v-else-if="isAdmin"
+                                        variant="outline"
+                                        size="sm"
+                                        class="gap-1"
+                                        :loading="deductingId === delivery.id"
+                                        :disabled="deductingId === delivery.id"
+                                        @click="deductStock(delivery)"
+                                    >
+                                        <PackageMinus class="size-4" />
+                                        {{ t('admin.livraisons.deductStock.action') }}
+                                    </Button>
+                                    <Badge v-else variant="secondary">{{ t('admin.livraisons.deductStock.notDeducted') }}</Badge>
+                                </TableCell>
                                 <TableCell @click.stop>
                                     <DeleteButton
                                         v-if="isAdmin"
@@ -269,7 +325,7 @@ function resetFilters() {
                         </template>
                     </template>
                     <TableRow v-else>
-                        <TableCell :colspan="11" class="h-24 text-center text-muted-foreground">
+                        <TableCell :colspan="9" class="h-24 text-center text-muted-foreground">
                             {{ t('admin.livraisons.table.empty') }}
                         </TableCell>
                     </TableRow>

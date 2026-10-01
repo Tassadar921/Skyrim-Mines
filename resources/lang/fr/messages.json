@@ -30,6 +30,13 @@
                     "invalid": "Les tranches doivent avoir des seuils croissants, seule la dernière pouvant être illimitée"
                 }
             },
+            "taxTiers": {
+                "update": {
+                    "success": "Paliers fiscaux mis à jour avec succès",
+                    "error": "Erreur lors de la mise à jour des paliers fiscaux",
+                    "invalid": "Les paliers doivent avoir des seuils croissants, seul le dernier pouvant être illimité"
+                }
+            },
             "capitalSnapshot": {
                 "store": {
                     "success": "Capital et stock enregistrés avec succès",
@@ -96,6 +103,14 @@
                 "invalidOrderWeek": "La semaine de la commande doit être comprise entre la semaine 1 et la semaine en cours",
                 "invalidDeliveryWeek": "La semaine de livraison doit être postérieure ou égale à la semaine de la commande, et ne peut pas dépasser la semaine en cours",
                 "buybackSummary": "Racheté sur le tonneau pour compléter le stock : {details}."
+            }
+        },
+        "livraisons": {
+            "deductStock": {
+                "success": "Quantités déduites du stock avec succès",
+                "allSuccess": "Quantités déduites du stock pour {count} livraison(s)",
+                "error": "Erreur lors de la déduction du stock",
+                "alreadyDeducted": "Le stock a déjà été déduit pour cette livraison"
             }
         },
         "barrel": {

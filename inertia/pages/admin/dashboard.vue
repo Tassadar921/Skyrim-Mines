@@ -11,8 +11,9 @@ import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '~/components/ui/tooltip';
-import { HelpCircle, Plus, Trash2 } from '@lucide/vue';
+import { HelpCircle } from '@lucide/vue';
 import WeeklyMetricChart from '~/partials/admin/WeeklyMetricChart.vue';
+import TaxBracketEditor from '~/partials/admin/TaxBracketEditor.vue';
 
 defineOptions({ layout: AdminLayout });
 const { t } = useI18n();
@@ -41,8 +42,9 @@ const props = defineProps<{
     employeeDueAmount: number;
     adminDueAmount: number;
     castellanyTaxRate: number;
-    taxSystem: 'flat' | 'progressive';
+    taxSystem: 'flat' | 'progressive' | 'progressive_full';
     taxBrackets: TaxBracketRow[];
+    taxTiers: TaxBracketRow[];
 }>();
 
 function formatWeekRange(recap: WeeklyRecap): string {
@@ -66,26 +68,18 @@ function submitCastellanyTax() {
     router.put(urlFor('admin.dashboard.castellanyTax.update'), { rate: castellanyTaxRate.value }, { preserveScroll: true, onFinish: () => (isSubmittingCastellanyTax.value = false) });
 }
 
-const bracketRows = ref<TaxBracketRow[]>(props.taxBrackets.length ? props.taxBrackets.map((bracket) => ({ ...bracket })) : [{ upperBound: null, rate: 0 }]);
 const isSubmittingBrackets = ref(false);
 
-function addBracket() {
-    const previousUpperBound = bracketRows.value.length > 1 ? bracketRows.value[bracketRows.value.length - 2].upperBound : 0;
-    bracketRows.value.splice(bracketRows.value.length - 1, 0, { upperBound: previousUpperBound ?? 0, rate: 0 });
-}
-
-function removeBracket(index: number) {
-    if (bracketRows.value.length <= 1) return;
-    bracketRows.value.splice(index, 1);
-}
-
-function submitBrackets() {
+function submitBrackets(brackets: TaxBracketRow[]) {
     isSubmittingBrackets.value = true;
-    router.put(
-        urlFor('admin.dashboard.taxBrackets.update'),
-        { brackets: bracketRows.value.map((bracket, index) => ({ upperBound: index === bracketRows.value.length - 1 ? null : bracket.upperBound, rate: bracket.rate })) },
-        { preserveScroll: true, onFinish: () => (isSubmittingBrackets.value = false) },
-    );
+    router.put(urlFor('admin.dashboard.taxBrackets.update'), { brackets }, { preserveScroll: true, onFinish: () => (isSubmittingBrackets.value = false) });
+}
+
+const isSubmittingTiers = ref(false);
+
+function submitTiers(tiers: TaxBracketRow[]) {
+    isSubmittingTiers.value = true;
+    router.put(urlFor('admin.dashboard.taxTiers.update'), { tiers }, { preserveScroll: true, onFinish: () => (isSubmittingTiers.value = false) });
 }
 
 const currentWeekRecap = computed(() => props.weeklyRecap[0]);
@@ -117,49 +111,33 @@ function submitCapitalSnapshot() {
                     </Button>
                 </template>
 
-                <template v-else>
-                    <div class="space-y-2">
-                        <div v-for="(bracket, index) in bracketRows" :key="index" class="flex items-end gap-2">
-                            <div class="flex-1">
-                                <Input
-                                    v-if="index < bracketRows.length - 1"
-                                    :model-value="bracket.upperBound ?? 0"
-                                    type="number"
-                                    :label="t('admin.dashboard.taxBrackets.upperBound')"
-                                    min="0"
-                                    step="1"
-                                    :readonly="!isAdmin"
-                                    @update:model-value="(value) => (bracket.upperBound = Number(value))"
-                                />
-                                <div v-else class="pb-2.5 text-xs text-muted-foreground">{{ t('admin.dashboard.taxBrackets.beyond') }}</div>
-                            </div>
-                            <div class="w-20">
-                                <Input
-                                    :model-value="bracket.rate"
-                                    type="number"
-                                    :label="t('admin.dashboard.taxBrackets.rate')"
-                                    min="0"
-                                    :max="100"
-                                    step="1"
-                                    :readonly="!isAdmin"
-                                    @update:model-value="(value) => (bracket.rate = Number(value))"
-                                />
-                            </div>
-                            <Button v-if="isAdmin && bracketRows.length > 1" variant="ghost" size="icon" type="button" class="mb-0.5 shrink-0" @click="removeBracket(index)">
-                                <Trash2 class="size-4" />
-                            </Button>
-                        </div>
-                    </div>
-                    <div v-if="isAdmin" class="flex items-center gap-2">
-                        <Button variant="outline" size="sm" type="button" class="gap-1" @click="addBracket">
-                            <Plus class="size-4" />
-                            {{ t('admin.dashboard.taxBrackets.add') }}
-                        </Button>
-                        <Button size="sm" :loading="isSubmittingBrackets" :disabled="isSubmittingBrackets" @click="submitBrackets">
-                            {{ t('admin.dashboard.taxBrackets.save') }}
-                        </Button>
-                    </div>
-                </template>
+                <TaxBracketEditor
+                    v-else-if="taxSystem === 'progressive'"
+                    :rows="taxBrackets"
+                    :is-admin="isAdmin"
+                    :processing="isSubmittingBrackets"
+                    summary-key="admin.dashboard.taxBrackets.summary"
+                    :upper-bound-label="t('admin.dashboard.taxBrackets.upperBound')"
+                    :beyond-label="t('admin.dashboard.taxBrackets.beyond')"
+                    :rate-label="t('admin.dashboard.taxBrackets.rate')"
+                    :add-label="t('admin.dashboard.taxBrackets.add')"
+                    :save-label="t('admin.dashboard.taxBrackets.save')"
+                    @save="submitBrackets"
+                />
+
+                <TaxBracketEditor
+                    v-else
+                    :rows="taxTiers"
+                    :is-admin="isAdmin"
+                    :processing="isSubmittingTiers"
+                    summary-key="admin.dashboard.taxTiers.summary"
+                    :upper-bound-label="t('admin.dashboard.taxTiers.upperBound')"
+                    :beyond-label="t('admin.dashboard.taxTiers.beyond')"
+                    :rate-label="t('admin.dashboard.taxTiers.rate')"
+                    :add-label="t('admin.dashboard.taxTiers.add')"
+                    :save-label="t('admin.dashboard.taxTiers.save')"
+                    @save="submitTiers"
+                />
             </div>
 
             <div class="rounded-md border p-5 space-y-3 flex-1 min-w-0">

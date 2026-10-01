@@ -403,6 +403,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/dashboard_controller').default['updateTaxBrackets']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'admin.dashboard.taxTiers.update': {
+    methods: ["PUT"]
+    pattern: '/admin/tax-tiers'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/admin/tax_tiers').updateTaxTiersValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/admin/tax_tiers').updateTaxTiersValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/dashboard_controller').default['updateTaxTiers']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/dashboard_controller').default['updateTaxTiers']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'admin.users.index': {
     methods: ["GET","HEAD"]
     pattern: '/admin/users'
@@ -929,6 +941,30 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/livraisons_controller').default['destroy']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/livraisons_controller').default['destroy']>>>
+    }
+  }
+  'admin.livraisons.deductStock': {
+    methods: ["PATCH"]
+    pattern: '/admin/livraisons/:id/deduct-stock'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/livraisons_controller').default['deductStock']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/livraisons_controller').default['deductStock']>>>
+    }
+  }
+  'admin.livraisons.deductStockAll': {
+    methods: ["POST"]
+    pattern: '/admin/livraisons/deduct-stock-all'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/livraisons_controller').default['deductStockAll']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/livraisons_controller').default['deductStockAll']>>>
     }
   }
   'admin.barrel.index': {

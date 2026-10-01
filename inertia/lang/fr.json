@@ -214,7 +214,9 @@
             "weekly": {
                 "current": "Actuelle"
             },
-            "resetFilters": "Réinitialiser les filtres"
+            "resetFilters": "Réinitialiser les filtres",
+            "expand": "Afficher",
+            "collapse": "Réduire"
         },
         "layout": {
             "logout": "Se déconnecter",
@@ -251,7 +253,16 @@
                 "beyond": "Au-delà",
                 "rate": "Taux (%)",
                 "add": "Ajouter une tranche",
-                "save": "Enregistrer"
+                "save": "Enregistrer",
+                "summary": "{count} tranche | {count} tranches"
+            },
+            "taxTiers": {
+                "upperBound": "Jusqu'à (s)",
+                "beyond": "Au-delà",
+                "rate": "Taux (%)",
+                "add": "Ajouter un palier",
+                "save": "Enregistrer",
+                "summary": "{count} palier | {count} paliers"
             },
             "capitalSnapshot": {
                 "title": "Capital & stock de la semaine",
@@ -301,9 +312,10 @@
             },
             "taxSystem": {
                 "title": "Système fiscal",
-                "hint": "Le taux fixe s'applique uniformément sur tout le bénéfice. Les tranches progressives se paramètrent depuis le tableau de bord.",
+                "hint": "Le taux fixe s'applique uniformément sur tout le bénéfice. Avec les tranches progressives, chaque tranche de bénéfice est taxée à son propre taux (comme l'impôt sur le revenu). Avec la taxation progressive intégrale, c'est tout le bénéfice qui est taxé au taux du palier atteint. Les tranches et paliers se paramètrent depuis le tableau de bord.",
                 "flat": "Pourcentage fixe",
-                "progressive": "Tranches progressives"
+                "progressive": "Tranches progressives",
+                "progressiveFull": "Taxation progressive intégrale"
             }
         },
         "users": {
@@ -674,7 +686,6 @@
                 "search": "Rechercher un client ou une organisation…",
                 "date": "Date",
                 "order": "Commande",
-                "requester": "Demandé par",
                 "organization": "Organisation",
                 "noOrganization": "Aucune",
                 "castellany": "Châtellerie",
@@ -707,6 +718,19 @@
                 "description": "La commande n° {number} redeviendra « À livrer » si elle était marquée comme entièrement livrée. Cette action est irréversible.",
                 "cancel": "Annuler",
                 "confirm": "Supprimer"
+            },
+            "deductStock": {
+                "column": "Stock",
+                "deducted": "Déduit",
+                "notDeducted": "Non déduit",
+                "action": "Déduire",
+                "allButton": "Tout déduire ({count})",
+                "allConfirm": {
+                    "title": "Déduire rétroactivement le stock de toutes les livraisons ?",
+                    "description": "{count} livraison(s) n'ont pas encore eu leurs quantités déduites du stock. Cette action va prendre en priorité sur le stock racheté, et racheter le manquant sur le tonneau des mineurs si besoin, pour chacune d'entre elles. Cette action est irréversible.",
+                    "cancel": "Annuler",
+                    "confirm": "Tout déduire"
+                }
             }
         },
         "barrel": {

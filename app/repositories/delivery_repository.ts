@@ -6,6 +6,9 @@ import DeliveryLine from '#models/delivery_line';
 import Order from '#models/order';
 import Resource from '#models/resource';
 import ResourceRecipeLineRepository from '#repositories/resource_recipe_line_repository';
+import ResourceStockRepository from '#repositories/resource_stock_repository';
+import ResourceBuybackRepository from '#repositories/resource_buyback_repository';
+import ResourceBuybackBatchRepository from '#repositories/resource_buyback_batch_repository';
 import OrderStatusEnum from '#types/enum/order_status_enum';
 import ResourceTypeEnum from '#types/enum/resource_type_enum';
 import { getWeekNumber } from '#helpers/game_week_helper';
@@ -27,7 +30,12 @@ export type DeliveryLineInput = {
 };
 
 export default class DeliveryRepository extends BaseRepository<typeof Delivery> {
-    constructor(private readonly resourceRecipeLineRepository: ResourceRecipeLineRepository = new ResourceRecipeLineRepository()) {
+    constructor(
+        private readonly resourceRecipeLineRepository: ResourceRecipeLineRepository = new ResourceRecipeLineRepository(),
+        private readonly resourceStockRepository: ResourceStockRepository = new ResourceStockRepository(),
+        private readonly resourceBuybackRepository: ResourceBuybackRepository = new ResourceBuybackRepository(),
+        private readonly resourceBuybackBatchRepository: ResourceBuybackBatchRepository = new ResourceBuybackBatchRepository(),
+    ) {
         super(Delivery);
     }
 
@@ -66,7 +74,7 @@ export default class DeliveryRepository extends BaseRepository<typeof Delivery> 
         orderId: string,
         deliveredByUserId: string,
         lines: DeliveryLineInput[],
-        options: { deliveredAt?: DateTime; castellanyId?: string | null } = {},
+        options: { deliveredAt?: DateTime; castellanyId?: string | null; stockDeducted?: boolean } = {},
     ): Promise<Delivery | null> {
         const remaining = await this.remainingQuantities(orderId);
         const remainingByLine = new Map(remaining.map((line) => [line.orderLineId, line]));
@@ -105,6 +113,7 @@ export default class DeliveryRepository extends BaseRepository<typeof Delivery> 
                     deliveredAt,
                     deliveredWeekNumber: getWeekNumber(deliveredAt),
                     castellanyId,
+                    stockDeducted: options.stockDeducted ?? false,
                 },
                 { client: trx },
             );
@@ -135,6 +144,70 @@ export default class DeliveryRepository extends BaseRepository<typeof Delivery> 
         }
 
         return delivery;
+    }
+
+    /**
+     * Deducts a delivery's lines from the company's purchased stock, buying back any shortfall
+     * from the barrel (same logic as the order-archiving "déduire quantités" checkbox). No-op if
+     * the delivery was already marked as deducted.
+     */
+    public async deductStockForDelivery(deliveryId: string): Promise<{ alreadyDeducted: boolean; buybackSummary: { resourceName: string; quantity: number }[] }> {
+        const buybackSummary: { resourceName: string; quantity: number }[] = [];
+        let alreadyDeducted = false;
+
+        await db.transaction(async (trx) => {
+            const delivery = await Delivery.query({ client: trx }).where('id', deliveryId).preload('lines').forUpdate().firstOrFail();
+            if (delivery.stockDeducted) {
+                alreadyDeducted = true;
+                return;
+            }
+
+            const resourceIds = [...new Set(delivery.lines.map((line) => line.resourceId).filter((id): id is string => id !== null))];
+            const resources = resourceIds.length ? await Resource.query({ client: trx }).whereIn('id', resourceIds) : [];
+            const resourceById = new Map(resources.map((resource) => [resource.id, resource]));
+
+            let batchId: string | null = null;
+            for (const line of delivery.lines) {
+                if (!line.resourceId || line.quantity <= 0) continue;
+
+                const takenFromStock = await this.resourceStockRepository.decrementPurchasedQuantity(line.resourceId, line.quantity, trx);
+                const shortfall = line.quantity - takenFromStock;
+                if (shortfall <= 0) continue;
+
+                const resource = resourceById.get(line.resourceId);
+                if (!resource) continue;
+
+                if (!batchId) {
+                    const batch = await this.resourceBuybackBatchRepository.createBatch(trx);
+                    batchId = batch.id;
+                }
+
+                const boughtBack = await this.resourceBuybackRepository.buybackResourceFromBarrel({
+                    resourceId: line.resourceId,
+                    requestedQuantity: shortfall,
+                    buyPrice: Number(resource.buyPrice),
+                    batchId,
+                    trx,
+                });
+                if (boughtBack > 0) {
+                    buybackSummary.push({ resourceName: line.resourceName, quantity: boughtBack });
+                }
+            }
+
+            delivery.stockDeducted = true;
+            await delivery.save();
+        });
+
+        return { alreadyDeducted, buybackSummary };
+    }
+
+    public async findNotStockDeducted(): Promise<Delivery[]> {
+        return Delivery.query().where('stockDeducted', false);
+    }
+
+    public async countNotStockDeducted(): Promise<number> {
+        const result = await Delivery.query().where('stockDeducted', false).count('* as total').first();
+        return Number(result?.$extras.total ?? 0);
     }
 
     public async destroy(id: string): Promise<void> {

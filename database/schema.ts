@@ -108,7 +108,7 @@ export class CompanyExpenseSchema extends BaseModel {
 }
 
 export class DeliverySchema extends BaseModel {
-  static $columns = ['castellanyId', 'createdAt', 'deliveredAt', 'deliveredByUserId', 'deliveredWeekNumber', 'id', 'orderId', 'updatedAt'] as const
+  static $columns = ['castellanyId', 'createdAt', 'deliveredAt', 'deliveredByUserId', 'deliveredWeekNumber', 'id', 'orderId', 'stockDeducted', 'updatedAt'] as const
   $columns = DeliverySchema.$columns
   @column()
   declare castellanyId: string | null
@@ -124,6 +124,8 @@ export class DeliverySchema extends BaseModel {
   declare id: string
   @column()
   declare orderId: string
+  @column()
+  declare stockDeducted: boolean
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
 }
@@ -439,6 +441,23 @@ export class SiteSettingSchema extends BaseModel {
 export class TaxBracketSchema extends BaseModel {
   static $columns = ['createdAt', 'id', 'order', 'rate', 'updatedAt', 'upperBound'] as const
   $columns = TaxBracketSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare order: number
+  @column()
+  declare rate: number
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare upperBound: string | null
+}
+
+export class TaxTierSchema extends BaseModel {
+  static $columns = ['createdAt', 'id', 'order', 'rate', 'updatedAt', 'upperBound'] as const
+  $columns = TaxTierSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
   @column({ isPrimary: true })

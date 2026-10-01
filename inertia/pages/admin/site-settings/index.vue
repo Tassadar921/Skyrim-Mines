@@ -21,14 +21,14 @@ const { pageTitle } = useAdminLayout();
 pageTitle.value = t('admin.siteSettings.title');
 
 const props = defineProps<{
-    taxSystem: 'flat' | 'progressive';
+    taxSystem: 'flat' | 'progressive' | 'progressive_full';
 }>();
 
 const taxSystemValue = ref(props.taxSystem);
 const isSubmittingTaxSystem = ref(false);
 
 function onTaxSystemChange(value: AcceptableValue) {
-    taxSystemValue.value = value as 'flat' | 'progressive';
+    taxSystemValue.value = value as 'flat' | 'progressive' | 'progressive_full';
     isSubmittingTaxSystem.value = true;
     router.put(urlFor('admin.siteSettings.updateTaxSystem'), { taxSystem: taxSystemValue.value }, { preserveScroll: true, onFinish: () => (isSubmittingTaxSystem.value = false) });
 }
@@ -108,6 +108,7 @@ function submitSubtitle() {
                 <SelectContent>
                     <SelectItem value="flat">{{ t('admin.siteSettings.taxSystem.flat') }}</SelectItem>
                     <SelectItem value="progressive">{{ t('admin.siteSettings.taxSystem.progressive') }}</SelectItem>
+                    <SelectItem value="progressive_full">{{ t('admin.siteSettings.taxSystem.progressiveFull') }}</SelectItem>
                 </SelectContent>
             </Select>
         </div>

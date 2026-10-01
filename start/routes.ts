@@ -55,6 +55,7 @@ router
         router.put('/site-settings/tax-system', [controllers.admin.SiteSettings, 'updateTaxSystem']).as('admin.siteSettings.updateTaxSystem').use(middleware.admin());
 
         router.put('/tax-brackets', [controllers.admin.Dashboard, 'updateTaxBrackets']).as('admin.dashboard.taxBrackets.update').use(middleware.admin());
+        router.put('/tax-tiers', [controllers.admin.Dashboard, 'updateTaxTiers']).as('admin.dashboard.taxTiers.update').use(middleware.admin());
 
         router.get('/users', [controllers.admin.Users, 'index']).as('admin.users.index').use(readOnly);
         router.get('/users/create', [controllers.admin.Users, 'create']).as('admin.users.create').use(middleware.admin());
@@ -109,6 +110,8 @@ router
 
         router.get('/livraisons', [controllers.admin.Livraisons, 'index']).as('admin.livraisons.index').use(readOnly);
         router.delete('/livraisons/:id', [controllers.admin.Livraisons, 'destroy']).as('admin.livraisons.destroy').use(middleware.admin());
+        router.patch('/livraisons/:id/deduct-stock', [controllers.admin.Livraisons, 'deductStock']).as('admin.livraisons.deductStock').use(middleware.admin());
+        router.post('/livraisons/deduct-stock-all', [controllers.admin.Livraisons, 'deductStockAll']).as('admin.livraisons.deductStockAll').use(middleware.admin());
 
         router.get('/barrel', [controllers.admin.Barrel, 'index']).as('admin.barrel.index').use(readOnly);
         router.patch('/barrel', [controllers.admin.Barrel, 'update']).as('admin.barrel.update').use(middleware.admin());
