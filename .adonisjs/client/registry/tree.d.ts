@@ -9,13 +9,6 @@ export interface ApiDefinition {
   tarifs: typeof routes['tarifs']
   stocks: typeof routes['stocks']
   organigramme: typeof routes['organigramme']
-  commandes: {
-    create: typeof routes['commandes.create']
-    store: typeof routes['commandes.store']
-    index: typeof routes['commandes.index']
-    show: typeof routes['commandes.show']
-    cancel: typeof routes['commandes.cancel']
-  }
   livraisons: {
     store: typeof routes['livraisons.store']
   }

@@ -82,10 +82,11 @@ export default class DashboardController {
     public async index({ inertia }: HttpContext) {
         const currentWeek = getWeekNumber(DateTime.now());
 
-        const [deliveryTotals, expenseTotals, employeeDueAmount, adminDueAmount, castellanyTax, siteSetting, taxBrackets, taxTiers, capitalSnapshotsByWeek] = await Promise.all([
+        const [deliveryTotals, expenseTotals, employeeDueAmount, foremanDueAmount, adminDueAmount, castellanyTax, siteSetting, taxBrackets, taxTiers, capitalSnapshotsByWeek] = await Promise.all([
             this.deliveryRepository.getWeeklyTotals(),
             this.companyExpenseRepository.getWeeklyTotals(),
             this.userRepository.sumBalanceByRole(UserRoleEnum.STAFF),
+            this.userRepository.sumBalanceByRole(UserRoleEnum.FOREMAN),
             this.userRepository.sumBalanceByRole(UserRoleEnum.ADMIN),
             this.castellanyTaxRepository.get(),
             this.siteSettingRepository.get(),
@@ -129,6 +130,7 @@ export default class DashboardController {
         return inertia.render('admin/dashboard', {
             weeklyRecap,
             employeeDueAmount,
+            foremanDueAmount,
             adminDueAmount,
             castellanyTaxRate: castellanyTax.rate,
             taxSystem: siteSetting.taxSystem as TaxSystemEnum,

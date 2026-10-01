@@ -107,7 +107,7 @@ export default class UsersController {
 
         try {
             const user = await this.userRepository.findOrFail(params.id);
-            if (user.role !== UserRoleEnum.STAFF && user.role !== UserRoleEnum.ADMIN) {
+            if (user.role !== UserRoleEnum.STAFF && user.role !== UserRoleEnum.ADMIN && user.role !== UserRoleEnum.FOREMAN) {
                 session.flash('error', i18n.t('messages.admin.users.balance.notEligible'));
                 return response.redirect().back();
             }

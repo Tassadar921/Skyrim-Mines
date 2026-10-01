@@ -24,7 +24,6 @@ export const controllers = {
   },
   Auth: () => import('#controllers/auth_controller'),
   Buybacks: () => import('#controllers/buybacks_controller'),
-  Commandes: () => import('#controllers/commandes_controller'),
   Deposits: () => import('#controllers/deposits_controller'),
   Home: () => import('#controllers/home_controller'),
   Livraisons: () => import('#controllers/livraisons_controller'),

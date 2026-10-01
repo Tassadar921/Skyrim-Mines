@@ -4,7 +4,7 @@ import OrganizationRoleEnum from '#types/enum/organization_role_enum';
 
 export const indexUserValidator = vine.create({
     page: vine.number().min(1).optional(),
-    sort: vine.enum(['username', 'createdAt']).optional(),
+    sort: vine.enum(['username', 'createdAt', 'lastActivity']).optional(),
     dir: vine.enum(['asc', 'desc']).optional(),
     search: vine.string().trim().maxLength(100).optional(),
     withoutAvatar: vine.boolean().optional(),

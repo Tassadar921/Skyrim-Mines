@@ -17,11 +17,6 @@ router.get('/tarifs', [controllers.Tarifs, 'index']).as('tarifs').use(middleware
 const companyOnly = middleware.admin({ roles: [UserRoleEnum.ADMIN, UserRoleEnum.AUDITOR, UserRoleEnum.STAFF] });
 router.get('/stocks', [controllers.Stocks, 'index']).as('stocks').use(middleware.auth()).use(companyOnly);
 router.get('/organigramme', [controllers.Organigramme, 'index']).as('organigramme').use(middleware.auth());
-router.get('/commandes', [controllers.Commandes, 'create']).as('commandes.create').use(middleware.auth());
-router.post('/commandes', [controllers.Commandes, 'store']).as('commandes.store').use(middleware.auth());
-router.get('/mes-commandes', [controllers.Commandes, 'index']).as('commandes.index').use(middleware.auth());
-router.get('/commandes/:id', [controllers.Commandes, 'show']).as('commandes.show').use(middleware.auth());
-router.patch('/commandes/:id/cancel', [controllers.Commandes, 'cancel']).as('commandes.cancel').use(middleware.auth());
 router.post('/commandes/:orderId/livraisons', [controllers.Livraisons, 'store']).as('livraisons.store').use(middleware.auth());
 router.post('/deposits', [controllers.Deposits, 'store']).as('deposits.store').use(middleware.auth());
 router.patch('/deposits/:id', [controllers.Deposits, 'update']).as('deposits.update').use(middleware.auth());
@@ -40,13 +35,20 @@ router.get('/auth/discord/redirect', [controllers.Auth, 'discordRedirect']).as('
 router.get('/auth/discord/callback', [controllers.Auth, 'discordCallback']).as('auth.discord.callback').use(discordAuthThrottle);
 router.delete('/logout', [controllers.Auth, 'logout']).as('auth.logout').use(middleware.auth());
 
+// Read-only sections the new "foreman" role (contremaître) does NOT get: resources, materials,
+// castellanies, barrel (tonneau breakdown), buybacks history, site settings.
 const readOnly = middleware.admin({ roles: [UserRoleEnum.ADMIN, UserRoleEnum.AUDITOR] });
+
+// Sections the foreman DOES get, with full read/write access (same level as admin) — dashboard,
+// users, organizations, stocks, barrel rentals, expenses, commandes, livraisons.
+const foremanAccess = middleware.admin({ roles: [UserRoleEnum.ADMIN, UserRoleEnum.AUDITOR, UserRoleEnum.FOREMAN] });
+const foremanManage = middleware.admin({ roles: [UserRoleEnum.ADMIN, UserRoleEnum.FOREMAN] });
 
 router
     .group((): void => {
-        router.get('/', [controllers.admin.Dashboard, 'index']).as('admin.dashboard').use(readOnly);
-        router.put('/castellany-tax', [controllers.admin.Dashboard, 'updateCastellanyTax']).as('admin.dashboard.castellanyTax.update').use(middleware.admin());
-        router.post('/capital-snapshot', [controllers.admin.Dashboard, 'storeCapitalSnapshot']).as('admin.dashboard.capitalSnapshot.store').use(middleware.admin());
+        router.get('/', [controllers.admin.Dashboard, 'index']).as('admin.dashboard').use(foremanAccess);
+        router.put('/castellany-tax', [controllers.admin.Dashboard, 'updateCastellanyTax']).as('admin.dashboard.castellanyTax.update').use(foremanManage);
+        router.post('/capital-snapshot', [controllers.admin.Dashboard, 'storeCapitalSnapshot']).as('admin.dashboard.capitalSnapshot.store').use(foremanManage);
 
         router.get('/site-settings', [controllers.admin.SiteSettings, 'index']).as('admin.siteSettings.index').use(readOnly);
         router.post('/site-settings/logo', [controllers.admin.SiteSettings, 'updateLogo']).as('admin.siteSettings.updateLogo').use(middleware.admin());
@@ -54,17 +56,17 @@ router
         router.put('/site-settings/subtitle', [controllers.admin.SiteSettings, 'updateSubtitle']).as('admin.siteSettings.updateSubtitle').use(middleware.admin());
         router.put('/site-settings/tax-system', [controllers.admin.SiteSettings, 'updateTaxSystem']).as('admin.siteSettings.updateTaxSystem').use(middleware.admin());
 
-        router.put('/tax-brackets', [controllers.admin.Dashboard, 'updateTaxBrackets']).as('admin.dashboard.taxBrackets.update').use(middleware.admin());
-        router.put('/tax-tiers', [controllers.admin.Dashboard, 'updateTaxTiers']).as('admin.dashboard.taxTiers.update').use(middleware.admin());
+        router.put('/tax-brackets', [controllers.admin.Dashboard, 'updateTaxBrackets']).as('admin.dashboard.taxBrackets.update').use(foremanManage);
+        router.put('/tax-tiers', [controllers.admin.Dashboard, 'updateTaxTiers']).as('admin.dashboard.taxTiers.update').use(foremanManage);
 
-        router.get('/users', [controllers.admin.Users, 'index']).as('admin.users.index').use(readOnly);
-        router.get('/users/create', [controllers.admin.Users, 'create']).as('admin.users.create').use(middleware.admin());
-        router.post('/users', [controllers.admin.Users, 'store']).as('admin.users.store').use(middleware.admin());
-        router.get('/users/:id', [controllers.admin.Users, 'show']).as('admin.users.show').use(readOnly);
-        router.put('/users/:id', [controllers.admin.Users, 'update']).as('admin.users.update').use(middleware.admin());
-        router.put('/users/:id/balance', [controllers.admin.Users, 'updateBalance']).as('admin.users.updateBalance').use(middleware.admin());
-        router.post('/users/:id/avatar', [controllers.admin.Users, 'updateAvatar']).as('admin.users.updateAvatar').use(middleware.admin());
-        router.delete('/users/:id', [controllers.admin.Users, 'destroy']).as('admin.users.destroy').use(middleware.admin());
+        router.get('/users', [controllers.admin.Users, 'index']).as('admin.users.index').use(foremanAccess);
+        router.get('/users/create', [controllers.admin.Users, 'create']).as('admin.users.create').use(foremanManage);
+        router.post('/users', [controllers.admin.Users, 'store']).as('admin.users.store').use(foremanManage);
+        router.get('/users/:id', [controllers.admin.Users, 'show']).as('admin.users.show').use(foremanAccess);
+        router.put('/users/:id', [controllers.admin.Users, 'update']).as('admin.users.update').use(foremanManage);
+        router.put('/users/:id/balance', [controllers.admin.Users, 'updateBalance']).as('admin.users.updateBalance').use(foremanManage);
+        router.post('/users/:id/avatar', [controllers.admin.Users, 'updateAvatar']).as('admin.users.updateAvatar').use(foremanManage);
+        router.delete('/users/:id', [controllers.admin.Users, 'destroy']).as('admin.users.destroy').use(foremanManage);
 
         router.get('/resources', [controllers.admin.Resources, 'index']).as('admin.resources.index').use(readOnly);
         router.get('/resources/create', [controllers.admin.Resources, 'create']).as('admin.resources.create').use(middleware.admin());
@@ -92,52 +94,49 @@ router
         router.put('/castellanies/:id', [controllers.admin.Castellanies, 'update']).as('admin.castellanies.update').use(middleware.admin());
         router.delete('/castellanies/:id', [controllers.admin.Castellanies, 'destroy']).as('admin.castellanies.destroy').use(middleware.admin());
 
-        router.get('/stocks', [controllers.admin.Stocks, 'index']).as('admin.stocks.index').use(readOnly);
-        router.patch('/stocks', [controllers.admin.Stocks, 'update']).as('admin.stocks.update').use(middleware.admin());
-        router.patch('/stocks/:resourceId/barrel', [controllers.admin.Stocks, 'updateBarrelTotal']).as('admin.stocks.barrel.update').use(middleware.admin());
+        router.get('/stocks', [controllers.admin.Stocks, 'index']).as('admin.stocks.index').use(foremanAccess);
+        router.patch('/stocks', [controllers.admin.Stocks, 'update']).as('admin.stocks.update').use(foremanManage);
+        router.patch('/stocks/:resourceId/barrel', [controllers.admin.Stocks, 'updateBarrelTotal']).as('admin.stocks.barrel.update').use(foremanManage);
 
         router.get('/buybacks', [controllers.admin.Buybacks, 'index']).as('admin.buybacks.index').use(readOnly);
 
-        router.get('/expenses', [controllers.admin.CompanyExpenses, 'index']).as('admin.expenses.index').use(readOnly);
-        router.post('/expenses', [controllers.admin.CompanyExpenses, 'store']).as('admin.expenses.store').use(middleware.admin());
-        router.delete('/expenses/:id', [controllers.admin.CompanyExpenses, 'destroy']).as('admin.expenses.destroy').use(middleware.admin());
+        router.get('/expenses', [controllers.admin.CompanyExpenses, 'index']).as('admin.expenses.index').use(foremanAccess);
+        router.post('/expenses', [controllers.admin.CompanyExpenses, 'store']).as('admin.expenses.store').use(foremanManage);
+        router.delete('/expenses/:id', [controllers.admin.CompanyExpenses, 'destroy']).as('admin.expenses.destroy').use(foremanManage);
 
-        router.get('/commandes', [controllers.admin.Commandes, 'index']).as('admin.commandes.index').use(readOnly);
-        router.patch('/commandes/:id/validate', [controllers.admin.Commandes, 'validate']).as('admin.commandes.validate').use(middleware.admin());
-        router.patch('/commandes/:id/cancel', [controllers.admin.Commandes, 'cancel']).as('admin.commandes.cancel').use(middleware.admin());
-        router.get('/commandes/archiver', [controllers.admin.OrderArchives, 'create']).as('admin.orderArchives.create').use(middleware.admin());
-        router.post('/commandes/archiver', [controllers.admin.OrderArchives, 'store']).as('admin.orderArchives.store').use(middleware.admin());
+        router.get('/commandes', [controllers.admin.Commandes, 'index']).as('admin.commandes.index').use(foremanAccess);
+        router.patch('/commandes/:id/validate', [controllers.admin.Commandes, 'validate']).as('admin.commandes.validate').use(foremanManage);
+        router.patch('/commandes/:id/cancel', [controllers.admin.Commandes, 'cancel']).as('admin.commandes.cancel').use(foremanManage);
+        router.get('/commandes/archiver', [controllers.admin.OrderArchives, 'create']).as('admin.orderArchives.create').use(foremanManage);
+        router.post('/commandes/archiver', [controllers.admin.OrderArchives, 'store']).as('admin.orderArchives.store').use(foremanManage);
 
-        router.get('/livraisons', [controllers.admin.Livraisons, 'index']).as('admin.livraisons.index').use(readOnly);
-        router.delete('/livraisons/:id', [controllers.admin.Livraisons, 'destroy']).as('admin.livraisons.destroy').use(middleware.admin());
-        router.patch('/livraisons/:id/deduct-stock', [controllers.admin.Livraisons, 'deductStock']).as('admin.livraisons.deductStock').use(middleware.admin());
-        router.post('/livraisons/deduct-stock-all', [controllers.admin.Livraisons, 'deductStockAll']).as('admin.livraisons.deductStockAll').use(middleware.admin());
+        router.get('/livraisons', [controllers.admin.Livraisons, 'index']).as('admin.livraisons.index').use(foremanAccess);
+        router.delete('/livraisons/:id', [controllers.admin.Livraisons, 'destroy']).as('admin.livraisons.destroy').use(foremanManage);
+        router.patch('/livraisons/:id/deduct-stock', [controllers.admin.Livraisons, 'deductStock']).as('admin.livraisons.deductStock').use(foremanManage);
+        router.post('/livraisons/deduct-stock-all', [controllers.admin.Livraisons, 'deductStockAll']).as('admin.livraisons.deductStockAll').use(foremanManage);
 
         router.get('/barrel', [controllers.admin.Barrel, 'index']).as('admin.barrel.index').use(readOnly);
         router.patch('/barrel', [controllers.admin.Barrel, 'update']).as('admin.barrel.update').use(middleware.admin());
 
-        router.get('/barrel-rentals', [controllers.admin.BarrelRentals, 'index']).as('admin.barrelRentals.index').use(readOnly);
-        router.post('/barrel-rentals', [controllers.admin.BarrelRentals, 'store']).as('admin.barrelRentals.store').use(middleware.admin());
-        router.get('/barrel-rentals/:id', [controllers.admin.BarrelRentals, 'show']).as('admin.barrelRentals.show').use(readOnly);
-        router.put('/barrel-rentals/:id', [controllers.admin.BarrelRentals, 'update']).as('admin.barrelRentals.update').use(middleware.admin());
-        router.delete('/barrel-rentals/:id', [controllers.admin.BarrelRentals, 'destroy']).as('admin.barrelRentals.destroy').use(middleware.admin());
-        router.post('/barrel-rentals/:id/payments', [controllers.admin.BarrelRentals, 'storePayment']).as('admin.barrelRentals.payments.store').use(middleware.admin());
-        router.delete('/barrel-rentals/payments/:id', [controllers.admin.BarrelRentals, 'destroyPayment']).as('admin.barrelRentals.payments.destroy').use(middleware.admin());
+        router.get('/barrel-rentals', [controllers.admin.BarrelRentals, 'index']).as('admin.barrelRentals.index').use(foremanAccess);
+        router.post('/barrel-rentals', [controllers.admin.BarrelRentals, 'store']).as('admin.barrelRentals.store').use(foremanManage);
+        router.get('/barrel-rentals/:id', [controllers.admin.BarrelRentals, 'show']).as('admin.barrelRentals.show').use(foremanAccess);
+        router.put('/barrel-rentals/:id', [controllers.admin.BarrelRentals, 'update']).as('admin.barrelRentals.update').use(foremanManage);
+        router.delete('/barrel-rentals/:id', [controllers.admin.BarrelRentals, 'destroy']).as('admin.barrelRentals.destroy').use(foremanManage);
+        router.post('/barrel-rentals/:id/payments', [controllers.admin.BarrelRentals, 'storePayment']).as('admin.barrelRentals.payments.store').use(foremanManage);
+        router.delete('/barrel-rentals/payments/:id', [controllers.admin.BarrelRentals, 'destroyPayment']).as('admin.barrelRentals.payments.destroy').use(foremanManage);
 
-        router.get('/organizations', [controllers.admin.Organizations, 'index']).as('admin.organizations.index').use(readOnly);
-        router.get('/organizations/create', [controllers.admin.Organizations, 'create']).as('admin.organizations.create').use(middleware.admin());
-        router.post('/organizations', [controllers.admin.Organizations, 'store']).as('admin.organizations.store').use(middleware.admin());
-        router.get('/organizations/:id', [controllers.admin.Organizations, 'show']).as('admin.organizations.show').use(readOnly);
-        router.put('/organizations/:id', [controllers.admin.Organizations, 'update']).as('admin.organizations.update').use(middleware.admin());
-        router.delete('/organizations/:id', [controllers.admin.Organizations, 'destroy']).as('admin.organizations.destroy').use(middleware.admin());
-        router.post('/organizations/:id/members', [controllers.admin.Organizations, 'storeMember']).as('admin.organizations.members.store').use(middleware.admin());
-        router.delete('/organizations/:id/members/:memberId', [controllers.admin.Organizations, 'destroyMember']).as('admin.organizations.members.destroy').use(middleware.admin());
-        router.patch('/organizations/:id/members/:memberId/role', [controllers.admin.Organizations, 'updateMemberRole']).as('admin.organizations.members.updateRole').use(middleware.admin());
-        router.put('/organizations/:id/resource-prices/:resourceId', [controllers.admin.Organizations, 'updateResourcePrice']).as('admin.organizations.resourcePrices.update').use(middleware.admin());
-        router
-            .delete('/organizations/:id/resource-prices/:resourceId', [controllers.admin.Organizations, 'destroyResourcePrice'])
-            .as('admin.organizations.resourcePrices.destroy')
-            .use(middleware.admin());
+        router.get('/organizations', [controllers.admin.Organizations, 'index']).as('admin.organizations.index').use(foremanAccess);
+        router.get('/organizations/create', [controllers.admin.Organizations, 'create']).as('admin.organizations.create').use(foremanManage);
+        router.post('/organizations', [controllers.admin.Organizations, 'store']).as('admin.organizations.store').use(foremanManage);
+        router.get('/organizations/:id', [controllers.admin.Organizations, 'show']).as('admin.organizations.show').use(foremanAccess);
+        router.put('/organizations/:id', [controllers.admin.Organizations, 'update']).as('admin.organizations.update').use(foremanManage);
+        router.delete('/organizations/:id', [controllers.admin.Organizations, 'destroy']).as('admin.organizations.destroy').use(foremanManage);
+        router.post('/organizations/:id/members', [controllers.admin.Organizations, 'storeMember']).as('admin.organizations.members.store').use(foremanManage);
+        router.delete('/organizations/:id/members/:memberId', [controllers.admin.Organizations, 'destroyMember']).as('admin.organizations.members.destroy').use(foremanManage);
+        router.patch('/organizations/:id/members/:memberId/role', [controllers.admin.Organizations, 'updateMemberRole']).as('admin.organizations.members.updateRole').use(foremanManage);
+        router.put('/organizations/:id/resource-prices/:resourceId', [controllers.admin.Organizations, 'updateResourcePrice']).as('admin.organizations.resourcePrices.update').use(foremanManage);
+        router.delete('/organizations/:id/resource-prices/:resourceId', [controllers.admin.Organizations, 'destroyResourcePrice']).as('admin.organizations.resourcePrices.destroy').use(foremanManage);
     })
     .prefix('/admin')
     .use(middleware.auth());

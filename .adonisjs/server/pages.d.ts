@@ -37,9 +37,6 @@ declare module '@adonisjs/inertia/types' {
     'admin/users/index': ExtractProps<(typeof import('../../inertia/pages/admin/users/index.vue'))['default']>
     'admin/users/show': ExtractProps<(typeof import('../../inertia/pages/admin/users/show.vue'))['default']>
     'auth/login': ExtractProps<(typeof import('../../inertia/pages/auth/login.vue'))['default']>
-    'commandes/create': ExtractProps<(typeof import('../../inertia/pages/commandes/create.vue'))['default']>
-    'commandes/index': ExtractProps<(typeof import('../../inertia/pages/commandes/index.vue'))['default']>
-    'commandes/show': ExtractProps<(typeof import('../../inertia/pages/commandes/show.vue'))['default']>
     'errors/not_found': ExtractProps<(typeof import('../../inertia/pages/errors/not_found.vue'))['default']>
     'errors/server_error': ExtractProps<(typeof import('../../inertia/pages/errors/server_error.vue'))['default']>
     'home': ExtractProps<(typeof import('../../inertia/pages/home.vue'))['default']>

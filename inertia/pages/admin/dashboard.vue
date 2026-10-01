@@ -40,6 +40,7 @@ type TaxBracketRow = { upperBound: number | null; rate: number };
 const props = defineProps<{
     weeklyRecap: WeeklyRecap[];
     employeeDueAmount: number;
+    foremanDueAmount: number;
     adminDueAmount: number;
     castellanyTaxRate: number;
     taxSystem: 'flat' | 'progressive' | 'progressive_full';
@@ -145,6 +146,10 @@ function submitCapitalSnapshot() {
                 <div class="text-sm flex items-center justify-between">
                     <span class="text-muted-foreground">{{ t('admin.dashboard.amountsDue.employees') }}</span>
                     <span class="font-medium">{{ formatAmount(employeeDueAmount) }}</span>
+                </div>
+                <div class="text-sm flex items-center justify-between">
+                    <span class="text-muted-foreground">{{ t('admin.dashboard.amountsDue.foremen') }}</span>
+                    <span class="font-medium">{{ formatAmount(foremanDueAmount) }}</span>
                 </div>
                 <div class="text-sm flex items-center justify-between">
                     <span class="text-muted-foreground">{{ t('admin.dashboard.amountsDue.executives') }}</span>

@@ -18,6 +18,7 @@ export default class UserRepository extends BaseRepository<typeof User> {
         const allowedSorts: Record<string, string> = {
             username: 'username',
             createdAt: 'created_at',
+            lastActivity: 'last_activity',
         };
         const sortColumn = allowedSorts[sort] ?? 'created_at';
 

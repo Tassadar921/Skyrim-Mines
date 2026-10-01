@@ -91,66 +91,6 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/organigramme_controller').default['index']>>>
     }
   }
-  'commandes.create': {
-    methods: ["GET","HEAD"]
-    pattern: '/commandes'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/commandes_controller').default['create']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/commandes_controller').default['create']>>>
-    }
-  }
-  'commandes.store': {
-    methods: ["POST"]
-    pattern: '/commandes'
-    types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/orders').createOrderValidator)>>
-      paramsTuple: []
-      params: {}
-      query: ExtractQuery<InferInput<(typeof import('#validators/orders').createOrderValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/commandes_controller').default['store']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/commandes_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
-  'commandes.index': {
-    methods: ["GET","HEAD"]
-    pattern: '/mes-commandes'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/commandes_controller').default['index']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/commandes_controller').default['index']>>>
-    }
-  }
-  'commandes.show': {
-    methods: ["GET","HEAD"]
-    pattern: '/commandes/:id'
-    types: {
-      body: {}
-      paramsTuple: [ParamValue]
-      params: { id: ParamValue }
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/commandes_controller').default['show']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/commandes_controller').default['show']>>>
-    }
-  }
-  'commandes.cancel': {
-    methods: ["PATCH"]
-    pattern: '/commandes/:id/cancel'
-    types: {
-      body: {}
-      paramsTuple: [ParamValue]
-      params: { id: ParamValue }
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/commandes_controller').default['cancel']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/commandes_controller').default['cancel']>>>
-    }
-  }
   'livraisons.store': {
     methods: ["POST"]
     pattern: '/commandes/:orderId/livraisons'

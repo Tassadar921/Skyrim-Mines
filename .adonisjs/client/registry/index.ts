@@ -48,36 +48,6 @@ const routes = {
     tokens: [{"old":"/organigramme","type":0,"val":"organigramme","end":""}],
     types: placeholder as Registry['organigramme']['types'],
   },
-  'commandes.create': {
-    methods: ["GET","HEAD"],
-    pattern: '/commandes',
-    tokens: [{"old":"/commandes","type":0,"val":"commandes","end":""}],
-    types: placeholder as Registry['commandes.create']['types'],
-  },
-  'commandes.store': {
-    methods: ["POST"],
-    pattern: '/commandes',
-    tokens: [{"old":"/commandes","type":0,"val":"commandes","end":""}],
-    types: placeholder as Registry['commandes.store']['types'],
-  },
-  'commandes.index': {
-    methods: ["GET","HEAD"],
-    pattern: '/mes-commandes',
-    tokens: [{"old":"/mes-commandes","type":0,"val":"mes-commandes","end":""}],
-    types: placeholder as Registry['commandes.index']['types'],
-  },
-  'commandes.show': {
-    methods: ["GET","HEAD"],
-    pattern: '/commandes/:id',
-    tokens: [{"old":"/commandes/:id","type":0,"val":"commandes","end":""},{"old":"/commandes/:id","type":1,"val":"id","end":""}],
-    types: placeholder as Registry['commandes.show']['types'],
-  },
-  'commandes.cancel': {
-    methods: ["PATCH"],
-    pattern: '/commandes/:id/cancel',
-    tokens: [{"old":"/commandes/:id/cancel","type":0,"val":"commandes","end":""},{"old":"/commandes/:id/cancel","type":1,"val":"id","end":""},{"old":"/commandes/:id/cancel","type":0,"val":"cancel","end":""}],
-    types: placeholder as Registry['commandes.cancel']['types'],
-  },
   'livraisons.store': {
     methods: ["POST"],
     pattern: '/commandes/:orderId/livraisons',

@@ -69,6 +69,7 @@ function submit() {
                     <SelectContent>
                         <SelectItem value="admin">{{ t('admin.users.show.fields.roles.admin') }}</SelectItem>
                         <SelectItem value="auditor">{{ t('admin.users.show.fields.roles.auditor') }}</SelectItem>
+                        <SelectItem value="foreman">{{ t('admin.users.show.fields.roles.foreman') }}</SelectItem>
                         <SelectItem value="staff">{{ t('admin.users.show.fields.roles.staff') }}</SelectItem>
                         <SelectItem value="contractor">{{ t('admin.users.show.fields.roles.contractor') }}</SelectItem>
                         <SelectItem value="client">{{ t('admin.users.show.fields.roles.client') }}</SelectItem>

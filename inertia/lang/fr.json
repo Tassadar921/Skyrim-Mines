@@ -64,20 +64,17 @@
             "empty": "Aucun élément trouvé",
             "barrelEdit": {
                 "title": "Modifier le tonneau de « {name} »",
-                "description": "Un ajout est réparti uniformément entre tous les membres du staff. Un retrait est réparti entre eux au prorata de la quantité actuellement dans leur tonneau. Cette action modifie directement le tonneau individuel de chaque membre du staff concerné.",
+                "description": "Un ajout est réparti uniformément entre tous les mineurs. Un retrait est réparti entre eux au prorata de la quantité actuellement dans leur tonneau. Cette action modifie directement le tonneau individuel de chaque mineur concerné.",
                 "current": "Quantité actuelle : {quantity}",
-                "willAdd": "{quantity} sera ajouté, réparti entre tout le staff.",
-                "willRemove": "{quantity} sera retiré, réparti entre le staff au prorata de leurs quantités.",
+                "willAdd": "{quantity} sera ajouté, réparti entre tous les mineurs.",
+                "willRemove": "{quantity} sera retiré, réparti entre les mineurs au prorata de leurs quantités.",
                 "cancel": "Annuler",
                 "confirm": "Confirmer"
             }
         }
     },
     "commande": {
-        "title": "Passer commande",
-        "description": "Choisissez les ressources et quantités souhaitées, une commande au format PDF sera générée automatiquement.",
         "totalValue": "Total estimé :",
-        "submit": "Valider la commande",
         "sections": {
             "minerais": "Minerais",
             "lingots": "Lingots"
@@ -112,37 +109,20 @@
             "scopePersonal": "À titre personnel"
         },
         "show": {
-            "title": "Commande enregistrée",
-            "number": "Commande n° {number}",
-            "ready": "Votre commande est enregistrée.",
-            "download": "Télécharger le PDF",
-            "total": "Total",
-            "newOrder": "Passer une nouvelle commande",
-            "delivery": "Livraison",
             "deliveredOfOrdered": "{delivered} / {ordered} livrées",
             "notDelivered": "Non livrée",
             "fullyDelivered": "Livrée"
         },
         "index": {
-            "navLink": "Mes commandes",
-            "title": "Mes commandes",
             "table": {
-                "count": "commande | commande | commandes",
-                "number": "N°",
-                "date": "Date",
-                "requester": "Demandé par",
-                "status": "Statut",
-                "amount": "Montant",
-                "actions": "Actions",
-                "download": "Télécharger",
-                "empty": "Aucune commande trouvée"
+                "number": "N°"
             }
         }
     },
     "organigramme": {
         "title": "Organigramme",
         "owners": "Propriétaires",
-        "employees": "Employés",
+        "employees": "Mineurs",
         "extras": "Extras"
     },
     "organization": {
@@ -187,7 +167,6 @@
             "account": "Mon compte",
             "tarifs": "Tarifs",
             "stocks": "Stocks",
-            "commandes": "Commander",
             "organigramme": "Organigramme"
         },
         "theme": {
@@ -277,8 +256,9 @@
             },
             "amountsDue": {
                 "title": "Soldes dus",
-                "employees": "Dû aux employés",
-                "executives": "Dû aux dirigeants"
+                "employees": "Dû aux mineurs",
+                "foremen": "Dû aux contremaîtres",
+                "executives": "Dû aux propriétaires"
             },
             "weeklyRecap": {
                 "title": "Récap financier hebdomadaire",
@@ -328,6 +308,8 @@
                 "enabled": "Actif",
                 "balance": "Solde dû",
                 "createdAt": "Inscrit le",
+                "lastActivity": "Dernière activité",
+                "never": "Jamais",
                 "actions": "Actions",
                 "view": "Voir",
                 "userCount": "utilisateur | utilisateur | utilisateurs",
@@ -357,11 +339,13 @@
                     "id": "Identifiant",
                     "createdAt": "Inscrit le",
                     "updatedAt": "Modifié le",
+                    "lastActivity": "Dernière activité",
                     "roles": {
-                        "admin": "Administrateur",
+                        "admin": "Propriétaire",
                         "auditor": "Auditeur",
-                        "staff": "Staff",
-                        "contractor": "Contractor",
+                        "foreman": "Contremaître",
+                        "staff": "Mineur",
+                        "contractor": "Prestataire",
                         "client": "Client"
                     }
                 },

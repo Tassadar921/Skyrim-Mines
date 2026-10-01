@@ -11,11 +11,6 @@ export type ScannedRoutes = {
     'tarifs': { paramsTuple?: []; params?: {} }
     'stocks': { paramsTuple?: []; params?: {} }
     'organigramme': { paramsTuple?: []; params?: {} }
-    'commandes.create': { paramsTuple?: []; params?: {} }
-    'commandes.store': { paramsTuple?: []; params?: {} }
-    'commandes.index': { paramsTuple?: []; params?: {} }
-    'commandes.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'commandes.cancel': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'livraisons.store': { paramsTuple: [ParamValue]; params: {'orderId': ParamValue} }
     'deposits.store': { paramsTuple?: []; params?: {} }
     'deposits.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -111,9 +106,6 @@ export type ScannedRoutes = {
     'tarifs': { paramsTuple?: []; params?: {} }
     'stocks': { paramsTuple?: []; params?: {} }
     'organigramme': { paramsTuple?: []; params?: {} }
-    'commandes.create': { paramsTuple?: []; params?: {} }
-    'commandes.index': { paramsTuple?: []; params?: {} }
-    'commandes.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'organization.show': { paramsTuple?: []; params?: {} }
     'login': { paramsTuple?: []; params?: {} }
     'auth.discord.redirect': { paramsTuple?: []; params?: {} }
@@ -152,9 +144,6 @@ export type ScannedRoutes = {
     'tarifs': { paramsTuple?: []; params?: {} }
     'stocks': { paramsTuple?: []; params?: {} }
     'organigramme': { paramsTuple?: []; params?: {} }
-    'commandes.create': { paramsTuple?: []; params?: {} }
-    'commandes.index': { paramsTuple?: []; params?: {} }
-    'commandes.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'organization.show': { paramsTuple?: []; params?: {} }
     'login': { paramsTuple?: []; params?: {} }
     'auth.discord.redirect': { paramsTuple?: []; params?: {} }
@@ -190,7 +179,6 @@ export type ScannedRoutes = {
   POST: {
     'subscribe': { paramsTuple?: []; params?: {} }
     'unsubscribe': { paramsTuple?: []; params?: {} }
-    'commandes.store': { paramsTuple?: []; params?: {} }
     'livraisons.store': { paramsTuple: [ParamValue]; params: {'orderId': ParamValue} }
     'deposits.store': { paramsTuple?: []; params?: {} }
     'buybacks.store': { paramsTuple?: []; params?: {} }
@@ -211,7 +199,6 @@ export type ScannedRoutes = {
     'admin.organizations.members.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   PATCH: {
-    'commandes.cancel': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'deposits.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'organization.members.updateRole': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.resources.reorder': { paramsTuple?: []; params?: {} }

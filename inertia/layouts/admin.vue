@@ -35,8 +35,8 @@ const page = usePage<Data.SharedProps>();
 const { pageTitle } = useAdminLayout();
 const { t } = useI18n();
 const { theme } = useTheme();
-const items = getItems(t);
-const footerItems = getFooterItems(t);
+const items = getItems(t, page.props.user?.role);
+const footerItems = getFooterItems(t, page.props.user?.role);
 
 watch(
     () => page.props.flash,

@@ -473,7 +473,7 @@ export class TaxTierSchema extends BaseModel {
 }
 
 export class UserSchema extends BaseModel {
-  static $columns = ['avatarId', 'balance', 'createdAt', 'discordId', 'enabled', 'id', 'lastLoginAt', 'organizationId', 'organizationRole', 'role', 'updatedAt', 'username'] as const
+  static $columns = ['avatarId', 'balance', 'createdAt', 'discordId', 'enabled', 'id', 'lastActivity', 'lastLoginAt', 'organizationId', 'organizationRole', 'role', 'updatedAt', 'username'] as const
   $columns = UserSchema.$columns
   @column()
   declare avatarId: string | null
@@ -487,6 +487,8 @@ export class UserSchema extends BaseModel {
   declare enabled: boolean
   @column({ isPrimary: true })
   declare id: string
+  @column.dateTime()
+  declare lastActivity: DateTime | null
   @column.dateTime()
   declare lastLoginAt: DateTime | null
   @column()

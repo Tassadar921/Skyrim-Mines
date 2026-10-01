@@ -13,6 +13,7 @@ export default class UserTransformer extends BaseTransformer<User> {
             organizationRole: this.resource.organizationRole,
             createdAt: this.resource.createdAt.toISO()!,
             updatedAt: this.resource.updatedAt?.toISO() ?? null,
+            lastActivity: this.resource.lastActivity?.toISO() ?? null,
         };
     }
 }

@@ -19,7 +19,7 @@ import { ArrowUp, ArrowDown, ArrowUpDown, Eye, CheckCircle, XCircle, Plus, UserC
 import { canHaveBalance } from '~/lib/user_balance';
 import type { Data } from '@generated/data';
 
-const roles = ['admin', 'auditor', 'staff', 'contractor', 'client'] as const;
+const roles = ['admin', 'auditor', 'foreman', 'staff', 'contractor', 'client'] as const;
 
 defineOptions({ layout: AdminLayout });
 
@@ -163,6 +163,12 @@ function resetFilters() {
                                 <component :is="sortIcon('createdAt')" class="size-4" />
                             </Button>
                         </TableHead>
+                        <TableHead v-if="isAdmin">
+                            <Button variant="ghost" class="gap-1 px-2" @click="onSort('lastActivity')">
+                                {{ $t('admin.users.table.lastActivity') }}
+                                <component :is="sortIcon('lastActivity')" class="size-4" />
+                            </Button>
+                        </TableHead>
                         <TableHead>{{ $t('admin.users.table.actions') }}</TableHead>
                     </TableRow>
                 </TableHeader>
@@ -175,7 +181,7 @@ function resetFilters() {
                             </TableCell>
                             <TableCell class="text-sm font-medium">{{ user.username }}</TableCell>
                             <TableCell>
-                                <Badge :variant="user.role === 'admin' ? 'default' : 'secondary'">{{ user.role }}</Badge>
+                                <Badge :variant="user.role === 'admin' ? 'default' : 'secondary'">{{ t(`admin.users.show.fields.roles.${user.role}`) }}</Badge>
                             </TableCell>
                             <TableCell>
                                 <CheckCircle v-if="user.enabled" class="size-4 text-green-600" />
@@ -183,6 +189,9 @@ function resetFilters() {
                             </TableCell>
                             <TableCell class="text-sm text-muted-foreground">{{ canHaveBalance(user.role) ? `${user.balance.toFixed(2)} s` : '—' }}</TableCell>
                             <TableCell class="text-sm text-muted-foreground">{{ new Date(user.createdAt).toLocaleDateString(undefined, { timeZone: 'UTC' }) }}</TableCell>
+                            <TableCell v-if="isAdmin" class="text-sm text-muted-foreground">
+                                {{ user.lastActivity ? new Date(user.lastActivity).toLocaleString(undefined, { timeZone: 'UTC' }) : t('admin.users.table.never') }}
+                            </TableCell>
                             <TableCell>
                                 <Link :route="'admin.users.show'" :params="{ id: user.id }">
                                     <Button variant="outline" size="sm" class="gap-1">
@@ -194,7 +203,7 @@ function resetFilters() {
                         </TableRow>
                     </template>
                     <TableRow v-else>
-                        <TableCell :colspan="7" class="h-24 text-center text-muted-foreground">
+                        <TableCell :colspan="isAdmin ? 8 : 7" class="h-24 text-center text-muted-foreground">
                             {{ $t('admin.users.table.empty') }}
                         </TableCell>
                     </TableRow>
