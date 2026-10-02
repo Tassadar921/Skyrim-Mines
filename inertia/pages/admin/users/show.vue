@@ -3,7 +3,7 @@ import AdminLayout from '~/layouts/admin.vue';
 import { useAdminLayout } from '~/composables/use_admin_layout';
 import { useAuth } from '~/composables/use_auth';
 import { useI18n } from 'vue-i18n';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { router, useForm } from '@inertiajs/vue3';
 import { urlFor } from '~/client';
 import { Button } from '~/components/ui/button';
@@ -32,13 +32,22 @@ defineOptions({ layout: AdminLayout });
 
 const { t } = useI18n();
 const { pageTitle } = useAdminLayout();
-const { isAdmin } = useAuth();
+const { isAdmin, isManager } = useAuth();
 
 const props = defineProps<{
     targetUser: Data.User & { avatarUrl: string | null };
 }>();
 
 pageTitle.value = `${t('admin.users.show.title')} - ${props.targetUser.username}`;
+
+const ALL_ROLES = ['admin', 'auditor', 'foreman', 'staff', 'contractor', 'client'] as const;
+const FOREMAN_ASSIGNABLE_ROLES = ['staff', 'contractor', 'client'] as const;
+// A foreman can only manage (edit/delete) accounts whose current role they're also allowed to assign —
+// owner and foreman accounts stay reserved for owners.
+const canManageTarget = computed(() => isAdmin.value || (isManager.value && (FOREMAN_ASSIGNABLE_ROLES as readonly string[]).includes(props.targetUser.role)));
+// When the select is disabled (foreman viewing an account they can't manage), keep every role
+// listed so the current value still renders correctly instead of showing blank.
+const assignableRoles = computed(() => (isAdmin.value || !canManageTarget.value ? ALL_ROLES : FOREMAN_ASSIGNABLE_ROLES));
 
 const username = ref(props.targetUser.username);
 const role = ref(props.targetUser.role);
@@ -123,7 +132,7 @@ function onAvatarChange(event: Event) {
                     {{ $t('admin.users.show.back') }}
                 </Link>
             </Button>
-            <div v-if="isAdmin" class="flex items-center gap-4">
+            <div v-if="canManageTarget" class="flex items-center gap-4">
                 <DeleteButton
                     :label="t('admin.users.show.delete')"
                     :title="t('admin.users.show.deleteConfirm.title')"
@@ -145,7 +154,7 @@ function onAvatarChange(event: Event) {
                 <div v-else class="flex size-16 items-center justify-center rounded-full bg-muted">
                     <UserCircle class="size-8 text-muted-foreground" />
                 </div>
-                <div v-if="isAdmin" class="space-y-1">
+                <div v-if="canManageTarget" class="space-y-1">
                     <Button variant="outline" size="sm" type="button" :loading="avatarForm.processing" :disabled="avatarForm.processing" @click="avatarInputRef?.click()">
                         {{ t('admin.users.show.avatar.upload') }}
                     </Button>
@@ -159,29 +168,24 @@ function onAvatarChange(event: Event) {
         <div class="rounded-md border p-5 space-y-4">
             <div class="space-y-1">
                 <Label for="username">{{ $t('admin.users.show.fields.username') }}</Label>
-                <Input id="username" v-model="username" type="text" maxlength="50" :readonly="!isAdmin" />
+                <Input id="username" v-model="username" type="text" maxlength="50" :readonly="!canManageTarget" />
                 <p class="text-xs text-muted-foreground text-right">{{ username.length }}/50</p>
             </div>
 
             <div class="space-y-1">
                 <Label>{{ $t('admin.users.show.fields.role') }}</Label>
-                <Select v-model="role" :disabled="!isAdmin">
+                <Select v-model="role" :disabled="!canManageTarget">
                     <SelectTrigger>
                         <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="admin">{{ $t('admin.users.show.fields.roles.admin') }}</SelectItem>
-                        <SelectItem value="auditor">{{ $t('admin.users.show.fields.roles.auditor') }}</SelectItem>
-                        <SelectItem value="foreman">{{ $t('admin.users.show.fields.roles.foreman') }}</SelectItem>
-                        <SelectItem value="staff">{{ $t('admin.users.show.fields.roles.staff') }}</SelectItem>
-                        <SelectItem value="contractor">{{ $t('admin.users.show.fields.roles.contractor') }}</SelectItem>
-                        <SelectItem value="client">{{ $t('admin.users.show.fields.roles.client') }}</SelectItem>
+                        <SelectItem v-for="roleOption in assignableRoles" :key="roleOption" :value="roleOption">{{ $t(`admin.users.show.fields.roles.${roleOption}`) }}</SelectItem>
                     </SelectContent>
                 </Select>
             </div>
 
             <div class="flex items-center gap-2">
-                <Checkbox id="enabled" :disabled="!isAdmin" :model-value="enabled" @update:model-value="(v) => (enabled = !!v)" />
+                <Checkbox id="enabled" :disabled="!canManageTarget" :model-value="enabled" @update:model-value="(v) => (enabled = !!v)" />
                 <Label for="enabled" class="cursor-pointer">{{ $t('admin.users.show.fields.enabled') }}</Label>
             </div>
         </div>
@@ -190,12 +194,12 @@ function onAvatarChange(event: Event) {
             <Label for="balance">{{ $t('admin.users.show.fields.balance') }}</Label>
             <div class="flex items-center gap-2">
                 <div class="w-40">
-                    <Input id="balance" v-model.number="balance" type="number" step="0.01" min="0" :readonly="!isAdmin" />
+                    <Input id="balance" v-model.number="balance" type="number" step="0.01" min="0" :readonly="!canManageTarget" />
                 </div>
-                <Button v-if="isAdmin" size="sm" :loading="isSubmittingBalance" :disabled="isSubmittingBalance" @click="submitBalance">
+                <Button v-if="canManageTarget" size="sm" :loading="isSubmittingBalance" :disabled="isSubmittingBalance" @click="submitBalance">
                     {{ $t('admin.users.show.balance.save') }}
                 </Button>
-                <AlertDialog v-if="isAdmin">
+                <AlertDialog v-if="canManageTarget">
                     <AlertDialogTrigger as-child>
                         <Button variant="outline" size="sm" class="gap-1" :disabled="isSubmittingBalance || balance <= 0">
                             <HandCoins class="size-4" />

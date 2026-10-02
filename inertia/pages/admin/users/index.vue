@@ -25,7 +25,7 @@ defineOptions({ layout: AdminLayout });
 
 const { t } = useI18n();
 const { pageTitle } = useAdminLayout();
-const { isAdmin } = useAuth();
+const { isAdmin, isManager } = useAuth();
 pageTitle.value = t('admin.users.title');
 
 type UserLine = Data.User & { avatarUrl: string | null };
@@ -104,7 +104,7 @@ function resetFilters() {
     <div class="space-y-4">
         <div class="flex items-center justify-between">
             <Badge variant="outline">{{ meta.total }} {{ $t('admin.users.table.userCount', meta.total) }}</Badge>
-            <Button v-if="isAdmin" as-child class="gap-2">
+            <Button v-if="isManager" as-child class="gap-2">
                 <Link :href="urlFor('admin.users.create')">
                     <Plus class="size-4" />
                     {{ t('admin.users.new') }}

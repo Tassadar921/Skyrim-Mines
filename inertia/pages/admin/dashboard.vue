@@ -17,7 +17,7 @@ import TaxBracketEditor from '~/partials/admin/TaxBracketEditor.vue';
 
 defineOptions({ layout: AdminLayout });
 const { t } = useI18n();
-const { isAdmin } = useAuth();
+const { isManager } = useAuth();
 
 const { pageTitle } = useAdminLayout();
 pageTitle.value = t('admin.dashboard.title');
@@ -106,8 +106,8 @@ function submitCapitalSnapshot() {
                 <div class="text-sm font-medium">{{ t('admin.dashboard.tax.title') }}</div>
 
                 <template v-if="taxSystem === 'flat'">
-                    <Input v-model="castellanyTaxRate" type="number" :label="t('admin.dashboard.castellanyTax.rate')" min="0" :max="100" step="1" :readonly="!isAdmin" />
-                    <Button v-if="isAdmin" size="sm" :loading="isSubmittingCastellanyTax" :disabled="isSubmittingCastellanyTax" @click="submitCastellanyTax">
+                    <Input v-model="castellanyTaxRate" type="number" :label="t('admin.dashboard.castellanyTax.rate')" min="0" :max="100" step="1" :readonly="!isManager" />
+                    <Button v-if="isManager" size="sm" :loading="isSubmittingCastellanyTax" :disabled="isSubmittingCastellanyTax" @click="submitCastellanyTax">
                         {{ t('admin.dashboard.castellanyTax.save') }}
                     </Button>
                 </template>
@@ -115,7 +115,7 @@ function submitCapitalSnapshot() {
                 <TaxBracketEditor
                     v-else-if="taxSystem === 'progressive'"
                     :rows="taxBrackets"
-                    :is-admin="isAdmin"
+                    :is-admin="isManager"
                     :processing="isSubmittingBrackets"
                     summary-key="admin.dashboard.taxBrackets.summary"
                     :upper-bound-label="t('admin.dashboard.taxBrackets.upperBound')"
@@ -129,7 +129,7 @@ function submitCapitalSnapshot() {
                 <TaxBracketEditor
                     v-else
                     :rows="taxTiers"
-                    :is-admin="isAdmin"
+                    :is-admin="isManager"
                     :processing="isSubmittingTiers"
                     summary-key="admin.dashboard.taxTiers.summary"
                     :upper-bound-label="t('admin.dashboard.taxTiers.upperBound')"
@@ -175,7 +175,7 @@ function submitCapitalSnapshot() {
                 </template>
                 <template v-else>
                     <p class="text-xs text-muted-foreground">{{ t('admin.dashboard.capitalSnapshot.notEntered') }}</p>
-                    <template v-if="isAdmin">
+                    <template v-if="isManager">
                         <Input v-model="capitalInput" type="number" :label="t('admin.dashboard.capitalSnapshot.capital')" min="0" step="0.01" />
                         <Input v-model="stockValueInput" type="number" :label="t('admin.dashboard.capitalSnapshot.stockValue')" min="0" step="0.01" />
                         <Button size="sm" :loading="isSubmittingCapitalSnapshot" :disabled="isSubmittingCapitalSnapshot" @click="submitCapitalSnapshot">

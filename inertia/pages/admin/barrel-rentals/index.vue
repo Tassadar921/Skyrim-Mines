@@ -22,7 +22,7 @@ defineOptions({ layout: AdminLayout });
 
 const { t } = useI18n();
 const { pageTitle } = useAdminLayout();
-const { isAdmin } = useAuth();
+const { isManager } = useAuth();
 pageTitle.value = t('admin.barrelRentals.title');
 
 const NO_TENANT = 'none';
@@ -158,7 +158,7 @@ function resetFilters() {
             <div class="flex items-center justify-between">
                 <Badge variant="outline">{{ meta.total }} {{ t('admin.barrelRentals.table.count', meta.total) }}</Badge>
 
-                <Dialog v-if="isAdmin" v-model:open="open">
+                <Dialog v-if="isManager" v-model:open="open">
                     <DialogTrigger as-child>
                         <Button size="sm" class="gap-2">
                             <Plus class="size-4" />

@@ -20,7 +20,11 @@ router.get('/organigramme', [controllers.Organigramme, 'index']).as('organigramm
 router.post('/commandes/:orderId/livraisons', [controllers.Livraisons, 'store']).as('livraisons.store').use(middleware.auth());
 router.post('/deposits', [controllers.Deposits, 'store']).as('deposits.store').use(middleware.auth());
 router.patch('/deposits/:id', [controllers.Deposits, 'update']).as('deposits.update').use(middleware.auth());
-router.post('/buybacks', [controllers.Buybacks, 'store']).as('buybacks.store').use(middleware.auth()).use(middleware.admin());
+router
+    .post('/buybacks', [controllers.Buybacks, 'store'])
+    .as('buybacks.store')
+    .use(middleware.auth())
+    .use(middleware.admin({ roles: [UserRoleEnum.ADMIN, UserRoleEnum.FOREMAN] }));
 
 const organizationManage = middleware.organization({ roles: [OrganizationRoleEnum.OWNER, OrganizationRoleEnum.ADMIN] });
 const organizationOwnerOnly = middleware.organization({ roles: [OrganizationRoleEnum.OWNER] });

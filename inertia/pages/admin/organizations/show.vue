@@ -22,7 +22,7 @@ defineOptions({ layout: AdminLayout });
 
 const { t } = useI18n();
 const { pageTitle } = useAdminLayout();
-const { isAdmin } = useAuth();
+const { isManager } = useAuth();
 
 type Member = Data.User;
 type EligibleUser = { id: string; username: string };
@@ -132,7 +132,7 @@ function resetResourcePrice(resourceId: string) {
                     {{ t('admin.organizations.show.back') }}
                 </Link>
             </Button>
-            <div v-if="isAdmin" class="flex items-center gap-2">
+            <div v-if="isManager" class="flex items-center gap-2">
                 <Button :loading="isSubmitting" :disabled="isSubmitting" @click="submit">
                     {{ t('admin.organizations.show.save') }}
                 </Button>
@@ -148,11 +148,11 @@ function resetResourcePrice(resourceId: string) {
         </div>
 
         <div class="rounded-md border p-5 space-y-4 max-w-lg">
-            <Input v-model="name" :label="t('admin.organizations.create.fields.name')" maxlength="100" required :readonly="!isAdmin" />
+            <Input v-model="name" :label="t('admin.organizations.create.fields.name')" maxlength="100" required :readonly="!isManager" />
 
             <div class="space-y-1">
                 <Label>{{ t('admin.organizations.create.fields.castellany') }}</Label>
-                <Select v-model="castellanyId" :disabled="!isAdmin">
+                <Select v-model="castellanyId" :disabled="!isManager">
                     <SelectTrigger>
                         <SelectValue />
                     </SelectTrigger>
@@ -168,7 +168,7 @@ function resetResourcePrice(resourceId: string) {
             <div class="flex items-center justify-between">
                 <Badge variant="outline">{{ props.members.length }} {{ t('organization.members.count', props.members.length) }}</Badge>
 
-                <Dialog v-if="isAdmin" v-model:open="open">
+                <Dialog v-if="isManager" v-model:open="open">
                     <DialogTrigger as-child>
                         <Button size="sm" class="gap-2">
                             <Plus class="size-4" />
@@ -251,7 +251,7 @@ function resetResourcePrice(resourceId: string) {
                             <TableRow v-for="member in props.members" :key="member.id">
                                 <TableCell class="text-sm font-medium">{{ member.username }}</TableCell>
                                 <TableCell>
-                                    <Select v-if="isAdmin" :model-value="member.organizationRole ?? undefined" @update:model-value="(value) => changeMemberRole(member.id, String(value))">
+                                    <Select v-if="isManager" :model-value="member.organizationRole ?? undefined" @update:model-value="(value) => changeMemberRole(member.id, String(value))">
                                         <SelectTrigger class="w-36">
                                             <SelectValue />
                                         </SelectTrigger>
@@ -265,7 +265,7 @@ function resetResourcePrice(resourceId: string) {
                                 </TableCell>
                                 <TableCell>
                                     <DeleteButton
-                                        v-if="isAdmin"
+                                        v-if="isManager"
                                         :label="t('organization.members.remove')"
                                         :title="t('organization.members.removeConfirm.title')"
                                         :description="t('organization.members.removeConfirm.description', { username: member.username })"
@@ -317,10 +317,10 @@ function resetResourcePrice(resourceId: string) {
                                     <TableCell class="text-sm font-medium">{{ resource.name }}</TableCell>
                                     <TableCell class="text-sm text-muted-foreground">{{ resource.sellPrice.toFixed(2) }} s</TableCell>
                                     <TableCell>
-                                        <Input v-model="customPriceInputs[resource.id]" type="number" min="0" step="0.01" class="w-28" :readonly="!isAdmin" />
+                                        <Input v-model="customPriceInputs[resource.id]" type="number" min="0" step="0.01" class="w-28" :readonly="!isManager" />
                                     </TableCell>
                                     <TableCell>
-                                        <div v-if="isAdmin" class="flex items-center gap-2">
+                                        <div v-if="isManager" class="flex items-center gap-2">
                                             <Button size="sm" variant="outline" @click="saveResourcePrice(resource.id)">
                                                 {{ t('admin.organizations.resourcePrices.save') }}
                                             </Button>

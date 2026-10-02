@@ -21,7 +21,7 @@ type MaterialQuantities = Record<string, number>;
 
 const { t } = useI18n();
 const { pageTitle } = useAdminLayout();
-const { isAdmin } = useAuth();
+const { isManager } = useAuth();
 pageTitle.value = t('admin.stocks.title');
 
 const props = defineProps<{
@@ -95,7 +95,7 @@ function submit() {
         <div class="flex items-start justify-between gap-4">
             <p class="text-sm text-muted-foreground max-w-2xl">{{ t('admin.stocks.description') }}</p>
             <div class="flex items-center gap-2 shrink-0">
-                <BuybackModal v-if="isAdmin" :resources="props.resources" />
+                <BuybackModal v-if="isManager" :resources="props.resources" />
                 <Button :loading="isSubmitting" :disabled="isSubmitting" @click="submit">{{ t('admin.stocks.save') }}</Button>
             </div>
         </div>

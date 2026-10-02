@@ -37,7 +37,7 @@ type OrderRow = {
 
 const { t } = useI18n();
 const { pageTitle } = useAdminLayout();
-const { isAdmin } = useAuth();
+const { isManager } = useAuth();
 pageTitle.value = t('admin.commandes.title');
 
 const props = defineProps<{
@@ -112,11 +112,11 @@ function lineSections(order: OrderRow): { type: string; label: string; lines: Or
 }
 
 function canValidate(order: OrderRow): boolean {
-    return isAdmin.value && order.status === 'pending';
+    return isManager.value && order.status === 'pending';
 }
 
 function canCancel(order: OrderRow): boolean {
-    return isAdmin.value && (order.status === 'pending' || order.status === 'to_deliver');
+    return isManager.value && (order.status === 'pending' || order.status === 'to_deliver');
 }
 
 function validateOrder(order: OrderRow) {
@@ -139,7 +139,7 @@ function resetFilters() {
     <div class="space-y-4">
         <div class="flex items-center justify-between">
             <Badge variant="outline">{{ meta.total }} {{ t('admin.commandes.table.count', meta.total) }}</Badge>
-            <Button v-if="isAdmin" variant="outline" class="gap-2" as-child>
+            <Button v-if="isManager" variant="outline" class="gap-2" as-child>
                 <Link :href="urlFor('admin.orderArchives.create')">
                     <Archive class="size-4" />
                     {{ t('admin.commandes.archiveLink') }}

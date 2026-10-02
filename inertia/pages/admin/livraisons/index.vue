@@ -52,7 +52,7 @@ type WeeklyTotal = {
 
 const { t } = useI18n();
 const { pageTitle } = useAdminLayout();
-const { isAdmin } = useAuth();
+const { isManager } = useAuth();
 pageTitle.value = t('admin.livraisons.title');
 
 const props = defineProps<{
@@ -161,7 +161,7 @@ function resetFilters() {
         <div class="flex items-center justify-between">
             <Badge variant="outline">{{ meta.total }} {{ t('admin.livraisons.table.count', meta.total) }}</Badge>
 
-            <AlertDialog v-if="isAdmin && pendingStockDeductionCount > 0">
+            <AlertDialog v-if="isManager && pendingStockDeductionCount > 0">
                 <AlertDialogTrigger as-child>
                     <Button variant="outline" size="sm" class="gap-2" :loading="isDeductingAll" :disabled="isDeductingAll">
                         <PackageMinus class="size-4" />
@@ -269,7 +269,7 @@ function resetFilters() {
                                 <TableCell @click.stop>
                                     <Badge v-if="delivery.stockDeducted" variant="outline">{{ t('admin.livraisons.deductStock.deducted') }}</Badge>
                                     <Button
-                                        v-else-if="isAdmin"
+                                        v-else-if="isManager"
                                         variant="outline"
                                         size="sm"
                                         class="gap-1"
@@ -284,7 +284,7 @@ function resetFilters() {
                                 </TableCell>
                                 <TableCell @click.stop>
                                     <DeleteButton
-                                        v-if="isAdmin"
+                                        v-if="isManager"
                                         :label="t('admin.livraisons.delete.label')"
                                         :title="t('admin.livraisons.delete.title')"
                                         :description="t('admin.livraisons.delete.description', { number: formatOrderNumber(delivery.orderNumber) })"

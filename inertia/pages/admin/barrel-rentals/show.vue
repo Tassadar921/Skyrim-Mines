@@ -21,7 +21,7 @@ defineOptions({ layout: AdminLayout });
 
 const { t } = useI18n();
 const { pageTitle } = useAdminLayout();
-const { isAdmin } = useAuth();
+const { isManager } = useAuth();
 
 const NO_TENANT = 'none';
 
@@ -90,7 +90,7 @@ function submitPayment() {
                 </Link>
             </Button>
             <DeleteButton
-                v-if="isAdmin"
+                v-if="isManager"
                 :label="t('admin.barrelRentals.show.delete')"
                 :title="t('admin.barrelRentals.show.deleteConfirm.title')"
                 :description="t('admin.barrelRentals.show.deleteConfirm.description', { label: props.rental.label })"
@@ -110,12 +110,12 @@ function submitPayment() {
         </div>
 
         <div class="rounded-md border p-5 space-y-4 max-w-lg">
-            <Input v-model="label" :label="t('admin.barrelRentals.fields.label')" maxlength="100" :readonly="!isAdmin" />
-            <Input v-model="price" type="number" min="0" step="0.01" :label="t('admin.barrelRentals.fields.price')" :readonly="!isAdmin" />
+            <Input v-model="label" :label="t('admin.barrelRentals.fields.label')" maxlength="100" :readonly="!isManager" />
+            <Input v-model="price" type="number" min="0" step="0.01" :label="t('admin.barrelRentals.fields.price')" :readonly="!isManager" />
 
             <div class="space-y-1">
                 <Label>{{ t('admin.barrelRentals.fields.tenant') }}</Label>
-                <Select v-model="userId" :disabled="!isAdmin">
+                <Select v-model="userId" :disabled="!isManager">
                     <SelectTrigger>
                         <SelectValue />
                     </SelectTrigger>
@@ -129,12 +129,12 @@ function submitPayment() {
             </div>
 
             <p class="text-xs text-muted-foreground">{{ t('admin.barrelRentals.show.freeHint') }}</p>
-            <Button v-if="isAdmin" :loading="isSubmitting" :disabled="isSubmitting" @click="submit">
+            <Button v-if="isManager" :loading="isSubmitting" :disabled="isSubmitting" @click="submit">
                 {{ t('admin.barrelRentals.show.save') }}
             </Button>
         </div>
 
-        <div v-if="isAdmin && props.rental.userId && props.rental.price > 0" class="rounded-md border p-5 space-y-4 max-w-lg">
+        <div v-if="isManager && props.rental.userId && props.rental.price > 0" class="rounded-md border p-5 space-y-4 max-w-lg">
             <div class="text-sm font-medium">{{ t('admin.barrelRentals.payments.add') }}</div>
 
             <div class="space-y-1">
@@ -157,7 +157,7 @@ function submitPayment() {
                 {{ t('admin.barrelRentals.payments.submit') }}
             </Button>
         </div>
-        <p v-else-if="isAdmin && !props.rental.userId" class="text-sm text-muted-foreground">{{ t('admin.barrelRentals.show.noTenantHint') }}</p>
+        <p v-else-if="isManager && !props.rental.userId" class="text-sm text-muted-foreground">{{ t('admin.barrelRentals.show.noTenantHint') }}</p>
 
         <div class="rounded-md border">
             <Table>
@@ -179,7 +179,7 @@ function submitPayment() {
                             <TableCell class="text-sm text-muted-foreground">{{ new Date(payment.createdAt).toLocaleDateString('fr-FR') }}</TableCell>
                             <TableCell>
                                 <DeleteButton
-                                    v-if="isAdmin"
+                                    v-if="isManager"
                                     :label="t('admin.barrelRentals.payments.delete.label')"
                                     :title="t('admin.barrelRentals.payments.delete.title')"
                                     :description="t('admin.barrelRentals.payments.delete.description', { week: payment.weekNumber })"

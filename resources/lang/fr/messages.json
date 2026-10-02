@@ -72,13 +72,15 @@
         "users": {
             "update": {
                 "success": "Utilisateur mis à jour avec succès",
-                "error": "Erreur lors de la mise à jour de l'utilisateur"
+                "error": "Erreur lors de la mise à jour de l'utilisateur",
+                "roleNotAllowed": "Seuls les propriétaires peuvent assigner ou modifier un compte contremaître ou propriétaire"
             },
             "create": {
                 "success": "Utilisateur créé avec succès",
                 "error": "Erreur lors de la création de l'utilisateur",
                 "discordIdTaken": "Cet identifiant Discord est déjà utilisé par un autre compte",
-                "missingOrganization": "Veuillez renseigner l'organisation et le rôle du client"
+                "missingOrganization": "Veuillez renseigner l'organisation et le rôle du client",
+                "roleNotAllowed": "Seuls les propriétaires peuvent créer un compte contremaître ou propriétaire"
             },
             "avatar": {
                 "success": "Avatar mis à jour avec succès",

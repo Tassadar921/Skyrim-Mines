@@ -11,6 +11,9 @@ import { isClientOrAuditor } from '#helpers/user_role_helper';
 import { storeUploadedFile, deleteStoredFile } from '#helpers/file_storage_helper';
 import { indexUserValidator, updateUserValidator, createUserValidator, updateUserAvatarValidator, updateUserBalanceValidator } from '#validators/admin/users';
 
+/** Roles a foreman (contremaître) is allowed to assign or act on — owner and foreman accounts stay reserved for owners. */
+const FOREMAN_ASSIGNABLE_ROLES: UserRoleEnum[] = [UserRoleEnum.STAFF, UserRoleEnum.CONTRACTOR, UserRoleEnum.CLIENT];
+
 export default class UsersController {
     constructor(
         private readonly userRepository: UserRepository = new UserRepository(),
@@ -56,11 +59,17 @@ export default class UsersController {
         });
     }
 
-    public async updateAvatar({ request, params, response, session, i18n }: HttpContext) {
+    public async updateAvatar({ request, params, response, session, i18n, auth }: HttpContext) {
         const { avatar } = await request.validateUsing(updateUserAvatarValidator);
 
         try {
             const user = await this.userRepository.findOrFail(params.id);
+
+            if (auth.user!.role === UserRoleEnum.FOREMAN && !FOREMAN_ASSIGNABLE_ROLES.includes(user.role as UserRoleEnum)) {
+                session.flash('error', i18n.t('messages.admin.users.update.roleNotAllowed'));
+                return response.redirect().back();
+            }
+
             const previousAvatarId = user.avatarId;
 
             const path = await storeUploadedFile(avatar, 'uploads/avatars');
@@ -88,10 +97,20 @@ export default class UsersController {
         return response.redirect().back();
     }
 
-    public async update({ request, params, response, session, i18n }: HttpContext) {
+    public async update({ request, params, response, session, i18n, auth }: HttpContext) {
         const data = await request.validateUsing(updateUserValidator);
 
         try {
+            if (auth.user!.role === UserRoleEnum.FOREMAN) {
+                const target = await this.userRepository.findOrFail(params.id);
+                const targetRoleAllowed = FOREMAN_ASSIGNABLE_ROLES.includes(target.role as UserRoleEnum);
+                const newRoleAllowed = FOREMAN_ASSIGNABLE_ROLES.includes(data.role as UserRoleEnum);
+                if (!targetRoleAllowed || !newRoleAllowed) {
+                    session.flash('error', i18n.t('messages.admin.users.update.roleNotAllowed'));
+                    return response.redirect().back();
+                }
+            }
+
             await this.userRepository.update(params.id, data);
             session.flash('success', i18n.t('messages.admin.users.update.success'));
         } catch (e) {
@@ -102,13 +121,18 @@ export default class UsersController {
         return response.redirect().back();
     }
 
-    public async updateBalance({ request, params, response, session, i18n }: HttpContext) {
+    public async updateBalance({ request, params, response, session, i18n, auth }: HttpContext) {
         const { balance } = await request.validateUsing(updateUserBalanceValidator);
 
         try {
             const user = await this.userRepository.findOrFail(params.id);
             if (user.role !== UserRoleEnum.STAFF && user.role !== UserRoleEnum.ADMIN && user.role !== UserRoleEnum.FOREMAN) {
                 session.flash('error', i18n.t('messages.admin.users.balance.notEligible'));
+                return response.redirect().back();
+            }
+
+            if (auth.user!.role === UserRoleEnum.FOREMAN && !FOREMAN_ASSIGNABLE_ROLES.includes(user.role as UserRoleEnum)) {
+                session.flash('error', i18n.t('messages.admin.users.update.roleNotAllowed'));
                 return response.redirect().back();
             }
 
@@ -130,10 +154,15 @@ export default class UsersController {
         });
     }
 
-    public async store({ request, response, session, i18n }: HttpContext) {
+    public async store({ request, response, session, i18n, auth }: HttpContext) {
         const data = await request.validateUsing(createUserValidator);
 
         try {
+            if (auth.user!.role === UserRoleEnum.FOREMAN && !FOREMAN_ASSIGNABLE_ROLES.includes(data.role)) {
+                session.flash('error', i18n.t('messages.admin.users.create.roleNotAllowed'));
+                return response.redirect().back();
+            }
+
             if (await this.userRepository.findByDiscordId(data.discordId)) {
                 session.flash('error', i18n.t('messages.admin.users.create.discordIdTaken'));
                 return response.redirect().back();
@@ -190,6 +219,14 @@ export default class UsersController {
             if (auth.user?.id === params.id) {
                 session.flash('error', i18n.t('messages.admin.users.destroy.self'));
                 return response.redirect().toRoute('admin.users.index');
+            }
+
+            if (auth.user!.role === UserRoleEnum.FOREMAN) {
+                const target = await this.userRepository.findOrFail(params.id);
+                if (!FOREMAN_ASSIGNABLE_ROLES.includes(target.role as UserRoleEnum)) {
+                    session.flash('error', i18n.t('messages.admin.users.update.roleNotAllowed'));
+                    return response.redirect().toRoute('admin.users.index');
+                }
             }
 
             if (await this.userRepository.hasLinkedRecords(params.id)) {

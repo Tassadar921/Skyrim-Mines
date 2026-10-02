@@ -20,7 +20,7 @@ defineOptions({ layout: AdminLayout });
 
 const { t } = useI18n();
 const { pageTitle } = useAdminLayout();
-const { isAdmin } = useAuth();
+const { isManager } = useAuth();
 pageTitle.value = t('admin.expenses.title');
 
 type ExpenseRow = { id: string; weekNumber: number; title: string; label: string; amount: number; createdAt: string };
@@ -140,7 +140,7 @@ function deleteExpense(id: string) {
         <div class="flex items-center justify-between">
             <Badge variant="outline">{{ meta.total }} {{ t('admin.expenses.table.count', meta.total) }}</Badge>
 
-            <Dialog v-if="isAdmin" v-model:open="open">
+            <Dialog v-if="isManager" v-model:open="open">
                 <DialogTrigger as-child>
                     <Button size="sm" class="gap-2">
                         <Plus class="size-4" />
@@ -222,7 +222,7 @@ function deleteExpense(id: string) {
                             <TableCell class="text-sm font-medium">{{ expense.amount.toFixed(2) }} s</TableCell>
                             <TableCell>
                                 <DeleteButton
-                                    v-if="isAdmin"
+                                    v-if="isManager"
                                     :label="t('admin.expenses.delete.label')"
                                     :title="t('admin.expenses.delete.title')"
                                     :description="t('admin.expenses.delete.description', { title: expense.title })"

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import AdminLayout from '~/layouts/admin.vue';
 import { useAdminLayout } from '~/composables/use_admin_layout';
+import { useAuth } from '~/composables/use_auth';
 import { useI18n } from 'vue-i18n';
 import { computed } from 'vue';
 import { useForm } from '@inertiajs/vue3';
@@ -16,11 +17,16 @@ defineOptions({ layout: AdminLayout });
 
 const { t } = useI18n();
 const { pageTitle } = useAdminLayout();
+const { isAdmin } = useAuth();
 pageTitle.value = t('admin.users.create.title');
 
 const props = defineProps<{
     organizations: { id: string; name: string }[];
 }>();
+
+const ALL_ROLES = ['admin', 'auditor', 'foreman', 'staff', 'contractor', 'client'] as const;
+const FOREMAN_ASSIGNABLE_ROLES = ['staff', 'contractor', 'client'] as const;
+const assignableRoles = computed(() => (isAdmin.value ? ALL_ROLES : FOREMAN_ASSIGNABLE_ROLES));
 
 const form = useForm({
     discordId: '',
@@ -67,12 +73,7 @@ function submit() {
                         <SelectValue :placeholder="t('admin.users.create.fields.rolePlaceholder')" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="admin">{{ t('admin.users.show.fields.roles.admin') }}</SelectItem>
-                        <SelectItem value="auditor">{{ t('admin.users.show.fields.roles.auditor') }}</SelectItem>
-                        <SelectItem value="foreman">{{ t('admin.users.show.fields.roles.foreman') }}</SelectItem>
-                        <SelectItem value="staff">{{ t('admin.users.show.fields.roles.staff') }}</SelectItem>
-                        <SelectItem value="contractor">{{ t('admin.users.show.fields.roles.contractor') }}</SelectItem>
-                        <SelectItem value="client">{{ t('admin.users.show.fields.roles.client') }}</SelectItem>
+                        <SelectItem v-for="roleOption in assignableRoles" :key="roleOption" :value="roleOption">{{ t(`admin.users.show.fields.roles.${roleOption}`) }}</SelectItem>
                     </SelectContent>
                 </Select>
                 <p v-if="form.errors.role" class="text-sm text-destructive">{{ form.errors.role }}</p>
