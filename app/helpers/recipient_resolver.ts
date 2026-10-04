@@ -2,7 +2,7 @@ import { type HttpContext } from '@adonisjs/core/http';
 import type OrganizationRepository from '#repositories/organization_repository';
 import type UserRepository from '#repositories/user_repository';
 import type OrganizationRoleEnum from '#types/enum/organization_role_enum';
-import { isStaffOrAdmin, isClientOrAuditor } from '#helpers/user_role_helper';
+import { isAdminOrForeman, isClientOrAuditor } from '#helpers/user_role_helper';
 
 export type RecipientData = {
     recipientMode?: 'myOrganization' | 'myself' | 'thirdPartyClient' | 'thirdPartyOrganization';
@@ -27,7 +27,7 @@ export async function resolveRecipient(
     const user = auth.user!;
     const mode = data.recipientMode ?? (user.organizationId ? 'myOrganization' : 'myself');
 
-    if ((mode === 'thirdPartyClient' || mode === 'thirdPartyOrganization') && !isStaffOrAdmin(user.role)) {
+    if ((mode === 'thirdPartyClient' || mode === 'thirdPartyOrganization') && !isAdminOrForeman(user.role)) {
         return null;
     }
 
