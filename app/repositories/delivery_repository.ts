@@ -267,21 +267,26 @@ export default class DeliveryRepository extends BaseRepository<typeof Delivery> 
         return q.paginate(page, perPage);
     }
 
-    public async getWeeklyQuantityTotals(): Promise<Map<number, { totalQuantity: number; byOre: { resourceName: string; quantity: number }[] }>> {
+    public async getWeeklyQuantityTotals(): Promise<Map<number, { totalQuantity: number; byOre: { resourceId: string; resourceName: string; quantity: number }[] }>> {
         const rows = await db
             .from('deliveries')
             .join('delivery_lines', 'delivery_lines.delivery_id', 'deliveries.id')
-            .select('deliveries.delivered_week_number as weekNumber', 'delivery_lines.resource_name as resourceName', 'delivery_lines.resource_type as resourceType')
+            .select(
+                'deliveries.delivered_week_number as weekNumber',
+                'delivery_lines.resource_id as resourceId',
+                'delivery_lines.resource_name as resourceName',
+                'delivery_lines.resource_type as resourceType',
+            )
             .sum('delivery_lines.quantity as quantity')
-            .groupBy('deliveries.delivered_week_number', 'delivery_lines.resource_name', 'delivery_lines.resource_type');
+            .groupBy('deliveries.delivered_week_number', 'delivery_lines.resource_id', 'delivery_lines.resource_name', 'delivery_lines.resource_type');
 
-        const result = new Map<number, { totalQuantity: number; byOre: { resourceName: string; quantity: number }[] }>();
+        const result = new Map<number, { totalQuantity: number; byOre: { resourceId: string; resourceName: string; quantity: number }[] }>();
         for (const row of rows) {
             const quantity = Number(row.quantity);
             const entry = result.get(row.weekNumber) ?? { totalQuantity: 0, byOre: [] };
             entry.totalQuantity += quantity;
-            if (row.resourceType === ResourceTypeEnum.MINERAI) {
-                entry.byOre.push({ resourceName: row.resourceName, quantity });
+            if (row.resourceType === ResourceTypeEnum.MINERAI && row.resourceId) {
+                entry.byOre.push({ resourceId: row.resourceId, resourceName: row.resourceName, quantity });
             }
             result.set(row.weekNumber, entry);
         }

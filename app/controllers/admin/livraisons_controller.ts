@@ -3,6 +3,8 @@ import { DateTime } from 'luxon';
 import logger from '@adonisjs/core/services/logger';
 import transmit from '@adonisjs/transmit/services/main';
 import DeliveryRepository from '#repositories/delivery_repository';
+import ResourceRepository from '#repositories/resource_repository';
+import ResourceTypeEnum from '#types/enum/resource_type_enum';
 import { indexDeliveryValidator } from '#validators/admin/deliveries';
 import { getWeekNumber, getWeekRange } from '#helpers/game_week_helper';
 
@@ -17,7 +19,10 @@ function formatBuybackSuccessMessage(i18n: HttpContext['i18n'], baseMessage: str
 const PER_PAGE = 20;
 
 export default class LivraisonsController {
-    constructor(private readonly deliveryRepository: DeliveryRepository = new DeliveryRepository()) {}
+    constructor(
+        private readonly deliveryRepository: DeliveryRepository = new DeliveryRepository(),
+        private readonly resourceRepository: ResourceRepository = new ResourceRepository(),
+    ) {}
 
     public async index({ inertia, request }: HttpContext) {
         const { page, sort, dir, search, week } = await request.validateUsing(indexDeliveryValidator);
@@ -39,23 +44,42 @@ export default class LivraisonsController {
         const pendingStockDeductionCount = await this.deliveryRepository.countNotStockDeducted();
         const rawWeeklyTotals = await this.deliveryRepository.getWeeklyTotals();
         const weeklyTotalsByWeek = new Map(rawWeeklyTotals.map((entry) => [entry.weekNumber, entry]));
-        const weeklyQuantityTotals = await this.deliveryRepository.getWeeklyQuantityTotals();
 
         const weeklyTotals = [];
         for (let weekNumber = currentWeek; weekNumber >= 1; weekNumber--) {
             const { start, end } = getWeekRange(weekNumber);
             const entry = weeklyTotalsByWeek.get(weekNumber);
-            const quantityEntry = weeklyQuantityTotals.get(weekNumber);
             weeklyTotals.push({
                 weekNumber,
                 startDate: start.toJSDate().toISOString(),
                 endDate: end.toJSDate().toISOString(),
                 deliveryCount: entry?.deliveryCount ?? 0,
                 totalAmount: entry?.totalAmount ?? 0,
-                totalQuantity: quantityEntry?.totalQuantity ?? 0,
-                byOre: quantityEntry?.byOre ?? [],
             });
         }
+
+        // Statistics tab: ore totals and per-week breakdowns, always ordered like the resources
+        // list (never raw Map iteration order) and zero-filled so colors/positions stay stable
+        // across weeks regardless of which ores actually had deliveries that week.
+        const allResources = await this.resourceRepository.all();
+        const ores = allResources.filter((resource) => resource.type === ResourceTypeEnum.MINERAI).map((resource) => ({ resourceId: resource.id, resourceName: resource.name }));
+        const weeklyQuantityTotals = await this.deliveryRepository.getWeeklyQuantityTotals();
+
+        const weeklyOreStats: { weekNumber: number; totalQuantity: number; byOre: { resourceId: string; resourceName: string; quantity: number }[] }[] = [];
+        for (let weekNumber = currentWeek; weekNumber >= 1; weekNumber--) {
+            const quantityEntry = weeklyQuantityTotals.get(weekNumber);
+            const byOreForWeek = new Map(quantityEntry?.byOre.map((entry) => [entry.resourceId, entry.quantity]) ?? []);
+            weeklyOreStats.push({
+                weekNumber,
+                totalQuantity: quantityEntry?.totalQuantity ?? 0,
+                byOre: ores.map((ore) => ({ ...ore, quantity: byOreForWeek.get(ore.resourceId) ?? 0 })),
+            });
+        }
+
+        const oreTotals = ores.map((ore) => ({
+            ...ore,
+            quantity: weeklyOreStats.reduce((sum, weekEntry) => sum + (weekEntry.byOre.find((entry) => entry.resourceId === ore.resourceId)?.quantity ?? 0), 0),
+        }));
 
         return inertia.render('admin/livraisons/index', {
             deliveries: deliveries.all().map((delivery) => {
@@ -94,6 +118,7 @@ export default class LivraisonsController {
             filters: { search: search ?? '', sort: currentSort, dir: currentDir, week: week ?? null },
             weeklyTotals,
             pendingStockDeductionCount,
+            stats: { ores, oreTotals, weeklyOreStats },
         });
     }
 

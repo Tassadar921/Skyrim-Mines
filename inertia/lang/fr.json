@@ -713,16 +713,28 @@
             },
             "weekly": {
                 "title": "Totaux par semaine",
-                "deliveries": "livraison | livraison | livraisons",
-                "units": "unités"
+                "deliveries": "livraison | livraison | livraisons"
             },
-            "weeklyQuantities": {
-                "title": "Quantités livrées par semaine",
-                "table": {
-                    "week": "Semaine",
-                    "total": "Quantité totale (global)",
-                    "detail": "Détail par minerai",
-                    "none": "—"
+            "tabs": {
+                "deliveries": "Livraisons",
+                "stats": "Statistiques"
+            },
+            "stats": {
+                "oreTotals": {
+                    "title": "Quantités livrées par minerai",
+                    "resource": "Minerai",
+                    "quantity": "Quantité livrée",
+                    "total": "Total",
+                    "empty": "Aucune livraison enregistrée"
+                },
+                "evolution": {
+                    "title": "Évolution des quantités livrées",
+                    "total": "Total (tous minerais)"
+                },
+                "distribution": {
+                    "allWeeks": "Toutes les semaines (total)",
+                    "other": "Autres",
+                    "empty": "Aucune livraison sur cette période"
                 }
             },
             "detail": {
