@@ -68,14 +68,20 @@ export class CastellanyTaxSchema extends BaseModel {
 }
 
 export class CompanyCapitalSnapshotSchema extends BaseModel {
-  static $columns = ['capital', 'createdAt', 'id', 'stockValue', 'taxRate', 'updatedAt', 'weekNumber', 'weeklyTax'] as const
+  static $columns = ['capital', 'createdAt', 'donationReduction', 'id', 'privilegeReduction', 'sponsorshipReduction', 'stockValue', 'taxRate', 'updatedAt', 'weekNumber', 'weeklyTax'] as const
   $columns = CompanyCapitalSnapshotSchema.$columns
   @column()
   declare capital: string
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
+  @column()
+  declare donationReduction: boolean
   @column({ isPrimary: true })
   declare id: string
+  @column()
+  declare privilegeReduction: boolean
+  @column()
+  declare sponsorshipReduction: boolean
   @column()
   declare stockValue: string
   @column()
@@ -422,7 +428,7 @@ export class ResourceSchema extends BaseModel {
 }
 
 export class SiteSettingSchema extends BaseModel {
-  static $columns = ['createdAt', 'id', 'logoFileId', 'subtitle', 'taxSystem', 'updatedAt'] as const
+  static $columns = ['createdAt', 'id', 'logoFileId', 'subtitle', 'taxSystem', 'updatedAt', 'weekOneStart'] as const
   $columns = SiteSettingSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -436,6 +442,8 @@ export class SiteSettingSchema extends BaseModel {
   declare taxSystem: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
+  @column.date()
+  declare weekOneStart: DateTime | null
 }
 
 export class TaxBracketSchema extends BaseModel {

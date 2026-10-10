@@ -24,8 +24,8 @@ const props = defineProps<{
     organizations: { id: string; name: string }[];
 }>();
 
-const ALL_ROLES = ['admin', 'auditor', 'foreman', 'staff', 'contractor', 'client'] as const;
-const FOREMAN_ASSIGNABLE_ROLES = ['staff', 'contractor', 'client'] as const;
+const ALL_ROLES = ['admin', 'auditor', 'foreman', 'staff', 'former_staff', 'contractor', 'client'] as const;
+const FOREMAN_ASSIGNABLE_ROLES = ['staff', 'former_staff', 'contractor', 'client'] as const;
 const assignableRoles = computed(() => (isAdmin.value ? ALL_ROLES : FOREMAN_ASSIGNABLE_ROLES));
 
 const form = useForm({

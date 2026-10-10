@@ -1,4 +1,5 @@
 import { type HttpContext } from '@adonisjs/core/http';
+import { DateTime } from 'luxon';
 import db from '@adonisjs/lucid/services/db';
 import logger from '@adonisjs/core/services/logger';
 import ResourceRepository from '#repositories/resource_repository';
@@ -11,9 +12,10 @@ import ResourceBarrelAdjustmentRepository from '#repositories/resource_barrel_ad
 import UserRepository from '#repositories/user_repository';
 import ResourceTransformer from '#transformers/resource_transformer';
 import MaterialTransformer from '#transformers/material_transformer';
-import { updateStocksValidator, updateBarrelTotalValidator } from '#validators/admin/stocks';
+import { updateStocksValidator, updateBarrelTotalValidator, externalBuybackValidator } from '#validators/admin/stocks';
 import { computeBarrelQuantity } from '#helpers/resource_barrel_helper';
 import { distributeEvenly, distributeProportionally } from '#helpers/barrel_redistribution_helper';
+import { getWeekNumber, getWeekRange } from '#helpers/game_week_helper';
 import UserRoleEnum from '#types/enum/user_role_enum';
 
 export default class StocksController {
@@ -42,6 +44,21 @@ export default class StocksController {
         const resourceStockByResourceId = new Map(resourceStocks.map((s) => [s.resourceId, s]));
         const materialStockByMaterialId = new Map(materialStocks.map((s) => [s.materialId, s]));
 
+        const currentWeek = getWeekNumber(DateTime.now());
+        const weeklyDepositTotals = await this.resourceDepositRepository.getWeeklyQuantityTotals();
+        const weeklyDeposits = [];
+        for (let weekNumber = currentWeek; weekNumber >= 1; weekNumber--) {
+            const { start, end } = getWeekRange(weekNumber);
+            const entry = weeklyDepositTotals.get(weekNumber);
+            weeklyDeposits.push({
+                weekNumber,
+                startDate: start.toJSDate().toISOString(),
+                endDate: end.toJSDate().toISOString(),
+                totalQuantity: entry?.totalQuantity ?? 0,
+                byOre: entry?.byOre ?? [],
+            });
+        }
+
         return inertia.render('admin/stocks/index', {
             resources: resources.map((r) => ({
                 ...new ResourceTransformer(r).toObject(),
@@ -52,6 +69,7 @@ export default class StocksController {
                 ...new MaterialTransformer(m).toObject(),
                 quantity: materialStockByMaterialId.get(m.id)?.quantity ?? 0,
             })),
+            weeklyDeposits,
         });
     }
 
@@ -67,6 +85,33 @@ export default class StocksController {
         } catch (e) {
             logger.error({ err: e }, 'admin.stocks.update failed');
             session.flash('error', i18n.t('messages.admin.stocks.update.error'));
+        }
+
+        return response.redirect().back();
+    }
+
+    /**
+     * Resources bought from an outside source, added straight to the purchased stock — no barrel
+     * involved, no payout to any player, unlike the player-facing buyback (buybacks_controller).
+     */
+    public async externalBuyback({ request, response, session, i18n }: HttpContext) {
+        const { items } = await request.validateUsing(externalBuybackValidator);
+        const lines = items.filter((item) => item.quantity > 0);
+
+        if (!lines.length) {
+            return response.redirect().back();
+        }
+
+        try {
+            await db.transaction(async (trx) => {
+                for (const line of lines) {
+                    await this.resourceStockRepository.incrementPurchasedQuantity(line.resourceId, line.quantity, trx);
+                }
+            });
+            session.flash('success', i18n.t('messages.admin.stocks.externalBuyback.success'));
+        } catch (e) {
+            logger.error({ err: e }, 'admin.stocks.externalBuyback failed');
+            session.flash('error', i18n.t('messages.admin.stocks.externalBuyback.error'));
         }
 
         return response.redirect().back();

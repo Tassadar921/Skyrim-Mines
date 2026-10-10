@@ -3,6 +3,9 @@ import db from '@adonisjs/lucid/services/db';
 import type { TransactionClientContract } from '@adonisjs/lucid/types/database';
 import BaseRepository from '#repositories/base/base_repository';
 import ResourceDeposit from '#models/resource_deposit';
+import Resource from '#models/resource';
+import ResourceTypeEnum from '#types/enum/resource_type_enum';
+import { getWeekNumber } from '#helpers/game_week_helper';
 
 export default class ResourceDepositRepository extends BaseRepository<typeof ResourceDeposit> {
     constructor() {
@@ -71,5 +74,31 @@ export default class ResourceDepositRepository extends BaseRepository<typeof Res
         const result = await ResourceDeposit.query().where('userId', userId).where('resourceId', resourceId).sum('quantity as total').first();
 
         return Number(result?.$extras.total ?? 0);
+    }
+
+    public async getWeeklyQuantityTotals(): Promise<Map<number, { totalQuantity: number; byOre: { resourceName: string; quantity: number }[] }>> {
+        const [deposits, resources] = await Promise.all([ResourceDeposit.query(), Resource.query()]);
+        const resourceById = new Map(resources.map((resource) => [resource.id, resource]));
+
+        const byWeek = new Map<number, { totalQuantity: number; byOre: Map<string, number> }>();
+        for (const deposit of deposits) {
+            const weekNumber = getWeekNumber(deposit.createdAt);
+            const entry = byWeek.get(weekNumber) ?? { totalQuantity: 0, byOre: new Map<string, number>() };
+            entry.totalQuantity += deposit.quantity;
+
+            const resource = resourceById.get(deposit.resourceId);
+            if (resource?.type === ResourceTypeEnum.MINERAI) {
+                entry.byOre.set(resource.name, (entry.byOre.get(resource.name) ?? 0) + deposit.quantity);
+            }
+
+            byWeek.set(weekNumber, entry);
+        }
+
+        const result = new Map<number, { totalQuantity: number; byOre: { resourceName: string; quantity: number }[] }>();
+        for (const [weekNumber, entry] of byWeek) {
+            result.set(weekNumber, { totalQuantity: entry.totalQuantity, byOre: [...entry.byOre.entries()].map(([resourceName, quantity]) => ({ resourceName, quantity })) });
+        }
+
+        return result;
     }
 }

@@ -114,7 +114,7 @@ const myLingots = computed(() => props.resources.filter((r) => r.type === 'lingo
 const totalMyBarrelValue = computed(() => props.resources.reduce((sum, resource) => sum + resource.buyPrice * resource.myQuantityBarrel, 0));
 
 const canSeeToDeliver = page.props.user?.role === 'admin' || page.props.user?.role === 'staff';
-const canSeeCompanyBarrel = page.props.user?.role === 'admin' || page.props.user?.role === 'auditor' || page.props.user?.role === 'staff';
+const canSeeCompanyBarrel = page.props.user?.role === 'admin' || page.props.user?.role === 'auditor' || page.props.user?.role === 'staff' || page.props.user?.role === 'foreman';
 
 let barrelSubscription: ReturnType<ReturnType<typeof getTransmit>['subscription']> | undefined;
 let toDeliverSubscription: ReturnType<ReturnType<typeof getTransmit>['subscription']> | undefined;

@@ -40,7 +40,7 @@ router.get('/auth/discord/callback', [controllers.Auth, 'discordCallback']).as('
 router.delete('/logout', [controllers.Auth, 'logout']).as('auth.logout').use(middleware.auth());
 
 // Read-only sections the new "foreman" role (contremaître) does NOT get: resources, materials,
-// castellanies, barrel (tonneau breakdown), buybacks history, site settings.
+// castellanies, buybacks history, site settings.
 const readOnly = middleware.admin({ roles: [UserRoleEnum.ADMIN, UserRoleEnum.AUDITOR] });
 
 // Sections the foreman DOES get, with full read/write access (same level as admin) — dashboard,
@@ -59,6 +59,7 @@ router
         router.delete('/site-settings/logo', [controllers.admin.SiteSettings, 'destroyLogo']).as('admin.siteSettings.destroyLogo').use(middleware.admin());
         router.put('/site-settings/subtitle', [controllers.admin.SiteSettings, 'updateSubtitle']).as('admin.siteSettings.updateSubtitle').use(middleware.admin());
         router.put('/site-settings/tax-system', [controllers.admin.SiteSettings, 'updateTaxSystem']).as('admin.siteSettings.updateTaxSystem').use(middleware.admin());
+        router.put('/site-settings/week-one-start', [controllers.admin.SiteSettings, 'updateWeekOneStart']).as('admin.siteSettings.updateWeekOneStart').use(middleware.admin());
 
         router.put('/tax-brackets', [controllers.admin.Dashboard, 'updateTaxBrackets']).as('admin.dashboard.taxBrackets.update').use(foremanManage);
         router.put('/tax-tiers', [controllers.admin.Dashboard, 'updateTaxTiers']).as('admin.dashboard.taxTiers.update').use(foremanManage);
@@ -70,6 +71,7 @@ router
         router.put('/users/:id', [controllers.admin.Users, 'update']).as('admin.users.update').use(foremanManage);
         router.put('/users/:id/balance', [controllers.admin.Users, 'updateBalance']).as('admin.users.updateBalance').use(foremanManage);
         router.post('/users/:id/avatar', [controllers.admin.Users, 'updateAvatar']).as('admin.users.updateAvatar').use(foremanManage);
+        router.delete('/users/:id/avatar', [controllers.admin.Users, 'destroyAvatar']).as('admin.users.destroyAvatar').use(foremanManage);
         router.delete('/users/:id', [controllers.admin.Users, 'destroy']).as('admin.users.destroy').use(foremanManage);
 
         router.get('/resources', [controllers.admin.Resources, 'index']).as('admin.resources.index').use(readOnly);
@@ -101,6 +103,7 @@ router
         router.get('/stocks', [controllers.admin.Stocks, 'index']).as('admin.stocks.index').use(foremanAccess);
         router.patch('/stocks', [controllers.admin.Stocks, 'update']).as('admin.stocks.update').use(foremanManage);
         router.patch('/stocks/:resourceId/barrel', [controllers.admin.Stocks, 'updateBarrelTotal']).as('admin.stocks.barrel.update').use(foremanManage);
+        router.post('/stocks/external-buyback', [controllers.admin.Stocks, 'externalBuyback']).as('admin.stocks.externalBuyback').use(foremanManage);
 
         router.get('/buybacks', [controllers.admin.Buybacks, 'index']).as('admin.buybacks.index').use(readOnly);
 
@@ -117,9 +120,9 @@ router
         router.get('/livraisons', [controllers.admin.Livraisons, 'index']).as('admin.livraisons.index').use(foremanAccess);
         router.delete('/livraisons/:id', [controllers.admin.Livraisons, 'destroy']).as('admin.livraisons.destroy').use(foremanManage);
         router.patch('/livraisons/:id/deduct-stock', [controllers.admin.Livraisons, 'deductStock']).as('admin.livraisons.deductStock').use(foremanManage);
+        router.patch('/livraisons/:id/mark-stock-deducted', [controllers.admin.Livraisons, 'markStockDeducted']).as('admin.livraisons.markStockDeducted').use(foremanManage);
         router.post('/livraisons/deduct-stock-all', [controllers.admin.Livraisons, 'deductStockAll']).as('admin.livraisons.deductStockAll').use(foremanManage);
 
-        router.get('/barrel', [controllers.admin.Barrel, 'index']).as('admin.barrel.index').use(readOnly);
         router.patch('/barrel', [controllers.admin.Barrel, 'update']).as('admin.barrel.update').use(middleware.admin());
 
         router.get('/barrel-rentals', [controllers.admin.BarrelRentals, 'index']).as('admin.barrelRentals.index').use(foremanAccess);

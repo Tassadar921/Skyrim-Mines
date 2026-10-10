@@ -124,6 +124,7 @@ function submitBarrelTotal(resource: Data.Resource) {
                         <TableCell class="text-sm">
                             <QuantityStepper
                                 v-if="editablePurchased"
+                                allow-formula
                                 :model-value="quantities[resource.id]?.quantityPurchased ?? 0"
                                 @update:model-value="(value) => emit('update-purchased', resource.id, value)"
                             />

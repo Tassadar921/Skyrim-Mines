@@ -12,3 +12,7 @@ export const updateSubtitleValidator = vine.create({
 export const updateTaxSystemValidator = vine.create({
     taxSystem: vine.enum(Object.values(TaxSystemEnum)),
 });
+
+export const updateWeekOneStartValidator = vine.create({
+    weekOneStart: vine.string().trim().optional(),
+});

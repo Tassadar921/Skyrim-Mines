@@ -22,6 +22,8 @@ pageTitle.value = t('admin.siteSettings.title');
 
 const props = defineProps<{
     taxSystem: 'flat' | 'progressive' | 'progressive_full';
+    weekOneStart: string | null;
+    defaultWeekOneStart: string;
 }>();
 
 const taxSystemValue = ref(props.taxSystem);
@@ -62,6 +64,20 @@ const isSubmittingSubtitle = ref(false);
 function submitSubtitle() {
     isSubmittingSubtitle.value = true;
     router.put(urlFor('admin.siteSettings.updateSubtitle'), { subtitle: subtitleInput.value }, { preserveScroll: true, onFinish: () => (isSubmittingSubtitle.value = false) });
+}
+
+const weekOneStartInput = ref(props.weekOneStart ?? props.defaultWeekOneStart);
+const isSubmittingWeekOneStart = ref(false);
+
+function submitWeekOneStart() {
+    isSubmittingWeekOneStart.value = true;
+    router.put(urlFor('admin.siteSettings.updateWeekOneStart'), { weekOneStart: weekOneStartInput.value }, { preserveScroll: true, onFinish: () => (isSubmittingWeekOneStart.value = false) });
+}
+
+function resetWeekOneStart() {
+    weekOneStartInput.value = props.defaultWeekOneStart;
+    isSubmittingWeekOneStart.value = true;
+    router.put(urlFor('admin.siteSettings.updateWeekOneStart'), { weekOneStart: '' }, { preserveScroll: true, onFinish: () => (isSubmittingWeekOneStart.value = false) });
 }
 </script>
 
@@ -111,6 +127,20 @@ function submitSubtitle() {
                     <SelectItem value="progressive_full">{{ t('admin.siteSettings.taxSystem.progressiveFull') }}</SelectItem>
                 </SelectContent>
             </Select>
+        </div>
+
+        <div class="rounded-md border p-5 space-y-4">
+            <div class="text-sm font-medium">{{ t('admin.siteSettings.weekOneStart.title') }}</div>
+            <p class="text-xs text-muted-foreground">{{ t('admin.siteSettings.weekOneStart.hint', { date: defaultWeekOneStart }) }}</p>
+            <Input v-model="weekOneStartInput" type="date" :min="defaultWeekOneStart" :label="t('admin.siteSettings.weekOneStart.field')" :readonly="!isAdmin" class="max-w-xs" />
+            <div v-if="isAdmin" class="flex gap-2">
+                <Button size="sm" :loading="isSubmittingWeekOneStart" :disabled="isSubmittingWeekOneStart" @click="submitWeekOneStart">
+                    {{ t('admin.siteSettings.weekOneStart.save') }}
+                </Button>
+                <Button variant="outline" size="sm" :disabled="isSubmittingWeekOneStart" @click="resetWeekOneStart">
+                    {{ t('admin.siteSettings.weekOneStart.reset') }}
+                </Button>
+            </div>
         </div>
     </div>
 </template>

@@ -56,6 +56,7 @@ export interface ApiDefinition {
       destroyLogo: typeof routes['admin.siteSettings.destroyLogo']
       updateSubtitle: typeof routes['admin.siteSettings.updateSubtitle']
       updateTaxSystem: typeof routes['admin.siteSettings.updateTaxSystem']
+      updateWeekOneStart: typeof routes['admin.siteSettings.updateWeekOneStart']
     }
     users: {
       index: typeof routes['admin.users.index']
@@ -65,6 +66,7 @@ export interface ApiDefinition {
       update: typeof routes['admin.users.update']
       updateBalance: typeof routes['admin.users.updateBalance']
       updateAvatar: typeof routes['admin.users.updateAvatar']
+      destroyAvatar: typeof routes['admin.users.destroyAvatar']
       destroy: typeof routes['admin.users.destroy']
     }
     resources: {
@@ -103,6 +105,7 @@ export interface ApiDefinition {
       barrel: {
         update: typeof routes['admin.stocks.barrel.update']
       }
+      externalBuyback: typeof routes['admin.stocks.externalBuyback']
     }
     buybacks: {
       index: typeof routes['admin.buybacks.index']
@@ -125,10 +128,10 @@ export interface ApiDefinition {
       index: typeof routes['admin.livraisons.index']
       destroy: typeof routes['admin.livraisons.destroy']
       deductStock: typeof routes['admin.livraisons.deductStock']
+      markStockDeducted: typeof routes['admin.livraisons.markStockDeducted']
       deductStockAll: typeof routes['admin.livraisons.deductStockAll']
     }
     barrel: {
-      index: typeof routes['admin.barrel.index']
       update: typeof routes['admin.barrel.update']
     }
     barrelRentals: {

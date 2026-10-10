@@ -168,6 +168,12 @@ const routes = {
     tokens: [{"old":"/admin/site-settings/tax-system","type":0,"val":"admin","end":""},{"old":"/admin/site-settings/tax-system","type":0,"val":"site-settings","end":""},{"old":"/admin/site-settings/tax-system","type":0,"val":"tax-system","end":""}],
     types: placeholder as Registry['admin.siteSettings.updateTaxSystem']['types'],
   },
+  'admin.siteSettings.updateWeekOneStart': {
+    methods: ["PUT"],
+    pattern: '/admin/site-settings/week-one-start',
+    tokens: [{"old":"/admin/site-settings/week-one-start","type":0,"val":"admin","end":""},{"old":"/admin/site-settings/week-one-start","type":0,"val":"site-settings","end":""},{"old":"/admin/site-settings/week-one-start","type":0,"val":"week-one-start","end":""}],
+    types: placeholder as Registry['admin.siteSettings.updateWeekOneStart']['types'],
+  },
   'admin.dashboard.taxBrackets.update': {
     methods: ["PUT"],
     pattern: '/admin/tax-brackets',
@@ -221,6 +227,12 @@ const routes = {
     pattern: '/admin/users/:id/avatar',
     tokens: [{"old":"/admin/users/:id/avatar","type":0,"val":"admin","end":""},{"old":"/admin/users/:id/avatar","type":0,"val":"users","end":""},{"old":"/admin/users/:id/avatar","type":1,"val":"id","end":""},{"old":"/admin/users/:id/avatar","type":0,"val":"avatar","end":""}],
     types: placeholder as Registry['admin.users.updateAvatar']['types'],
+  },
+  'admin.users.destroyAvatar': {
+    methods: ["DELETE"],
+    pattern: '/admin/users/:id/avatar',
+    tokens: [{"old":"/admin/users/:id/avatar","type":0,"val":"admin","end":""},{"old":"/admin/users/:id/avatar","type":0,"val":"users","end":""},{"old":"/admin/users/:id/avatar","type":1,"val":"id","end":""},{"old":"/admin/users/:id/avatar","type":0,"val":"avatar","end":""}],
+    types: placeholder as Registry['admin.users.destroyAvatar']['types'],
   },
   'admin.users.destroy': {
     methods: ["DELETE"],
@@ -378,6 +390,12 @@ const routes = {
     tokens: [{"old":"/admin/stocks/:resourceId/barrel","type":0,"val":"admin","end":""},{"old":"/admin/stocks/:resourceId/barrel","type":0,"val":"stocks","end":""},{"old":"/admin/stocks/:resourceId/barrel","type":1,"val":"resourceId","end":""},{"old":"/admin/stocks/:resourceId/barrel","type":0,"val":"barrel","end":""}],
     types: placeholder as Registry['admin.stocks.barrel.update']['types'],
   },
+  'admin.stocks.externalBuyback': {
+    methods: ["POST"],
+    pattern: '/admin/stocks/external-buyback',
+    tokens: [{"old":"/admin/stocks/external-buyback","type":0,"val":"admin","end":""},{"old":"/admin/stocks/external-buyback","type":0,"val":"stocks","end":""},{"old":"/admin/stocks/external-buyback","type":0,"val":"external-buyback","end":""}],
+    types: placeholder as Registry['admin.stocks.externalBuyback']['types'],
+  },
   'admin.buybacks.index': {
     methods: ["GET","HEAD"],
     pattern: '/admin/buybacks',
@@ -450,17 +468,17 @@ const routes = {
     tokens: [{"old":"/admin/livraisons/:id/deduct-stock","type":0,"val":"admin","end":""},{"old":"/admin/livraisons/:id/deduct-stock","type":0,"val":"livraisons","end":""},{"old":"/admin/livraisons/:id/deduct-stock","type":1,"val":"id","end":""},{"old":"/admin/livraisons/:id/deduct-stock","type":0,"val":"deduct-stock","end":""}],
     types: placeholder as Registry['admin.livraisons.deductStock']['types'],
   },
+  'admin.livraisons.markStockDeducted': {
+    methods: ["PATCH"],
+    pattern: '/admin/livraisons/:id/mark-stock-deducted',
+    tokens: [{"old":"/admin/livraisons/:id/mark-stock-deducted","type":0,"val":"admin","end":""},{"old":"/admin/livraisons/:id/mark-stock-deducted","type":0,"val":"livraisons","end":""},{"old":"/admin/livraisons/:id/mark-stock-deducted","type":1,"val":"id","end":""},{"old":"/admin/livraisons/:id/mark-stock-deducted","type":0,"val":"mark-stock-deducted","end":""}],
+    types: placeholder as Registry['admin.livraisons.markStockDeducted']['types'],
+  },
   'admin.livraisons.deductStockAll': {
     methods: ["POST"],
     pattern: '/admin/livraisons/deduct-stock-all',
     tokens: [{"old":"/admin/livraisons/deduct-stock-all","type":0,"val":"admin","end":""},{"old":"/admin/livraisons/deduct-stock-all","type":0,"val":"livraisons","end":""},{"old":"/admin/livraisons/deduct-stock-all","type":0,"val":"deduct-stock-all","end":""}],
     types: placeholder as Registry['admin.livraisons.deductStockAll']['types'],
-  },
-  'admin.barrel.index': {
-    methods: ["GET","HEAD"],
-    pattern: '/admin/barrel',
-    tokens: [{"old":"/admin/barrel","type":0,"val":"admin","end":""},{"old":"/admin/barrel","type":0,"val":"barrel","end":""}],
-    types: placeholder as Registry['admin.barrel.index']['types'],
   },
   'admin.barrel.update': {
     methods: ["PATCH"],

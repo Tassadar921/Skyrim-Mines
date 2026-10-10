@@ -11,6 +11,8 @@ import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '~/components/ui/tooltip';
+import { Checkbox } from '~/components/ui/checkbox';
+import { Label } from '~/components/ui/label';
 import { HelpCircle } from '@lucide/vue';
 import WeeklyMetricChart from '~/partials/admin/WeeklyMetricChart.vue';
 import TaxBracketEditor from '~/partials/admin/TaxBracketEditor.vue';
@@ -21,6 +23,8 @@ const { isManager } = useAuth();
 
 const { pageTitle } = useAdminLayout();
 pageTitle.value = t('admin.dashboard.title');
+
+type TaxReductions = { donation: boolean; sponsorship: boolean; privilege: boolean };
 
 type WeeklyRecap = {
     weekNumber: number;
@@ -33,6 +37,7 @@ type WeeklyRecap = {
     capital: number | null;
     stockValue: number | null;
     totalCapital: number | null;
+    reductions: TaxReductions | null;
 };
 
 type TaxBracketRow = { upperBound: number | null; rate: number };
@@ -87,15 +92,33 @@ const currentWeekRecap = computed(() => props.weeklyRecap[0]);
 
 const capitalInput = ref('');
 const stockValueInput = ref('');
+const donationReduction = ref(false);
+const sponsorshipReduction = ref(false);
+const privilegeReduction = ref(false);
 const isSubmittingCapitalSnapshot = ref(false);
 
 function submitCapitalSnapshot() {
     isSubmittingCapitalSnapshot.value = true;
     router.post(
         urlFor('admin.dashboard.capitalSnapshot.store'),
-        { capital: capitalInput.value, stockValue: stockValueInput.value },
+        {
+            capital: capitalInput.value,
+            stockValue: stockValueInput.value,
+            donationReduction: donationReduction.value,
+            sponsorshipReduction: sponsorshipReduction.value,
+            privilegeReduction: privilegeReduction.value,
+        },
         { preserveScroll: true, onFinish: () => (isSubmittingCapitalSnapshot.value = false) },
     );
+}
+
+function reductionBadges(reductions: TaxReductions | null): string[] {
+    if (!reductions) return [];
+    const labels: string[] = [];
+    if (reductions.donation) labels.push(t('admin.dashboard.capitalSnapshot.taxReductions.donation.label'));
+    if (reductions.sponsorship) labels.push(t('admin.dashboard.capitalSnapshot.taxReductions.sponsorship.label'));
+    if (reductions.privilege) labels.push(t('admin.dashboard.capitalSnapshot.taxReductions.privilege.label'));
+    return labels;
 }
 </script>
 
@@ -172,12 +195,60 @@ function submitCapitalSnapshot() {
                         <span class="text-muted-foreground">{{ t('admin.dashboard.capitalSnapshot.totalCapital') }}</span>
                         <span class="font-medium">{{ formatAmount(currentWeekRecap.totalCapital ?? 0) }}</span>
                     </div>
+                    <div v-if="reductionBadges(currentWeekRecap.reductions).length" class="flex flex-wrap gap-1 pt-1">
+                        <Badge v-for="label in reductionBadges(currentWeekRecap.reductions)" :key="label" variant="secondary" class="text-xs">{{ label }}</Badge>
+                    </div>
                 </template>
                 <template v-else>
                     <p class="text-xs text-muted-foreground">{{ t('admin.dashboard.capitalSnapshot.notEntered') }}</p>
                     <template v-if="isManager">
                         <Input v-model="capitalInput" type="number" :label="t('admin.dashboard.capitalSnapshot.capital')" min="0" step="0.01" />
                         <Input v-model="stockValueInput" type="number" :label="t('admin.dashboard.capitalSnapshot.stockValue')" min="0" step="0.01" />
+
+                        <div v-if="taxSystem === 'progressive'" class="space-y-2 border-t pt-3">
+                            <div class="text-xs font-medium">{{ t('admin.dashboard.capitalSnapshot.taxReductions.title') }}</div>
+                            <p class="text-xs text-muted-foreground">{{ t('admin.dashboard.capitalSnapshot.taxReductions.hint') }}</p>
+
+                            <TooltipProvider>
+                                <div class="flex items-start gap-2">
+                                    <Checkbox id="donationReduction" :model-value="donationReduction" @update:model-value="(v) => (donationReduction = !!v)" />
+                                    <Label for="donationReduction" class="text-xs cursor-pointer leading-tight">{{ t('admin.dashboard.capitalSnapshot.taxReductions.donation.label') }}</Label>
+                                    <Tooltip>
+                                        <TooltipTrigger as-child>
+                                            <button type="button" class="text-muted-foreground hover:text-foreground shrink-0">
+                                                <HelpCircle class="size-3.5" />
+                                            </button>
+                                        </TooltipTrigger>
+                                        <TooltipContent class="max-w-64">{{ t('admin.dashboard.capitalSnapshot.taxReductions.donation.description') }}</TooltipContent>
+                                    </Tooltip>
+                                </div>
+                                <div class="flex items-start gap-2">
+                                    <Checkbox id="sponsorshipReduction" :model-value="sponsorshipReduction" @update:model-value="(v) => (sponsorshipReduction = !!v)" />
+                                    <Label for="sponsorshipReduction" class="text-xs cursor-pointer leading-tight">{{ t('admin.dashboard.capitalSnapshot.taxReductions.sponsorship.label') }}</Label>
+                                    <Tooltip>
+                                        <TooltipTrigger as-child>
+                                            <button type="button" class="text-muted-foreground hover:text-foreground shrink-0">
+                                                <HelpCircle class="size-3.5" />
+                                            </button>
+                                        </TooltipTrigger>
+                                        <TooltipContent class="max-w-64">{{ t('admin.dashboard.capitalSnapshot.taxReductions.sponsorship.description') }}</TooltipContent>
+                                    </Tooltip>
+                                </div>
+                                <div class="flex items-start gap-2">
+                                    <Checkbox id="privilegeReduction" :model-value="privilegeReduction" @update:model-value="(v) => (privilegeReduction = !!v)" />
+                                    <Label for="privilegeReduction" class="text-xs cursor-pointer leading-tight">{{ t('admin.dashboard.capitalSnapshot.taxReductions.privilege.label') }}</Label>
+                                    <Tooltip>
+                                        <TooltipTrigger as-child>
+                                            <button type="button" class="text-muted-foreground hover:text-foreground shrink-0">
+                                                <HelpCircle class="size-3.5" />
+                                            </button>
+                                        </TooltipTrigger>
+                                        <TooltipContent class="max-w-64">{{ t('admin.dashboard.capitalSnapshot.taxReductions.privilege.description') }}</TooltipContent>
+                                    </Tooltip>
+                                </div>
+                            </TooltipProvider>
+                        </div>
+
                         <Button size="sm" :loading="isSubmittingCapitalSnapshot" :disabled="isSubmittingCapitalSnapshot" @click="submitCapitalSnapshot">
                             {{ t('admin.dashboard.capitalSnapshot.save') }}
                         </Button>
@@ -214,6 +285,7 @@ function submitCapitalSnapshot() {
                         </TableHead>
                         <TableHead>{{ t('admin.dashboard.weeklyRecap.weeklyTax') }}</TableHead>
                         <TableHead>{{ t('admin.dashboard.weeklyRecap.taxRate') }}</TableHead>
+                        <TableHead>{{ t('admin.dashboard.weeklyRecap.reductions') }}</TableHead>
                         <TableHead>{{ t('admin.dashboard.weeklyRecap.capital') }}</TableHead>
                         <TableHead>{{ t('admin.dashboard.weeklyRecap.stockValue') }}</TableHead>
                     </TableRow>
@@ -234,12 +306,18 @@ function submitCapitalSnapshot() {
                             </TableCell>
                             <TableCell class="text-sm">{{ formatAmount(recap.weeklyTax) }}</TableCell>
                             <TableCell class="text-sm text-muted-foreground">{{ recap.taxRate }} %</TableCell>
+                            <TableCell>
+                                <div v-if="reductionBadges(recap.reductions).length" class="flex flex-wrap gap-1">
+                                    <Badge v-for="label in reductionBadges(recap.reductions)" :key="label" variant="secondary" class="text-xs">{{ label }}</Badge>
+                                </div>
+                                <span v-else class="text-xs text-muted-foreground">{{ t('admin.dashboard.weeklyRecap.reductionsNone') }}</span>
+                            </TableCell>
                             <TableCell class="text-sm">{{ formatAmountOrDash(recap.capital) }}</TableCell>
                             <TableCell class="text-sm">{{ formatAmountOrDash(recap.stockValue) }}</TableCell>
                         </TableRow>
                     </template>
                     <TableRow v-else>
-                        <TableCell colspan="7" class="text-center text-sm text-muted-foreground py-6">
+                        <TableCell colspan="8" class="text-center text-sm text-muted-foreground py-6">
                             {{ t('admin.dashboard.weeklyRecap.empty') }}
                         </TableCell>
                     </TableRow>

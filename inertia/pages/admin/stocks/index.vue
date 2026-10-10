@@ -9,7 +9,10 @@ import { useAuth } from '~/composables/use_auth';
 import StockResourceTable from '~/partials/stocks/StockResourceTable.vue';
 import StockMaterialTable from '~/partials/stocks/StockMaterialTable.vue';
 import BuybackModal from '~/partials/buyback/BuybackModal.vue';
+import ExternalBuybackModal from '~/partials/stocks/ExternalBuybackModal.vue';
 import { Button } from '~/components/ui/button';
+import { Badge } from '~/components/ui/badge';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '~/components/ui/table';
 import type { Data } from '@generated/data';
 
 defineOptions({ layout: AdminLayout });
@@ -18,6 +21,7 @@ type ResourceStockLine = { id: string; quantityBarrel: number; quantityPurchased
 type ResourceQuantities = Record<string, { quantityBarrel: number; quantityPurchased: number }>;
 type MaterialStockLine = { id: string; quantity: number };
 type MaterialQuantities = Record<string, number>;
+type WeeklyDeposit = { weekNumber: number; startDate: string; endDate: string; totalQuantity: number; byOre: { resourceName: string; quantity: number }[] };
 
 const { t } = useI18n();
 const { pageTitle } = useAdminLayout();
@@ -27,6 +31,7 @@ pageTitle.value = t('admin.stocks.title');
 const props = defineProps<{
     resources: (Data.Resource & ResourceStockLine)[];
     materials: (Data.Material & MaterialStockLine)[];
+    weeklyDeposits: WeeklyDeposit[];
 }>();
 
 const minerais = computed(() => props.resources.filter((r) => r.type === 'minerai'));
@@ -96,6 +101,7 @@ function submit() {
             <p class="text-sm text-muted-foreground max-w-2xl">{{ t('admin.stocks.description') }}</p>
             <div class="flex items-center gap-2 shrink-0">
                 <BuybackModal v-if="isManager" :resources="props.resources" />
+                <ExternalBuybackModal v-if="isManager" :resources="props.resources" />
                 <Button :loading="isSubmitting" :disabled="isSubmitting" @click="submit">{{ t('admin.stocks.save') }}</Button>
             </div>
         </div>
@@ -122,6 +128,33 @@ function submit() {
 
         <div class="flex justify-end">
             <Button :loading="isSubmitting" :disabled="isSubmitting" @click="submit">{{ t('admin.stocks.save') }}</Button>
+        </div>
+
+        <div class="space-y-3">
+            <h2 class="font-serif text-2xl font-light">{{ t('admin.stocks.weeklyDeposits.title') }}</h2>
+            <div class="rounded-md border">
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>{{ t('admin.stocks.weeklyDeposits.table.week') }}</TableHead>
+                            <TableHead>{{ t('admin.stocks.weeklyDeposits.table.total') }}</TableHead>
+                            <TableHead>{{ t('admin.stocks.weeklyDeposits.table.detail') }}</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        <TableRow v-for="weeklyDeposit in weeklyDeposits" :key="weeklyDeposit.weekNumber">
+                            <TableCell class="text-sm font-medium">{{ t('admin.stocks.weeklyDeposits.table.week') }} {{ weeklyDeposit.weekNumber }}</TableCell>
+                            <TableCell class="text-sm font-medium">{{ weeklyDeposit.totalQuantity }} {{ t('admin.stocks.weeklyDeposits.table.units') }}</TableCell>
+                            <TableCell>
+                                <div v-if="weeklyDeposit.byOre.length" class="flex flex-wrap gap-1">
+                                    <Badge v-for="ore in weeklyDeposit.byOre" :key="ore.resourceName" variant="secondary" class="text-xs">{{ ore.resourceName }} : {{ ore.quantity }}</Badge>
+                                </div>
+                                <span v-else class="text-xs text-muted-foreground">{{ t('admin.stocks.weeklyDeposits.table.none') }}</span>
+                            </TableCell>
+                        </TableRow>
+                    </TableBody>
+                </Table>
+            </div>
         </div>
     </div>
 </template>

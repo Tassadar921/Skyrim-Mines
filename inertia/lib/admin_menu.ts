@@ -1,7 +1,7 @@
 import type { Component } from 'vue';
 import type { useI18n } from 'vue-i18n';
 import type { urlFor } from '~/client';
-import { BarChart2, Home, Users, Pickaxe, Package, Barrel, HandCoins, History, Building2, ShoppingCart, Truck, Landmark, Boxes, Receipt, Settings } from '@lucide/vue';
+import { BarChart2, Home, Users, Pickaxe, Package, HandCoins, History, Building2, ShoppingCart, Truck, Landmark, Boxes, Receipt, Settings } from '@lucide/vue';
 
 type RouteName = Parameters<typeof urlFor>[0];
 
@@ -12,7 +12,7 @@ export type MenuItem = {
     exact?: boolean;
 };
 
-/** Sections hidden from the "foreman" role (contremaître): resources, materials, barrel breakdown, buybacks history, castellanies. Undefined means every role with admin access sees it. */
+/** Sections hidden from the "foreman" role (contremaître): resources, materials, buybacks history, castellanies. Undefined means every role with admin access sees it. */
 type MenuItemDef = MenuItem & { hiddenForRoles?: string[] };
 
 const FOREMAN_RESTRICTED = ['foreman'];
@@ -25,7 +25,6 @@ export const getItems = (t: ReturnType<typeof useI18n>['t'], role: string | unde
         { title: t('admin.layout.menu.resources'), route: 'admin.resources.index', icon: Pickaxe, hiddenForRoles: FOREMAN_RESTRICTED },
         { title: t('admin.layout.menu.materials'), route: 'admin.materials.index', icon: Package, hiddenForRoles: FOREMAN_RESTRICTED },
         { title: t('admin.layout.menu.stocks'), route: 'admin.stocks.index', icon: Boxes },
-        { title: t('admin.layout.menu.barrel'), route: 'admin.barrel.index', icon: Barrel, hiddenForRoles: FOREMAN_RESTRICTED },
         { title: t('admin.layout.menu.barrelRentals'), route: 'admin.barrelRentals.index', icon: HandCoins },
         { title: t('admin.layout.menu.buybacks'), route: 'admin.buybacks.index', icon: History, hiddenForRoles: FOREMAN_RESTRICTED },
         { title: t('admin.layout.menu.expenses'), route: 'admin.expenses.index', icon: Receipt },

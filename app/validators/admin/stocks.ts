@@ -18,3 +18,12 @@ export const updateStocksValidator = vine.create({
 export const updateBarrelTotalValidator = vine.create({
     quantity: vine.number().min(0),
 });
+
+export const externalBuybackValidator = vine.create({
+    items: vine.array(
+        vine.object({
+            resourceId: vine.string().uuid(),
+            quantity: vine.number().min(0),
+        }),
+    ),
+});

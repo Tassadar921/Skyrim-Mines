@@ -3,7 +3,7 @@ import AdminLayout from '~/layouts/admin.vue';
 import { useAdminLayout } from '~/composables/use_admin_layout';
 import { useAuth } from '~/composables/use_auth';
 import { useI18n } from 'vue-i18n';
-import { computed, ref } from 'vue';
+import { computed, reactive, ref, watch } from 'vue';
 import { router, useForm } from '@inertiajs/vue3';
 import { urlFor } from '~/client';
 import { Button } from '~/components/ui/button';
@@ -11,6 +11,8 @@ import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
 import { Checkbox } from '~/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '~/components/ui/table';
+import QuantityStepper from '~/partials/stocks/QuantityStepper.vue';
 import DeleteButton from '~/components/ui/DeleteButton.vue';
 import {
     AlertDialog,
@@ -34,14 +36,17 @@ const { t } = useI18n();
 const { pageTitle } = useAdminLayout();
 const { isAdmin, isManager } = useAuth();
 
+type BarrelEntry = { resourceId: string; resourceName: string; resourceType: string; quantity: number };
+
 const props = defineProps<{
     targetUser: Data.User & { avatarUrl: string | null };
+    barrelEntries: BarrelEntry[];
 }>();
 
 pageTitle.value = `${t('admin.users.show.title')} - ${props.targetUser.username}`;
 
-const ALL_ROLES = ['admin', 'auditor', 'foreman', 'staff', 'contractor', 'client'] as const;
-const FOREMAN_ASSIGNABLE_ROLES = ['staff', 'contractor', 'client'] as const;
+const ALL_ROLES = ['admin', 'auditor', 'foreman', 'staff', 'former_staff', 'contractor', 'client'] as const;
+const FOREMAN_ASSIGNABLE_ROLES = ['staff', 'former_staff', 'contractor', 'client'] as const;
 // A foreman can only manage (edit/delete) accounts whose current role they're also allowed to assign —
 // owner and foreman accounts stay reserved for owners.
 const canManageTarget = computed(() => isAdmin.value || (isManager.value && (FOREMAN_ASSIGNABLE_ROLES as readonly string[]).includes(props.targetUser.role)));
@@ -121,6 +126,41 @@ function onAvatarChange(event: Event) {
         },
     });
 }
+
+const isRemovingAvatar = ref(false);
+
+function removeAvatar() {
+    isRemovingAvatar.value = true;
+    router.delete(urlFor('admin.users.destroyAvatar', { id: props.targetUser.id }), { preserveScroll: true, onFinish: () => (isRemovingAvatar.value = false) });
+}
+
+function toBarrelQuantityMap(entries: BarrelEntry[]): Record<string, number> {
+    return Object.fromEntries(entries.map((entry) => [entry.resourceId, entry.quantity]));
+}
+
+const barrelQuantities = reactive<Record<string, number>>(toBarrelQuantityMap(props.barrelEntries));
+
+watch(
+    () => props.barrelEntries,
+    (entries) => {
+        Object.assign(barrelQuantities, toBarrelQuantityMap(entries));
+    },
+);
+
+const mineraiEntries = computed(() => props.barrelEntries.filter((entry) => entry.resourceType === 'minerai'));
+const lingotEntries = computed(() => props.barrelEntries.filter((entry) => entry.resourceType === 'lingot'));
+
+const barrelDebounceTimers: Record<string, ReturnType<typeof setTimeout>> = {};
+
+function updateBarrelQuantity(entry: BarrelEntry, value: number) {
+    const quantity = Math.max(0, Math.round(value));
+    barrelQuantities[entry.resourceId] = quantity;
+
+    if (barrelDebounceTimers[entry.resourceId]) clearTimeout(barrelDebounceTimers[entry.resourceId]);
+    barrelDebounceTimers[entry.resourceId] = setTimeout(() => {
+        router.patch(urlFor('admin.barrel.update'), { userId: props.targetUser.id, resourceId: entry.resourceId, quantity }, { preserveScroll: true, preserveState: true });
+    }, 500);
+}
 </script>
 
 <template>
@@ -155,9 +195,14 @@ function onAvatarChange(event: Event) {
                     <UserCircle class="size-8 text-muted-foreground" />
                 </div>
                 <div v-if="canManageTarget" class="space-y-1">
-                    <Button variant="outline" size="sm" type="button" :loading="avatarForm.processing" :disabled="avatarForm.processing" @click="avatarInputRef?.click()">
-                        {{ t('admin.users.show.avatar.upload') }}
-                    </Button>
+                    <div class="flex gap-2">
+                        <Button variant="outline" size="sm" type="button" :loading="avatarForm.processing" :disabled="avatarForm.processing" @click="avatarInputRef?.click()">
+                            {{ t('admin.users.show.avatar.upload') }}
+                        </Button>
+                        <Button v-if="targetUser.avatarUrl" variant="ghost" size="sm" type="button" :loading="isRemovingAvatar" :disabled="isRemovingAvatar" @click="removeAvatar">
+                            {{ t('admin.users.show.avatar.remove') }}
+                        </Button>
+                    </div>
                     <p class="text-xs text-muted-foreground">{{ t('admin.users.show.avatar.hint') }}</p>
                     <p v-if="avatarForm.errors.avatar" class="text-xs text-destructive">{{ avatarForm.errors.avatar }}</p>
                     <input ref="avatarInputRef" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" class="hidden" @change="onAvatarChange" />
@@ -219,6 +264,70 @@ function onAvatarChange(event: Event) {
                         </AlertDialogFooter>
                     </AlertDialogContent>
                 </AlertDialog>
+            </div>
+        </div>
+
+        <div class="rounded-md border p-5 space-y-4">
+            <Label>{{ t('admin.barrel.title') }}</Label>
+
+            <div class="space-y-2">
+                <h3 class="text-sm font-medium text-muted-foreground">{{ t('admin.resources.types.minerai') }}</h3>
+                <div class="rounded-md border">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>{{ t('admin.barrel.table.resource') }}</TableHead>
+                                <TableHead>{{ t('admin.barrel.table.quantity') }}</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            <template v-if="mineraiEntries.length">
+                                <TableRow v-for="entry in mineraiEntries" :key="entry.resourceId">
+                                    <TableCell class="text-sm font-medium">{{ entry.resourceName }}</TableCell>
+                                    <TableCell>
+                                        <QuantityStepper v-if="isAdmin" :model-value="barrelQuantities[entry.resourceId] ?? 0" @update:model-value="(value) => updateBarrelQuantity(entry, value)" />
+                                        <span v-else class="text-sm">{{ barrelQuantities[entry.resourceId] ?? 0 }}</span>
+                                    </TableCell>
+                                </TableRow>
+                            </template>
+                            <TableRow v-else>
+                                <TableCell :colspan="2" class="h-24 text-center text-muted-foreground">
+                                    {{ t('admin.barrel.table.empty') }}
+                                </TableCell>
+                            </TableRow>
+                        </TableBody>
+                    </Table>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <h3 class="text-sm font-medium text-muted-foreground">{{ t('admin.resources.types.lingot') }}</h3>
+                <div class="rounded-md border">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>{{ t('admin.barrel.table.resource') }}</TableHead>
+                                <TableHead>{{ t('admin.barrel.table.quantity') }}</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            <template v-if="lingotEntries.length">
+                                <TableRow v-for="entry in lingotEntries" :key="entry.resourceId">
+                                    <TableCell class="text-sm font-medium">{{ entry.resourceName }}</TableCell>
+                                    <TableCell>
+                                        <QuantityStepper v-if="isAdmin" :model-value="barrelQuantities[entry.resourceId] ?? 0" @update:model-value="(value) => updateBarrelQuantity(entry, value)" />
+                                        <span v-else class="text-sm">{{ barrelQuantities[entry.resourceId] ?? 0 }}</span>
+                                    </TableCell>
+                                </TableRow>
+                            </template>
+                            <TableRow v-else>
+                                <TableCell :colspan="2" class="h-24 text-center text-muted-foreground">
+                                    {{ t('admin.barrel.table.empty') }}
+                                </TableCell>
+                            </TableRow>
+                        </TableBody>
+                    </Table>
+                </div>
             </div>
         </div>
 

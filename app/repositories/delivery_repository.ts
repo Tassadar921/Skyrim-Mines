@@ -201,6 +201,20 @@ export default class DeliveryRepository extends BaseRepository<typeof Delivery> 
         return { alreadyDeducted, buybackSummary };
     }
 
+    /**
+     * Marks a delivery as stock-deducted without touching stock or buying back from the barrel —
+     * for cases where the deduction was already handled manually elsewhere.
+     */
+    public async markStockDeducted(deliveryId: string): Promise<{ alreadyDeducted: boolean }> {
+        const delivery = await Delivery.findOrFail(deliveryId);
+        if (delivery.stockDeducted) return { alreadyDeducted: true };
+
+        delivery.stockDeducted = true;
+        await delivery.save();
+
+        return { alreadyDeducted: false };
+    }
+
     public async findNotStockDeducted(): Promise<Delivery[]> {
         return Delivery.query().where('stockDeducted', false);
     }
@@ -251,6 +265,28 @@ export default class DeliveryRepository extends BaseRepository<typeof Delivery> 
         }
 
         return q.paginate(page, perPage);
+    }
+
+    public async getWeeklyQuantityTotals(): Promise<Map<number, { totalQuantity: number; byOre: { resourceName: string; quantity: number }[] }>> {
+        const rows = await db
+            .from('deliveries')
+            .join('delivery_lines', 'delivery_lines.delivery_id', 'deliveries.id')
+            .select('deliveries.delivered_week_number as weekNumber', 'delivery_lines.resource_name as resourceName', 'delivery_lines.resource_type as resourceType')
+            .sum('delivery_lines.quantity as quantity')
+            .groupBy('deliveries.delivered_week_number', 'delivery_lines.resource_name', 'delivery_lines.resource_type');
+
+        const result = new Map<number, { totalQuantity: number; byOre: { resourceName: string; quantity: number }[] }>();
+        for (const row of rows) {
+            const quantity = Number(row.quantity);
+            const entry = result.get(row.weekNumber) ?? { totalQuantity: 0, byOre: [] };
+            entry.totalQuantity += quantity;
+            if (row.resourceType === ResourceTypeEnum.MINERAI) {
+                entry.byOre.push({ resourceName: row.resourceName, quantity });
+            }
+            result.set(row.weekNumber, entry);
+        }
+
+        return result;
     }
 
     public async getWeeklyTotals(): Promise<{ weekNumber: number; deliveryCount: number; totalAmount: number; totalProfit: number }[]> {

@@ -11,7 +11,6 @@ declare module '@adonisjs/inertia/types' {
   export interface InertiaPages {
     'admin/barrel-rentals/index': ExtractProps<(typeof import('../../inertia/pages/admin/barrel-rentals/index.vue'))['default']>
     'admin/barrel-rentals/show': ExtractProps<(typeof import('../../inertia/pages/admin/barrel-rentals/show.vue'))['default']>
-    'admin/barrel/index': ExtractProps<(typeof import('../../inertia/pages/admin/barrel/index.vue'))['default']>
     'admin/buybacks/index': ExtractProps<(typeof import('../../inertia/pages/admin/buybacks/index.vue'))['default']>
     'admin/castellanies/create': ExtractProps<(typeof import('../../inertia/pages/admin/castellanies/create.vue'))['default']>
     'admin/castellanies/index': ExtractProps<(typeof import('../../inertia/pages/admin/castellanies/index.vue'))['default']>

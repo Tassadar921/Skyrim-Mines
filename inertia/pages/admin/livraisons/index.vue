@@ -48,6 +48,8 @@ type WeeklyTotal = {
     endDate: string;
     deliveryCount: number;
     totalAmount: number;
+    totalQuantity: number;
+    byOre: { resourceName: string; quantity: number }[];
 };
 
 const { t } = useI18n();
@@ -141,6 +143,11 @@ function deductStock(delivery: DeliveryRow) {
     router.patch(urlFor('admin.livraisons.deductStock', { id: delivery.id }), {}, { preserveScroll: true, preserveState: true, onFinish: () => (deductingId.value = null) });
 }
 
+function markStockDeducted(delivery: DeliveryRow) {
+    deductingId.value = delivery.id;
+    router.patch(urlFor('admin.livraisons.markStockDeducted', { id: delivery.id }), {}, { preserveScroll: true, preserveState: true, onFinish: () => (deductingId.value = null) });
+}
+
 const isDeductingAll = ref(false);
 
 function deductStockAll() {
@@ -201,6 +208,31 @@ function resetFilters() {
                     <div class="text-xs text-muted-foreground">{{ weeklyTotal.deliveryCount }} {{ t('admin.livraisons.weekly.deliveries', weeklyTotal.deliveryCount) }}</div>
                 </button>
             </div>
+        </div>
+
+        <div class="rounded-md border p-3 space-y-2">
+            <div class="text-sm font-medium text-muted-foreground">{{ t('admin.livraisons.weeklyQuantities.title') }}</div>
+            <Table>
+                <TableHeader>
+                    <TableRow>
+                        <TableHead>{{ t('admin.livraisons.table.week') }}</TableHead>
+                        <TableHead>{{ t('admin.livraisons.weeklyQuantities.table.total') }}</TableHead>
+                        <TableHead>{{ t('admin.livraisons.weeklyQuantities.table.detail') }}</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    <TableRow v-for="weeklyTotal in weeklyTotals" :key="weeklyTotal.weekNumber">
+                        <TableCell class="text-sm font-medium">{{ t('admin.livraisons.table.weekBadge', { week: weeklyTotal.weekNumber }) }}</TableCell>
+                        <TableCell class="text-sm font-medium">{{ weeklyTotal.totalQuantity }} {{ t('admin.livraisons.weekly.units') }}</TableCell>
+                        <TableCell>
+                            <div v-if="weeklyTotal.byOre.length" class="flex flex-wrap gap-1">
+                                <Badge v-for="ore in weeklyTotal.byOre" :key="ore.resourceName" variant="secondary" class="text-xs">{{ ore.resourceName }} : {{ ore.quantity }}</Badge>
+                            </div>
+                            <span v-else class="text-xs text-muted-foreground">{{ t('admin.livraisons.weeklyQuantities.table.none') }}</span>
+                        </TableCell>
+                    </TableRow>
+                </TableBody>
+            </Table>
         </div>
 
         <div class="flex items-center gap-2">
@@ -268,18 +300,43 @@ function resetFilters() {
                                 <TableCell class="text-sm font-medium" :class="delivery.totalProfit >= 0 ? 'text-green-600' : 'text-destructive'">{{ delivery.totalProfit.toFixed(2) }} s</TableCell>
                                 <TableCell @click.stop>
                                     <Badge v-if="delivery.stockDeducted" variant="outline">{{ t('admin.livraisons.deductStock.deducted') }}</Badge>
-                                    <Button
-                                        v-else-if="isManager"
-                                        variant="outline"
-                                        size="sm"
-                                        class="gap-1"
-                                        :loading="deductingId === delivery.id"
-                                        :disabled="deductingId === delivery.id"
-                                        @click="deductStock(delivery)"
-                                    >
-                                        <PackageMinus class="size-4" />
-                                        {{ t('admin.livraisons.deductStock.action') }}
-                                    </Button>
+                                    <div v-else-if="isManager" class="flex items-center gap-1">
+                                        <AlertDialog>
+                                            <AlertDialogTrigger as-child>
+                                                <Button variant="outline" size="sm" class="gap-1" :loading="deductingId === delivery.id" :disabled="deductingId === delivery.id">
+                                                    <PackageMinus class="size-4" />
+                                                    {{ t('admin.livraisons.deductStock.action') }}
+                                                </Button>
+                                            </AlertDialogTrigger>
+                                            <AlertDialogContent>
+                                                <AlertDialogHeader>
+                                                    <AlertDialogTitle>{{ t('admin.livraisons.deductStock.confirm.title') }}</AlertDialogTitle>
+                                                    <AlertDialogDescription>{{ t('admin.livraisons.deductStock.confirm.description') }}</AlertDialogDescription>
+                                                </AlertDialogHeader>
+                                                <AlertDialogFooter>
+                                                    <AlertDialogCancel>{{ t('admin.livraisons.deductStock.confirm.cancel') }}</AlertDialogCancel>
+                                                    <AlertDialogAction @click="deductStock(delivery)">{{ t('admin.livraisons.deductStock.confirm.confirm') }}</AlertDialogAction>
+                                                </AlertDialogFooter>
+                                            </AlertDialogContent>
+                                        </AlertDialog>
+                                        <AlertDialog>
+                                            <AlertDialogTrigger as-child>
+                                                <Button variant="ghost" size="sm" class="gap-1" :loading="deductingId === delivery.id" :disabled="deductingId === delivery.id">
+                                                    {{ t('admin.livraisons.deductStock.markAction') }}
+                                                </Button>
+                                            </AlertDialogTrigger>
+                                            <AlertDialogContent>
+                                                <AlertDialogHeader>
+                                                    <AlertDialogTitle>{{ t('admin.livraisons.deductStock.markConfirm.title') }}</AlertDialogTitle>
+                                                    <AlertDialogDescription>{{ t('admin.livraisons.deductStock.markConfirm.description') }}</AlertDialogDescription>
+                                                </AlertDialogHeader>
+                                                <AlertDialogFooter>
+                                                    <AlertDialogCancel>{{ t('admin.livraisons.deductStock.markConfirm.cancel') }}</AlertDialogCancel>
+                                                    <AlertDialogAction @click="markStockDeducted(delivery)">{{ t('admin.livraisons.deductStock.markConfirm.confirm') }}</AlertDialogAction>
+                                                </AlertDialogFooter>
+                                            </AlertDialogContent>
+                                        </AlertDialog>
+                                    </div>
                                     <Badge v-else variant="secondary">{{ t('admin.livraisons.deductStock.notDeducted') }}</Badge>
                                 </TableCell>
                                 <TableCell @click.stop>

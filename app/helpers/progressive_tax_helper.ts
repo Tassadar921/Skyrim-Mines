@@ -34,3 +34,22 @@ export function computeFullProgressiveTax(profit: number, tiers: TaxBracketInput
     const matchingTier = tiers.find((tier) => tier.upperBound === null || profit <= tier.upperBound) ?? tiers[tiers.length - 1];
     return profit * (matchingTier.rate / 100);
 }
+
+/**
+ * County-registry tax reductions ("Argenterie du Comté de Bruma"), only applicable under the
+ * marginal tax-brackets system — never flat or full-progressive-tier.
+ */
+export const TAX_REDUCTION_RATES = {
+    donation: 15,
+    sponsorship: 5,
+    privilege: 5,
+} as const;
+
+export type TaxReductionFlags = { donation: boolean; sponsorship: boolean; privilege: boolean };
+
+export function applyTaxReductions(weeklyTax: number, reductions: TaxReductionFlags): number {
+    const totalReductionRate =
+        (reductions.donation ? TAX_REDUCTION_RATES.donation : 0) + (reductions.sponsorship ? TAX_REDUCTION_RATES.sponsorship : 0) + (reductions.privilege ? TAX_REDUCTION_RATES.privilege : 0);
+
+    return weeklyTax * (1 - totalReductionRate / 100);
+}

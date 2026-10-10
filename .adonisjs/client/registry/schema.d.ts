@@ -331,6 +331,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/site_settings_controller').default['updateTaxSystem']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'admin.siteSettings.updateWeekOneStart': {
+    methods: ["PUT"]
+    pattern: '/admin/site-settings/week-one-start'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/admin/site_settings').updateWeekOneStartValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/admin/site_settings').updateWeekOneStartValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/site_settings_controller').default['updateWeekOneStart']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/site_settings_controller').default['updateWeekOneStart']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'admin.dashboard.taxBrackets.update': {
     methods: ["PUT"]
     pattern: '/admin/tax-brackets'
@@ -437,6 +449,18 @@ export interface Registry {
       query: ExtractQuery<InferInput<(typeof import('#validators/admin/users').updateUserAvatarValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/users_controller').default['updateAvatar']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/users_controller').default['updateAvatar']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'admin.users.destroyAvatar': {
+    methods: ["DELETE"]
+    pattern: '/admin/users/:id/avatar'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/users_controller').default['destroyAvatar']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/users_controller').default['destroyAvatar']>>>
     }
   }
   'admin.users.destroy': {
@@ -751,6 +775,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/stocks_controller').default['updateBarrelTotal']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'admin.stocks.externalBuyback': {
+    methods: ["POST"]
+    pattern: '/admin/stocks/external-buyback'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/admin/stocks').externalBuybackValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/admin/stocks').externalBuybackValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/stocks_controller').default['externalBuyback']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/stocks_controller').default['externalBuyback']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'admin.buybacks.index': {
     methods: ["GET","HEAD"]
     pattern: '/admin/buybacks'
@@ -895,6 +931,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/livraisons_controller').default['deductStock']>>>
     }
   }
+  'admin.livraisons.markStockDeducted': {
+    methods: ["PATCH"]
+    pattern: '/admin/livraisons/:id/mark-stock-deducted'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/livraisons_controller').default['markStockDeducted']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/livraisons_controller').default['markStockDeducted']>>>
+    }
+  }
   'admin.livraisons.deductStockAll': {
     methods: ["POST"]
     pattern: '/admin/livraisons/deduct-stock-all'
@@ -905,18 +953,6 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/livraisons_controller').default['deductStockAll']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/livraisons_controller').default['deductStockAll']>>>
-    }
-  }
-  'admin.barrel.index': {
-    methods: ["GET","HEAD"]
-    pattern: '/admin/barrel'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: ExtractQueryForGet<InferInput<(typeof import('#validators/admin/barrel').indexBarrelValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/barrel_controller').default['index']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/barrel_controller').default['index']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'admin.barrel.update': {

@@ -12,7 +12,7 @@ import TaxTierRepository from '#repositories/tax_tier_repository';
 import UserRoleEnum from '#types/enum/user_role_enum';
 import TaxSystemEnum from '#types/enum/tax_system_enum';
 import { getWeekNumber, getWeekRange } from '#helpers/game_week_helper';
-import { computeProgressiveTax, computeFullProgressiveTax, type TaxBracketInput } from '#helpers/progressive_tax_helper';
+import { computeProgressiveTax, computeFullProgressiveTax, applyTaxReductions, type TaxBracketInput, type TaxReductionFlags } from '#helpers/progressive_tax_helper';
 import { updateCastellanyTaxValidator } from '#validators/admin/castellany_tax';
 import { storeCompanyCapitalSnapshotValidator } from '#validators/admin/company_capital_snapshot';
 import { updateTaxBracketsValidator } from '#validators/admin/tax_brackets';
@@ -124,6 +124,7 @@ export default class DashboardController {
                 capital,
                 stockValue,
                 totalCapital: capital !== null && stockValue !== null ? capital + stockValue : null,
+                reductions: capitalSnapshot ? { donation: capitalSnapshot.donationReduction, sponsorship: capitalSnapshot.sponsorshipReduction, privilege: capitalSnapshot.privilegeReduction } : null,
             });
         }
 
@@ -192,7 +193,7 @@ export default class DashboardController {
     }
 
     public async storeCapitalSnapshot({ request, response, session, i18n }: HttpContext) {
-        const { capital, stockValue } = await request.validateUsing(storeCompanyCapitalSnapshotValidator);
+        const { capital, stockValue, donationReduction, sponsorshipReduction, privilegeReduction } = await request.validateUsing(storeCompanyCapitalSnapshotValidator);
         const weekNumber = getWeekNumber(DateTime.now());
 
         try {
@@ -212,7 +213,17 @@ export default class DashboardController {
             ]);
 
             const profit = computeProfitForWeek(weekNumber, { deliveryTotals, expenseTotals });
-            const { weeklyTax, taxRate } = computeLiveTax(profit, siteSetting, castellanyTax, taxBrackets, taxTiers);
+            const { weeklyTax: baseTax } = computeLiveTax(profit, siteSetting, castellanyTax, taxBrackets, taxTiers);
+
+            // County-registry tax reductions only make sense under the marginal brackets system.
+            const isBracketSystem = siteSetting.taxSystem === TaxSystemEnum.PROGRESSIVE;
+            const reductions: TaxReductionFlags = {
+                donation: isBracketSystem && !!donationReduction,
+                sponsorship: isBracketSystem && !!sponsorshipReduction,
+                privilege: isBracketSystem && !!privilegeReduction,
+            };
+            const weeklyTax = applyTaxReductions(baseTax, reductions);
+            const taxRate = profit > 0 ? Math.round((weeklyTax / profit) * 100) : 0;
 
             await this.companyCapitalSnapshotRepository.create({
                 weekNumber,
@@ -220,6 +231,9 @@ export default class DashboardController {
                 stockValue: String(stockValue),
                 weeklyTax: String(weeklyTax),
                 taxRate,
+                donationReduction: reductions.donation,
+                sponsorshipReduction: reductions.sponsorship,
+                privilegeReduction: reductions.privilege,
             });
             session.flash('success', i18n.t('messages.admin.dashboard.capitalSnapshot.store.success'));
         } catch (e) {

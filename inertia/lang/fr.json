@@ -58,7 +58,7 @@
             "buyPrice": "Prix d'achat",
             "sellPrice": "Prix de vente",
             "quantityBarrel": "Dans le tonneau",
-            "quantityPurchased": "Acheté",
+            "quantityPurchased": "Stock",
             "inStock": "En stock",
             "stockValue": "Valeur du stock",
             "empty": "Aucun élément trouvé",
@@ -209,7 +209,6 @@
                 "resources": "Ressources",
                 "materials": "Matériaux",
                 "stocks": "Stocks",
-                "barrel": "Tonneau",
                 "barrelRentals": "Location tonneau",
                 "buybacks": "Historique des rachats",
                 "expenses": "Dépenses",
@@ -250,7 +249,23 @@
                 "stockValue": "Valeur du stock",
                 "totalCapital": "Capital total",
                 "notEntered": "Pas encore renseigné pour cette semaine",
-                "save": "Enregistrer"
+                "save": "Enregistrer",
+                "taxReductions": {
+                    "title": "Réductions fiscales du registre (semaine en cours)",
+                    "hint": "Ces réductions s'appliquent sur la taxe hebdomadaire calculée, uniquement avec le système fiscal par tranches progressives.",
+                    "donation": {
+                        "label": "Donation de marchandises en quantité (−15 %)",
+                        "description": "Forgerons, alchimistes, taverniers & aubergistes. Fournir un lot de matériel ou de consommable à la Garde Comtale de Bruma, en quantité minimale évaluée par l'Argenterie du Comté."
+                    },
+                    "sponsorship": {
+                        "label": "Sponsoring d'un événement local (−5 %)",
+                        "description": "Tous les commerces et compagnies. Prendre en charge le financement ou la logistique d'un événement qui anime le quartier, la cité ou le Comté."
+                    },
+                    "privilege": {
+                        "label": "Tarif Privilège (−5 %)",
+                        "description": "Forgerons, alchimistes, couturiers, taverniers & aubergistes. Tarif préférentiel d'au moins 10 % pour la Garde du Comté, et remise automatique de 5 % pour tout citoyen enregistré à Bruma."
+                    }
+                }
             },
             "chart": {
                 "title": "Évolution hebdomadaire"
@@ -272,6 +287,8 @@
                 "capital": "Capital",
                 "stockValue": "Valeur du stock",
                 "totalCapital": "Capital total",
+                "reductions": "Réductions",
+                "reductionsNone": "—",
                 "empty": "Aucune donnée pour le moment",
                 "notAvailable": "—"
             }
@@ -297,6 +314,13 @@
                 "flat": "Pourcentage fixe",
                 "progressive": "Tranches progressives",
                 "progressiveFull": "Taxation progressive intégrale"
+            },
+            "weekOneStart": {
+                "title": "Semaine 1",
+                "hint": "Date de début de la semaine 1, utilisée pour tous les calculs de semaine de jeu. Ne peut être repoussée que vers une date ultérieure à la date par défaut ({date}), jamais antérieure.",
+                "field": "Date de début de la semaine 1",
+                "save": "Enregistrer",
+                "reset": "Réinitialiser (défaut)"
             }
         },
         "users": {
@@ -306,8 +330,8 @@
                 "avatar": "Avatar",
                 "username": "Nom d'utilisateur",
                 "role": "Rôle",
-                "enabled": "Actif",
                 "balance": "Solde dû",
+                "barrelValue": "Valeur du tonneau",
                 "createdAt": "Inscrit le",
                 "lastActivity": "Dernière activité",
                 "never": "Jamais",
@@ -346,6 +370,7 @@
                         "auditor": "Auditeur",
                         "foreman": "Contremaître",
                         "staff": "Mineur",
+                        "former_staff": "Ancien mineur",
                         "contractor": "Prestataire",
                         "client": "Client"
                     }
@@ -353,6 +378,7 @@
                 "avatar": {
                     "title": "Avatar",
                     "upload": "Changer l'avatar",
+                    "remove": "Supprimer",
                     "hint": "JPG, JPEG, PNG ou WEBP, 5 Mo maximum",
                     "empty": "Aucun avatar"
                 },
@@ -687,7 +713,17 @@
             },
             "weekly": {
                 "title": "Totaux par semaine",
-                "deliveries": "livraison | livraison | livraisons"
+                "deliveries": "livraison | livraison | livraisons",
+                "units": "unités"
+            },
+            "weeklyQuantities": {
+                "title": "Quantités livrées par semaine",
+                "table": {
+                    "week": "Semaine",
+                    "total": "Quantité totale (global)",
+                    "detail": "Détail par minerai",
+                    "none": "—"
+                }
             },
             "detail": {
                 "resource": "Ressource",
@@ -709,6 +745,19 @@
                 "deducted": "Déduit",
                 "notDeducted": "Non déduit",
                 "action": "Déduire",
+                "markAction": "Noter comme déduit",
+                "confirm": {
+                    "title": "Déduire le stock de cette livraison ?",
+                    "description": "Cette action va prendre en priorité sur le stock racheté, et racheter le manquant sur le tonneau des mineurs si besoin. Cette action est irréversible.",
+                    "cancel": "Annuler",
+                    "confirm": "Déduire"
+                },
+                "markConfirm": {
+                    "title": "Noter cette livraison comme déduite ?",
+                    "description": "Cette action marque la livraison comme déduite sans toucher au stock : à utiliser uniquement si la déduction a déjà été faite manuellement. Cette action est irréversible.",
+                    "cancel": "Annuler",
+                    "confirm": "Noter comme déduit"
+                },
                 "allButton": "Tout déduire ({count})",
                 "allConfirm": {
                     "title": "Déduire rétroactivement le stock de toutes les livraisons ?",
@@ -720,15 +769,10 @@
         },
         "barrel": {
             "title": "Tonneau",
-            "description": "Quantités actuellement au tonneau, par utilisateur et par ressource.",
             "table": {
-                "user": "Utilisateur",
                 "resource": "Ressource",
-                "type": "Type",
                 "quantity": "Quantité",
-                "search": "Rechercher un utilisateur ou une ressource…",
-                "allResources": "Toutes les ressources",
-                "empty": "Aucune quantité au tonneau pour le moment"
+                "empty": "Aucune ressource définie"
             }
         },
         "barrelRentals": {
@@ -802,7 +846,25 @@
         "stocks": {
             "title": "Stocks",
             "description": "Vue identique à la page « Stocks » publique. Les quantités « Acheté », la quantité dans le tonneau et les quantités de tous les matériaux peuvent être modifiées ici, à la main.",
-            "save": "Enregistrer les modifications"
+            "save": "Enregistrer les modifications",
+            "externalBuyback": {
+                "trigger": "Réaliser un rachat externe",
+                "title": "Rachat externe",
+                "description": "Ajoute directement les quantités au stock acheté, sans passer par le tonneau des mineurs. Le montant indiqué est à payer au vendeur externe.",
+                "unitPrice": "Prix unitaire",
+                "totalToPay": "Montant à payer :",
+                "submit": "Valider le rachat"
+            },
+            "weeklyDeposits": {
+                "title": "Dépôts par semaine",
+                "table": {
+                    "week": "Semaine",
+                    "total": "Quantité totale (global)",
+                    "detail": "Détail par minerai",
+                    "none": "—",
+                    "units": "unités"
+                }
+            }
         }
     }
 }

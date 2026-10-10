@@ -15,11 +15,11 @@ import { Label } from '~/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select';
 import type { AcceptableValue } from 'reka-ui';
 import { Link } from '@adonisjs/inertia/vue';
-import { ArrowUp, ArrowDown, ArrowUpDown, Eye, CheckCircle, XCircle, Plus, UserCircle, FilterX } from '@lucide/vue';
+import { ArrowUp, ArrowDown, ArrowUpDown, Eye, Plus, UserCircle, FilterX } from '@lucide/vue';
 import { canHaveBalance } from '~/lib/user_balance';
 import type { Data } from '@generated/data';
 
-const roles = ['admin', 'auditor', 'foreman', 'staff', 'contractor', 'client'] as const;
+const roles = ['admin', 'auditor', 'foreman', 'staff', 'former_staff', 'contractor', 'client'] as const;
 
 defineOptions({ layout: AdminLayout });
 
@@ -28,7 +28,7 @@ const { pageTitle } = useAdminLayout();
 const { isAdmin, isManager } = useAuth();
 pageTitle.value = t('admin.users.title');
 
-type UserLine = Data.User & { avatarUrl: string | null };
+type UserLine = Data.User & { avatarUrl: string | null; barrelValue: number };
 
 const props = defineProps<{
     users: UserLine[];
@@ -155,8 +155,8 @@ function resetFilters() {
                             </Button>
                         </TableHead>
                         <TableHead>{{ $t('admin.users.table.role') }}</TableHead>
-                        <TableHead>{{ $t('admin.users.table.enabled') }}</TableHead>
                         <TableHead>{{ $t('admin.users.table.balance') }}</TableHead>
+                        <TableHead>{{ $t('admin.users.table.barrelValue') }}</TableHead>
                         <TableHead>
                             <Button variant="ghost" class="gap-1 px-2" @click="onSort('createdAt')">
                                 {{ $t('admin.users.table.createdAt') }}
@@ -183,11 +183,8 @@ function resetFilters() {
                             <TableCell>
                                 <Badge :variant="user.role === 'admin' ? 'default' : 'secondary'">{{ t(`admin.users.show.fields.roles.${user.role}`) }}</Badge>
                             </TableCell>
-                            <TableCell>
-                                <CheckCircle v-if="user.enabled" class="size-4 text-green-600" />
-                                <XCircle v-else class="size-4 text-muted-foreground" />
-                            </TableCell>
                             <TableCell class="text-sm text-muted-foreground">{{ canHaveBalance(user.role) ? `${user.balance.toFixed(2)} s` : '—' }}</TableCell>
+                            <TableCell class="text-sm text-muted-foreground">{{ user.role === 'client' && user.barrelValue === 0 ? '—' : `${user.barrelValue.toFixed(2)} s` }}</TableCell>
                             <TableCell class="text-sm text-muted-foreground">{{ new Date(user.createdAt).toLocaleDateString(undefined, { timeZone: 'UTC' }) }}</TableCell>
                             <TableCell v-if="isAdmin" class="text-sm text-muted-foreground">
                                 {{ user.lastActivity ? new Date(user.lastActivity).toLocaleString(undefined, { timeZone: 'UTC' }) : t('admin.users.table.never') }}

@@ -39,17 +39,21 @@ export default class LivraisonsController {
         const pendingStockDeductionCount = await this.deliveryRepository.countNotStockDeducted();
         const rawWeeklyTotals = await this.deliveryRepository.getWeeklyTotals();
         const weeklyTotalsByWeek = new Map(rawWeeklyTotals.map((entry) => [entry.weekNumber, entry]));
+        const weeklyQuantityTotals = await this.deliveryRepository.getWeeklyQuantityTotals();
 
         const weeklyTotals = [];
         for (let weekNumber = currentWeek; weekNumber >= 1; weekNumber--) {
             const { start, end } = getWeekRange(weekNumber);
             const entry = weeklyTotalsByWeek.get(weekNumber);
+            const quantityEntry = weeklyQuantityTotals.get(weekNumber);
             weeklyTotals.push({
                 weekNumber,
                 startDate: start.toJSDate().toISOString(),
                 endDate: end.toJSDate().toISOString(),
                 deliveryCount: entry?.deliveryCount ?? 0,
                 totalAmount: entry?.totalAmount ?? 0,
+                totalQuantity: quantityEntry?.totalQuantity ?? 0,
+                byOre: quantityEntry?.byOre ?? [],
             });
         }
 
@@ -111,6 +115,23 @@ export default class LivraisonsController {
             session.flash('success', formatBuybackSuccessMessage(i18n, i18n.t('messages.admin.livraisons.deductStock.success'), buybackSummary));
         } catch (e) {
             logger.error({ err: e }, 'livraisons.deductStock failed');
+            session.flash('error', i18n.t('messages.admin.livraisons.deductStock.error'));
+        }
+
+        return response.redirect().back();
+    }
+
+    public async markStockDeducted({ params, response, session, i18n }: HttpContext) {
+        try {
+            const { alreadyDeducted } = await this.deliveryRepository.markStockDeducted(params.id);
+            if (alreadyDeducted) {
+                session.flash('error', i18n.t('messages.admin.livraisons.deductStock.alreadyDeducted'));
+                return response.redirect().back();
+            }
+
+            session.flash('success', i18n.t('messages.admin.livraisons.deductStock.markedSuccess'));
+        } catch (e) {
+            logger.error({ err: e }, 'livraisons.markStockDeducted failed');
             session.flash('error', i18n.t('messages.admin.livraisons.deductStock.error'));
         }
 

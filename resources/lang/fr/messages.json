@@ -67,6 +67,13 @@
                     "success": "Système fiscal mis à jour avec succès",
                     "error": "Erreur lors de la mise à jour du système fiscal"
                 }
+            },
+            "weekOneStart": {
+                "update": {
+                    "success": "Semaine 1 mise à jour avec succès",
+                    "error": "Erreur lors de la mise à jour de la semaine 1",
+                    "invalid": "La date doit être postérieure ou égale à la date de la semaine 1 par défaut"
+                }
             }
         },
         "users": {
@@ -84,12 +91,14 @@
             },
             "avatar": {
                 "success": "Avatar mis à jour avec succès",
-                "error": "Erreur lors de la mise à jour de l'avatar"
+                "error": "Erreur lors de la mise à jour de l'avatar",
+                "destroySuccess": "Avatar supprimé avec succès",
+                "destroyError": "Erreur lors de la suppression de l'avatar"
             },
             "balance": {
                 "success": "Montant dû mis à jour avec succès",
                 "error": "Erreur lors de la mise à jour du montant dû",
-                "notEligible": "Seuls les mineurs, les contremaîtres et les propriétaires peuvent avoir un montant dû"
+                "notEligible": "Seuls les mineurs, anciens mineurs, contremaîtres et propriétaires peuvent avoir un montant dû"
             },
             "destroy": {
                 "success": "Utilisateur supprimé avec succès",
@@ -110,6 +119,7 @@
         "livraisons": {
             "deductStock": {
                 "success": "Quantités déduites du stock avec succès",
+                "markedSuccess": "Livraison notée comme déduite avec succès",
                 "allSuccess": "Quantités déduites du stock pour {count} livraison(s)",
                 "error": "Erreur lors de la déduction du stock",
                 "alreadyDeducted": "Le stock a déjà été déduit pour cette livraison"
@@ -133,6 +143,10 @@
                     "noStaff": "Aucun mineur n'existe pour répartir cette quantité",
                     "insufficientStaffStock": "Les mineurs ne possèdent pas assez de cette ressource dans leur tonneau pour retirer cette quantité"
                 }
+            },
+            "externalBuyback": {
+                "success": "Rachat externe ajouté au stock avec succès",
+                "error": "Erreur lors de l'ajout du rachat externe"
             }
         },
         "resources": {
