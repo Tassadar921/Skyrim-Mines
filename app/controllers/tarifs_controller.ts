@@ -1,15 +1,27 @@
 import { type HttpContext } from '@adonisjs/core/http';
 import ResourceRepository from '#repositories/resource_repository';
+import OrganizationResourcePriceRepository from '#repositories/organization_resource_price_repository';
 import ResourceTransformer from '#transformers/resource_transformer';
+import UserRoleEnum from '#types/enum/user_role_enum';
 
 export default class TarifsController {
-    constructor(private readonly resourceRepository: ResourceRepository = new ResourceRepository()) {}
+    constructor(
+        private readonly resourceRepository: ResourceRepository = new ResourceRepository(),
+        private readonly organizationResourcePriceRepository: OrganizationResourcePriceRepository = new OrganizationResourcePriceRepository(),
+    ) {}
 
-    public async index({ inertia }: HttpContext) {
+    public async index({ inertia, auth }: HttpContext) {
         const resources = await this.resourceRepository.all();
+        const isClient = auth.user!.role === UserRoleEnum.CLIENT;
+
+        const customPrices = isClient && auth.user!.organizationId ? await this.organizationResourcePriceRepository.findMapForOrganization(auth.user!.organizationId) : new Map<string, number>();
 
         return inertia.render('tarifs', {
-            resources: resources.map((r) => new ResourceTransformer(r).toObject()),
+            isClient,
+            resources: resources.map((r) => {
+                const base = new ResourceTransformer(r).toObject();
+                return isClient ? { ...base, sellPrice: customPrices.get(r.id) ?? base.sellPrice } : base;
+            }),
         });
     }
 }

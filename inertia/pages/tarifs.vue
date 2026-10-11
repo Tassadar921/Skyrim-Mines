@@ -9,6 +9,7 @@ const { t } = useI18n();
 
 const props = defineProps<{
     resources: Data.Resource[];
+    isClient: boolean;
 }>();
 
 const minerais = computed(() => props.resources.filter((r) => r.type === 'minerai'));
@@ -30,7 +31,7 @@ const lingots = computed(() => props.resources.filter((r) => r.type === 'lingot'
                         <TableHeader>
                             <TableRow>
                                 <TableHead>{{ t('admin.resources.table.name') }}</TableHead>
-                                <TableHead>{{ t('admin.resources.table.buyPrice') }}</TableHead>
+                                <TableHead v-if="!isClient">{{ t('admin.resources.table.buyPrice') }}</TableHead>
                                 <TableHead>{{ t('admin.resources.table.sellPrice') }}</TableHead>
                             </TableRow>
                         </TableHeader>
@@ -38,12 +39,12 @@ const lingots = computed(() => props.resources.filter((r) => r.type === 'lingot'
                             <template v-if="minerais.length">
                                 <TableRow v-for="resource in minerais" :key="resource.id">
                                     <TableCell class="text-sm font-medium">{{ resource.name }}</TableCell>
-                                    <TableCell class="text-sm text-muted-foreground">{{ resource.buyPrice }}</TableCell>
+                                    <TableCell v-if="!isClient" class="text-sm text-muted-foreground">{{ resource.buyPrice }}</TableCell>
                                     <TableCell class="text-sm text-muted-foreground">{{ resource.sellPrice }}</TableCell>
                                 </TableRow>
                             </template>
                             <TableRow v-else>
-                                <TableCell :colspan="3" class="h-24 text-center text-muted-foreground">
+                                <TableCell :colspan="isClient ? 2 : 3" class="h-24 text-center text-muted-foreground">
                                     {{ t('admin.resources.table.empty') }}
                                 </TableCell>
                             </TableRow>
@@ -59,7 +60,7 @@ const lingots = computed(() => props.resources.filter((r) => r.type === 'lingot'
                         <TableHeader>
                             <TableRow>
                                 <TableHead>{{ t('admin.resources.table.name') }}</TableHead>
-                                <TableHead>{{ t('admin.resources.table.buyPrice') }}</TableHead>
+                                <TableHead v-if="!isClient">{{ t('admin.resources.table.buyPrice') }}</TableHead>
                                 <TableHead>{{ t('admin.resources.table.sellPrice') }}</TableHead>
                             </TableRow>
                         </TableHeader>
@@ -67,12 +68,12 @@ const lingots = computed(() => props.resources.filter((r) => r.type === 'lingot'
                             <template v-if="lingots.length">
                                 <TableRow v-for="resource in lingots" :key="resource.id">
                                     <TableCell class="text-sm font-medium">{{ resource.name }}</TableCell>
-                                    <TableCell class="text-sm text-muted-foreground">{{ resource.buyPrice }}</TableCell>
+                                    <TableCell v-if="!isClient" class="text-sm text-muted-foreground">{{ resource.buyPrice }}</TableCell>
                                     <TableCell class="text-sm text-muted-foreground">{{ resource.sellPrice }}</TableCell>
                                 </TableRow>
                             </template>
                             <TableRow v-else>
-                                <TableCell :colspan="3" class="h-24 text-center text-muted-foreground">
+                                <TableCell :colspan="isClient ? 2 : 3" class="h-24 text-center text-muted-foreground">
                                     {{ t('admin.resources.table.empty') }}
                                 </TableCell>
                             </TableRow>

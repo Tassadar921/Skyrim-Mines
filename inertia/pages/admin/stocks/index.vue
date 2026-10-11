@@ -76,7 +76,15 @@ function updateMaterialQuantity(id: string, value: string | number) {
 
 const isSubmitting = ref(false);
 
+// Forces any field still focused (e.g. an uncommitted "=50+30" formula) to blur and commit its
+// value first — clicking "Enregistrer" doesn't reliably blur the active input on every browser
+// (Safari in particular doesn't focus a <button> on click), so we can't rely on that happening on its own.
+function flushPendingEdits() {
+    if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+}
+
 function submit() {
+    flushPendingEdits();
     isSubmitting.value = true;
     router.patch(
         urlFor('admin.stocks.update'),

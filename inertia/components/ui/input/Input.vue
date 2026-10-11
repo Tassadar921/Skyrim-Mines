@@ -29,6 +29,8 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{
     'update:modelValue': [value: string];
+    focus: [event: FocusEvent];
+    blur: [event: FocusEvent];
 }>();
 
 const isFocused = ref(false);
@@ -47,13 +49,15 @@ const hasValue = computed(() => props.modelValue !== undefined && props.modelVal
 const showError = computed(() => !!props.error && touched.value);
 const inputId = computed(() => props.id ?? props.name);
 
-const handleFocus = () => {
+const handleFocus = (e: FocusEvent) => {
     isFocused.value = true;
+    emit('focus', e);
 };
 
-const handleBlur = () => {
+const handleBlur = (e: FocusEvent) => {
     isFocused.value = false;
     touched.value = true;
+    emit('blur', e);
 };
 
 const numberControlKeys = ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'];
