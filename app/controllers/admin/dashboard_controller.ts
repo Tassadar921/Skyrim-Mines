@@ -115,8 +115,8 @@ export default class DashboardController {
                 : computeLiveTax(profit, siteSetting, castellanyTax, taxBrackets, taxTiers);
             weeklyRecap.push({
                 weekNumber,
-                startDate: start.toJSDate().toISOString(),
-                endDate: end.toJSDate().toISOString(),
+                startDate: start.toISODate()!,
+                endDate: end.toISODate()!,
                 deliveriesAmount: deliveriesByWeek.get(weekNumber) ?? 0,
                 profit,
                 weeklyTax,

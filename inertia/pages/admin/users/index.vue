@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import AdminLayout from '~/layouts/admin.vue';
+import { formatDate, formatDateTime } from '~/lib/date_format';
 import { useAdminLayout } from '~/composables/use_admin_layout';
 import { useAuth } from '~/composables/use_auth';
 import { useI18n } from 'vue-i18n';
@@ -185,9 +186,9 @@ function resetFilters() {
                             </TableCell>
                             <TableCell class="text-sm text-muted-foreground">{{ canHaveBalance(user.role) ? `${user.balance.toFixed(2)} s` : '—' }}</TableCell>
                             <TableCell class="text-sm text-muted-foreground">{{ user.role === 'client' && user.barrelValue === 0 ? '—' : `${user.barrelValue.toFixed(2)} s` }}</TableCell>
-                            <TableCell class="text-sm text-muted-foreground">{{ new Date(user.createdAt).toLocaleDateString(undefined, { timeZone: 'UTC' }) }}</TableCell>
+                            <TableCell class="text-sm text-muted-foreground">{{ formatDate(user.createdAt) }}</TableCell>
                             <TableCell v-if="isAdmin" class="text-sm text-muted-foreground">
-                                {{ user.lastActivity ? new Date(user.lastActivity).toLocaleString(undefined, { timeZone: 'UTC' }) : t('admin.users.table.never') }}
+                                {{ user.lastActivity ? formatDateTime(user.lastActivity) : t('admin.users.table.never') }}
                             </TableCell>
                             <TableCell>
                                 <Link :route="'admin.users.show'" :params="{ id: user.id }">

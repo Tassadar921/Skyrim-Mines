@@ -52,8 +52,8 @@ export default class StocksController {
             const entry = weeklyDepositTotals.get(weekNumber);
             weeklyDeposits.push({
                 weekNumber,
-                startDate: start.toJSDate().toISOString(),
-                endDate: end.toJSDate().toISOString(),
+                startDate: start.toISODate()!,
+                endDate: end.toISODate()!,
                 totalQuantity: entry?.totalQuantity ?? 0,
                 byOre: entry?.byOre ?? [],
             });

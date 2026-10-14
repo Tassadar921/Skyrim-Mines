@@ -317,7 +317,7 @@
             },
             "weekOneStart": {
                 "title": "Semaine 1",
-                "hint": "Date de début de la semaine 1, utilisée pour tous les calculs de semaine de jeu. Ne peut être repoussée que vers une date ultérieure à la date par défaut ({date}), jamais antérieure.",
+                "hint": "Date de début de la semaine 1, utilisée pour tous les calculs de semaine de jeu (du lundi au dimanche inclus). Doit être un lundi, et ne peut être repoussée que vers une date ultérieure à la date par défaut ({date}), jamais antérieure.",
                 "field": "Date de début de la semaine 1",
                 "save": "Enregistrer",
                 "reset": "Réinitialiser (défaut)"

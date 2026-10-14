@@ -51,8 +51,8 @@ export default class LivraisonsController {
             const entry = weeklyTotalsByWeek.get(weekNumber);
             weeklyTotals.push({
                 weekNumber,
-                startDate: start.toJSDate().toISOString(),
-                endDate: end.toJSDate().toISOString(),
+                startDate: start.toISODate()!,
+                endDate: end.toISODate()!,
                 deliveryCount: entry?.deliveryCount ?? 0,
                 totalAmount: entry?.totalAmount ?? 0,
             });

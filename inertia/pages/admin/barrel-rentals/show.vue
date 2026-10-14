@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import AdminLayout from '~/layouts/admin.vue';
+import { formatDate, formatShortDate } from '~/lib/date_format';
 import { useAdminLayout } from '~/composables/use_admin_layout';
 import { useAuth } from '~/composables/use_auth';
 import { useI18n } from 'vue-i18n';
@@ -53,7 +54,7 @@ function isWeekPaid(week: number): boolean {
 }
 
 function formatWeekRange(week: AvailableWeek): string {
-    const format = (iso: string) => new Date(iso).toLocaleDateString('fr-FR', { timeZone: 'UTC', day: '2-digit', month: '2-digit' });
+    const format = formatShortDate;
     return `${format(week.startDate)} - ${format(week.endDate)}`;
 }
 
@@ -176,7 +177,7 @@ function submitPayment() {
                                 <Badge variant="secondary">{{ t('admin.barrelRentals.weekly.weekBadge', { week: payment.weekNumber }) }}</Badge>
                             </TableCell>
                             <TableCell class="text-sm font-medium">{{ payment.amountPaid.toFixed(2) }} s</TableCell>
-                            <TableCell class="text-sm text-muted-foreground">{{ new Date(payment.createdAt).toLocaleDateString('fr-FR') }}</TableCell>
+                            <TableCell class="text-sm text-muted-foreground">{{ formatDate(payment.createdAt) }}</TableCell>
                             <TableCell>
                                 <DeleteButton
                                     v-if="isManager"

@@ -46,8 +46,8 @@ export default class BarrelRentalsController {
             const entry = weeklyTotalsByWeek.get(weekNumber);
             weeklyTotals.push({
                 weekNumber,
-                startDate: start.toJSDate().toISOString(),
-                endDate: end.toJSDate().toISOString(),
+                startDate: start.toISODate()!,
+                endDate: end.toISODate()!,
                 totalAmount: entry?.totalAmount ?? 0,
                 paymentCount: entry?.paymentCount ?? 0,
             });
@@ -85,7 +85,7 @@ export default class BarrelRentalsController {
 
         const availableWeeks = [currentWeek, currentWeek + 1, currentWeek + 2, currentWeek + 3].map((weekNumber) => {
             const { start, end } = getWeekRange(weekNumber);
-            return { weekNumber, startDate: start.toJSDate().toISOString(), endDate: end.toJSDate().toISOString() };
+            return { weekNumber, startDate: start.toISODate()!, endDate: end.toISODate()! };
         });
 
         return inertia.render('admin/barrel-rentals/show', {

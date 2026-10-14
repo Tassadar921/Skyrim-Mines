@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import AdminLayout from '~/layouts/admin.vue';
+import { formatShortDate } from '~/lib/date_format';
 import { useAdminLayout } from '~/composables/use_admin_layout';
 import { useAuth } from '~/composables/use_auth';
 import { useI18n } from 'vue-i18n';
@@ -54,7 +55,7 @@ const props = defineProps<{
 }>();
 
 function formatWeekRange(recap: WeeklyRecap): string {
-    const format = (iso: string) => new Date(iso).toLocaleDateString('fr-FR', { timeZone: 'UTC', day: '2-digit', month: '2-digit' });
+    const format = formatShortDate;
     return `${format(recap.startDate)} - ${format(recap.endDate)}`;
 }
 

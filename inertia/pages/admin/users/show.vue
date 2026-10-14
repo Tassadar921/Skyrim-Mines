@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import AdminLayout from '~/layouts/admin.vue';
+import { formatDateTime } from '~/lib/date_format';
 import { useAdminLayout } from '~/composables/use_admin_layout';
 import { useAuth } from '~/composables/use_auth';
 import { useI18n } from 'vue-i18n';
@@ -336,11 +337,11 @@ function updateBarrelQuantity(entry: BarrelEntry, value: number) {
                 {{ $t('admin.users.show.fields.id') }} :
                 <span class="font-mono">{{ targetUser.id }}</span>
             </div>
-            <div>{{ $t('admin.users.show.fields.createdAt') }} : {{ new Date(targetUser.createdAt).toLocaleString(undefined, { timeZone: 'UTC' }) }}</div>
-            <div v-if="targetUser.updatedAt">{{ $t('admin.users.show.fields.updatedAt') }} : {{ new Date(targetUser.updatedAt).toLocaleString(undefined, { timeZone: 'UTC' }) }}</div>
+            <div>{{ $t('admin.users.show.fields.createdAt') }} : {{ formatDateTime(targetUser.createdAt) }}</div>
+            <div v-if="targetUser.updatedAt">{{ $t('admin.users.show.fields.updatedAt') }} : {{ formatDateTime(targetUser.updatedAt) }}</div>
             <div v-if="isAdmin">
                 {{ $t('admin.users.show.fields.lastActivity') }} :
-                {{ targetUser.lastActivity ? new Date(targetUser.lastActivity).toLocaleString(undefined, { timeZone: 'UTC' }) : $t('admin.users.table.never') }}
+                {{ targetUser.lastActivity ? formatDateTime(targetUser.lastActivity) : $t('admin.users.table.never') }}
             </div>
         </div>
     </div>

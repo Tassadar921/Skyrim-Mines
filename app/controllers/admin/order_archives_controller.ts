@@ -43,7 +43,7 @@ export default class OrderArchivesController {
         const availableWeeks = [];
         for (let weekNumber = currentWeek; weekNumber >= 1; weekNumber--) {
             const { start, end } = getWeekRange(weekNumber);
-            availableWeeks.push({ weekNumber, startDate: start.toJSDate().toISOString(), endDate: end.toJSDate().toISOString() });
+            availableWeeks.push({ weekNumber, startDate: start.toISODate()!, endDate: end.toISODate()! });
         }
 
         return inertia.render('admin/commandes/archive', {

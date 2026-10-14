@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import AdminLayout from '~/layouts/admin.vue';
+import { formatDateTime } from '~/lib/date_format';
 import { useAdminLayout } from '~/composables/use_admin_layout';
 import { useAuth } from '~/composables/use_auth';
 import { useI18n } from 'vue-i18n';
@@ -212,7 +213,7 @@ function resetFilters() {
                                     <ChevronRight v-else class="size-4 text-muted-foreground" />
                                 </TableCell>
                                 <TableCell class="text-sm font-medium">{{ formatNumber(order.number) }}</TableCell>
-                                <TableCell class="text-sm text-muted-foreground">{{ new Date(order.createdAt).toLocaleString('fr-FR', { timeZone: 'UTC' }) }}</TableCell>
+                                <TableCell class="text-sm text-muted-foreground">{{ formatDateTime(order.createdAt) }}</TableCell>
                                 <TableCell class="text-sm font-medium">{{ order.requesterName }}</TableCell>
                                 <TableCell class="text-sm text-muted-foreground">
                                     <span v-if="order.organizationName">{{ order.organizationName }}</span>

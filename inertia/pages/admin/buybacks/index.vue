@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import AdminLayout from '~/layouts/admin.vue';
+import { formatShortDate, formatDateTime } from '~/lib/date_format';
 import { useAdminLayout } from '~/composables/use_admin_layout';
 import { useI18n } from 'vue-i18n';
 import { computed, ref } from 'vue';
@@ -103,7 +104,7 @@ function onWeekFilterChange(value: AcceptableValue) {
 }
 
 function formatWeekRange(weeklyTotal: WeeklyTotal): string {
-    const format = (iso: string) => new Date(iso).toLocaleDateString('fr-FR', { timeZone: 'UTC', day: '2-digit', month: '2-digit' });
+    const format = formatShortDate;
     return `${format(weeklyTotal.startDate)} - ${format(weeklyTotal.endDate)}`;
 }
 
@@ -228,7 +229,7 @@ function resetFilters() {
                                     <ChevronDown v-if="expanded.has(groupKey(group))" class="size-4 text-muted-foreground" />
                                     <ChevronRight v-else class="size-4 text-muted-foreground" />
                                 </TableCell>
-                                <TableCell class="text-sm text-muted-foreground">{{ new Date(group.createdAt).toLocaleString(undefined, { timeZone: 'UTC' }) }}</TableCell>
+                                <TableCell class="text-sm text-muted-foreground">{{ formatDateTime(group.createdAt) }}</TableCell>
                                 <TableCell class="text-sm text-muted-foreground">
                                     <Badge variant="secondary">{{ t('admin.buybacks.table.weekBadge', { week: group.weekNumber }) }}</Badge>
                                 </TableCell>

@@ -115,7 +115,9 @@ export default class SiteSettingsController {
             }
 
             const parsed = DateTime.fromISO(weekOneStart, { zone: 'utc' }).startOf('day');
-            if (!parsed.isValid || parsed < DEFAULT_GAME_WEEK_ONE_START) {
+            // Weeks must run Monday -> Sunday (deliveries happen all the way through Sunday, taxes are
+            // paid Sunday night), so the anchor itself has to land on a Monday or every week shifts.
+            if (!parsed.isValid || parsed < DEFAULT_GAME_WEEK_ONE_START || parsed.weekday !== 1) {
                 session.flash('error', i18n.t('messages.admin.siteSettings.weekOneStart.update.invalid'));
                 return response.redirect().back();
             }

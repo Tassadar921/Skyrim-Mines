@@ -9,6 +9,8 @@ import { urlFor } from '~/client';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select';
+import { DatePicker } from '~/components/ui/date-picker';
+import { formatCalendarDate } from '~/lib/date_format';
 import type { AcceptableValue } from 'reka-ui';
 import type { Data } from '@generated/data';
 
@@ -131,8 +133,8 @@ function resetWeekOneStart() {
 
         <div class="rounded-md border p-5 space-y-4">
             <div class="text-sm font-medium">{{ t('admin.siteSettings.weekOneStart.title') }}</div>
-            <p class="text-xs text-muted-foreground">{{ t('admin.siteSettings.weekOneStart.hint', { date: defaultWeekOneStart }) }}</p>
-            <Input v-model="weekOneStartInput" type="date" :min="defaultWeekOneStart" :label="t('admin.siteSettings.weekOneStart.field')" :readonly="!isAdmin" class="max-w-xs" />
+            <p class="text-xs text-muted-foreground">{{ t('admin.siteSettings.weekOneStart.hint', { date: formatCalendarDate(defaultWeekOneStart) }) }}</p>
+            <DatePicker v-model="weekOneStartInput" :min="defaultWeekOneStart" :disabled="!isAdmin" :placeholder="t('admin.siteSettings.weekOneStart.field')" class="max-w-xs" />
             <div v-if="isAdmin" class="flex gap-2">
                 <Button size="sm" :loading="isSubmittingWeekOneStart" :disabled="isSubmittingWeekOneStart" @click="submitWeekOneStart">
                     {{ t('admin.siteSettings.weekOneStart.save') }}

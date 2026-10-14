@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import AdminLayout from '~/layouts/admin.vue';
+import { formatShortDate, formatDateTime } from '~/lib/date_format';
 import { useAdminLayout } from '~/composables/use_admin_layout';
 import { useAuth } from '~/composables/use_auth';
 import { useI18n } from 'vue-i18n';
@@ -114,7 +115,7 @@ function onWeekFilterChange(value: AcceptableValue) {
 }
 
 function formatWeekRange(weeklyTotal: WeeklyTotal): string {
-    const format = (iso: string) => new Date(iso).toLocaleDateString('fr-FR', { timeZone: 'UTC', day: '2-digit', month: '2-digit' });
+    const format = formatShortDate;
     return `${format(weeklyTotal.startDate)} - ${format(weeklyTotal.endDate)}`;
 }
 
@@ -290,7 +291,7 @@ const statsOreData = computed<OreQuantity[]>(() => {
                                             <ChevronDown v-if="expanded.has(delivery.id)" class="size-4 text-muted-foreground" />
                                             <ChevronRight v-else class="size-4 text-muted-foreground" />
                                         </TableCell>
-                                        <TableCell class="text-sm text-muted-foreground">{{ new Date(delivery.deliveredAt).toLocaleString('fr-FR', { timeZone: 'UTC' }) }}</TableCell>
+                                        <TableCell class="text-sm text-muted-foreground">{{ formatDateTime(delivery.deliveredAt) }}</TableCell>
                                         <TableCell class="text-sm text-muted-foreground">
                                             <Badge variant="secondary">{{ t('admin.livraisons.table.weekBadge', { week: delivery.weekNumber }) }}</Badge>
                                         </TableCell>

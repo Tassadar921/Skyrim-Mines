@@ -72,7 +72,7 @@
                 "update": {
                     "success": "Semaine 1 mise à jour avec succès",
                     "error": "Erreur lors de la mise à jour de la semaine 1",
-                    "invalid": "La date doit être postérieure ou égale à la date de la semaine 1 par défaut"
+                    "invalid": "La date doit être un lundi, postérieur ou égal à la date de la semaine 1 par défaut"
                 }
             }
         },

@@ -84,6 +84,7 @@
         "@adonisjs/transmit-client": "^1.1.0",
         "@adonisjs/vite": "^5.1.0",
         "@inertiajs/vue3": "^2.3.17",
+        "@internationalized/date": "3.12.4",
         "@lucide/vue": "^1.14.0",
         "@tailwindcss/vite": "^4.2.1",
         "@tanstack/vue-table": "^8.21.3",
@@ -125,5 +126,10 @@
     },
     "simple-git-hooks": {
         "pre-commit": "node ./node_modules/lint-staged/bin/lint-staged.js"
+    },
+    "pnpm": {
+        "overrides": {
+            "@internationalized/date": "3.12.4"
+        }
     }
 }

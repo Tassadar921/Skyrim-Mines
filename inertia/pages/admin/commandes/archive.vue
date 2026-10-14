@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import AdminLayout from '~/layouts/admin.vue';
+import { formatShortDate } from '~/lib/date_format';
 import { useAdminLayout } from '~/composables/use_admin_layout';
 import { useI18n } from 'vue-i18n';
 import { computed, reactive, ref, watch } from 'vue';
@@ -37,7 +38,7 @@ const props = defineProps<{
 }>();
 
 function formatWeekRange(week: AvailableWeek): string {
-    const format = (iso: string) => new Date(iso).toLocaleDateString('fr-FR', { timeZone: 'UTC', day: '2-digit', month: '2-digit' });
+    const format = formatShortDate;
     return `${format(week.startDate)} - ${format(week.endDate)}`;
 }
 

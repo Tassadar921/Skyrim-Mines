@@ -29,8 +29,8 @@ export default class CompanyExpensesController {
             const entry = weeklyTotalsByWeek.get(weekNumber);
             weeklyTotals.push({
                 weekNumber,
-                startDate: start.toJSDate().toISOString(),
-                endDate: end.toJSDate().toISOString(),
+                startDate: start.toISODate()!,
+                endDate: end.toISODate()!,
                 totalAmount: entry?.totalAmount ?? 0,
             });
         }

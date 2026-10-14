@@ -51,8 +51,8 @@ export default class BuybacksController {
             const entry = weeklyTotalsByWeek.get(weekNumber);
             weeklyTotals.push({
                 weekNumber,
-                startDate: start.toJSDate().toISOString(),
-                endDate: end.toJSDate().toISOString(),
+                startDate: start.toISODate()!,
+                endDate: end.toISODate()!,
                 totalQuantity: entry?.totalQuantity ?? 0,
                 totalAmount: entry?.totalAmount ?? 0,
             });
