@@ -156,7 +156,7 @@ function resetFilters() {
         </div>
 
         <div class="space-y-3">
-            <div class="flex items-center justify-between">
+            <div class="flex flex-wrap items-center justify-between gap-2">
                 <Badge variant="outline">{{ meta.total }} {{ t('admin.barrelRentals.table.count', meta.total) }}</Badge>
 
                 <Dialog v-if="isManager" v-model:open="open">
@@ -200,10 +200,10 @@ function resetFilters() {
                 </Dialog>
             </div>
 
-            <div class="flex items-center gap-2">
-                <Input :placeholder="t('admin.barrelRentals.table.search')" :model-value="searchValue" class="max-w-sm" @update:model-value="onSearchInput" />
+            <div class="flex flex-col gap-2 lg:flex-row lg:items-center">
+                <Input :placeholder="t('admin.barrelRentals.table.search')" :model-value="searchValue" class="w-full lg:max-w-sm" @update:model-value="onSearchInput" />
                 <Select :model-value="filters.status || 'all'" @update:model-value="onStatusFilterChange">
-                    <SelectTrigger class="w-48">
+                    <SelectTrigger class="w-full lg:w-48">
                         <SelectValue />
                     </SelectTrigger>
                     <SelectContent>

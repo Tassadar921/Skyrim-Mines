@@ -10,6 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '~
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
+import { Checkbox } from '~/components/ui/checkbox';
 import { Badge } from '~/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '~/components/ui/dialog';
@@ -28,7 +29,7 @@ type Member = Data.User;
 type EligibleUser = { id: string; username: string };
 
 const props = defineProps<{
-    organization: { id: string; name: string; castellanyId: string | null };
+    organization: { id: string; name: string; castellanyId: string | null; enabled: boolean };
     members: Member[];
     eligibleUsers: EligibleUser[];
     resources: Data.Resource[];
@@ -42,13 +43,14 @@ const NO_CASTELLANY = 'none';
 
 const name = ref(props.organization.name);
 const castellanyId = ref(props.organization.castellanyId ?? NO_CASTELLANY);
+const enabled = ref(props.organization.enabled);
 const isSubmitting = ref(false);
 
 function submit() {
     isSubmitting.value = true;
     router.put(
         urlFor('admin.organizations.update', { id: props.organization.id }),
-        { name: name.value, castellanyId: castellanyId.value === NO_CASTELLANY ? undefined : castellanyId.value },
+        { name: name.value, castellanyId: castellanyId.value === NO_CASTELLANY ? undefined : castellanyId.value, enabled: enabled.value },
         {
             onFinish: () => {
                 isSubmitting.value = false;
@@ -125,7 +127,7 @@ function resetResourcePrice(resourceId: string) {
 
 <template>
     <div class="space-y-6">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-wrap items-center justify-between gap-2">
             <Button variant="outline" class="gap-2" as-child>
                 <Link :href="urlFor('admin.organizations.index')">
                     <ArrowLeft class="size-4" />
@@ -162,10 +164,18 @@ function resetResourcePrice(resourceId: string) {
                     </SelectContent>
                 </Select>
             </div>
+
+            <div class="space-y-1">
+                <div class="flex items-center gap-2">
+                    <Checkbox id="enabled" :disabled="!isManager" :model-value="enabled" @update:model-value="(v) => (enabled = !!v)" />
+                    <Label for="enabled" class="cursor-pointer">{{ t('admin.organizations.show.enabled') }}</Label>
+                </div>
+                <p class="text-xs text-muted-foreground">{{ t('admin.organizations.show.enabledHint') }}</p>
+            </div>
         </div>
 
         <div class="space-y-3">
-            <div class="flex items-center justify-between">
+            <div class="flex flex-wrap items-center justify-between gap-2">
                 <Badge variant="outline">{{ props.members.length }} {{ t('organization.members.count', props.members.length) }}</Badge>
 
                 <Dialog v-if="isManager" v-model:open="open">

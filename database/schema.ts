@@ -68,7 +68,7 @@ export class CastellanyTaxSchema extends BaseModel {
 }
 
 export class CompanyCapitalSnapshotSchema extends BaseModel {
-  static $columns = ['capital', 'createdAt', 'donationReduction', 'id', 'privilegeReduction', 'sponsorshipReduction', 'stockValue', 'taxRate', 'updatedAt', 'weekNumber', 'weeklyTax'] as const
+  static $columns = ['capital', 'createdAt', 'donationReduction', 'id', 'privilegeReduction', 'sponsorshipReduction', 'stockValue', 'taxRate', 'topBracketIndex', 'topBracketRate', 'updatedAt', 'weekNumber', 'weeklyTax'] as const
   $columns = CompanyCapitalSnapshotSchema.$columns
   @column()
   declare capital: string
@@ -86,6 +86,10 @@ export class CompanyCapitalSnapshotSchema extends BaseModel {
   declare stockValue: string
   @column()
   declare taxRate: number
+  @column()
+  declare topBracketIndex: number | null
+  @column()
+  declare topBracketRate: number | null
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
   @column()
@@ -288,12 +292,14 @@ export class OrganizationResourcePriceSchema extends BaseModel {
 }
 
 export class OrganizationSchema extends BaseModel {
-  static $columns = ['castellanyId', 'createdAt', 'id', 'name', 'updatedAt'] as const
+  static $columns = ['castellanyId', 'createdAt', 'enabled', 'id', 'name', 'updatedAt'] as const
   $columns = OrganizationSchema.$columns
   @column()
   declare castellanyId: string | null
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
+  @column()
+  declare enabled: boolean
   @column({ isPrimary: true })
   declare id: string
   @column()
@@ -334,8 +340,25 @@ export class ResourceBuybackBatchSchema extends BaseModel {
   declare weekNumber: number
 }
 
+export class ResourceBuybackShareSchema extends BaseModel {
+  static $columns = ['amount', 'createdAt', 'id', 'resourceBuybackId', 'updatedAt', 'userId'] as const
+  $columns = ResourceBuybackShareSchema.$columns
+  @column()
+  declare amount: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare resourceBuybackId: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare userId: string
+}
+
 export class ResourceBuybackSchema extends BaseModel {
-  static $columns = ['amount', 'batchId', 'createdAt', 'id', 'quantity', 'resourceId', 'updatedAt', 'userId'] as const
+  static $columns = ['amount', 'batchId', 'createdAt', 'id', 'quantity', 'resourceId', 'sharedAmount', 'updatedAt', 'userId'] as const
   $columns = ResourceBuybackSchema.$columns
   @column()
   declare amount: string
@@ -349,6 +372,8 @@ export class ResourceBuybackSchema extends BaseModel {
   declare quantity: number
   @column()
   declare resourceId: string
+  @column()
+  declare sharedAmount: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
   @column()
@@ -407,20 +432,26 @@ export class ResourceStockSchema extends BaseModel {
 }
 
 export class ResourceSchema extends BaseModel {
-  static $columns = ['buyPrice', 'createdAt', 'id', 'name', 'order', 'sellPrice', 'type', 'updatedAt'] as const
+  static $columns = ['buyPrice', 'buybackSplitEnabled', 'createdAt', 'id', 'minerShare', 'name', 'order', 'sellPrice', 'sharedShare', 'type', 'updatedAt'] as const
   $columns = ResourceSchema.$columns
   @column()
   declare buyPrice: string
+  @column()
+  declare buybackSplitEnabled: boolean
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
   @column({ isPrimary: true })
   declare id: string
+  @column()
+  declare minerShare: string | null
   @column()
   declare name: string
   @column()
   declare order: number
   @column()
   declare sellPrice: string
+  @column()
+  declare sharedShare: string | null
   @column()
   declare type: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })
@@ -478,6 +509,37 @@ export class TaxTierSchema extends BaseModel {
   declare updatedAt: DateTime | null
   @column()
   declare upperBound: string | null
+}
+
+export class UserBalanceChangeSchema extends BaseModel {
+  static $columns = ['action', 'changedByUserId', 'changedByUsername', 'createdAt', 'id', 'newBalance', 'previousBalance', 'rollbackOfId', 'rolledBackAt', 'updatedAt', 'userId', 'username', 'weekNumber'] as const
+  $columns = UserBalanceChangeSchema.$columns
+  @column()
+  declare action: string
+  @column()
+  declare changedByUserId: string | null
+  @column()
+  declare changedByUsername: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare newBalance: string
+  @column()
+  declare previousBalance: string
+  @column()
+  declare rollbackOfId: string | null
+  @column.dateTime()
+  declare rolledBackAt: DateTime | null
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare userId: string | null
+  @column()
+  declare username: string
+  @column()
+  declare weekNumber: number
 }
 
 export class UserSchema extends BaseModel {

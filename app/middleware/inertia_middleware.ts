@@ -2,12 +2,14 @@ import type { HttpContext } from '@adonisjs/core/http';
 import type { NextFn } from '@adonisjs/core/types/http';
 import UserTransformer from '#transformers/user_transformer';
 import SiteSettingRepository from '#repositories/site_setting_repository';
+import OrganizationRepository from '#repositories/organization_repository';
 import BaseInertiaMiddleware from '@adonisjs/inertia/inertia_middleware';
 
 const DEFAULT_LOGO_URL = '/logo.png';
 
 export default class InertiaMiddleware extends BaseInertiaMiddleware {
     private readonly siteSettingRepository = new SiteSettingRepository();
+    private readonly organizationRepository = new OrganizationRepository();
 
     async share(ctx: HttpContext) {
         /**
@@ -40,10 +42,14 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
                 error: error ?? session?.flashMessages.get('error'),
                 success: session?.flashMessages.get('success'),
             }),
-            user: ctx.inertia.always(auth?.user ? new UserTransformer(auth.user).toObject() : undefined),
+            user: ctx.inertia.always(auth?.user ? { ...new UserTransformer(auth.user).toObject(), organizationEnabled: await this.isOrganizationEnabled(auth.user.organizationId) } : undefined),
             logoUrl: ctx.inertia.always(siteSetting.logoFile?.path ?? DEFAULT_LOGO_URL),
             subtitle: ctx.inertia.always(siteSetting.subtitle ?? undefined),
         };
+    }
+
+    private async isOrganizationEnabled(organizationId: string | null): Promise<boolean> {
+        return organizationId ? (await this.organizationRepository.findEnabled(organizationId)) !== null : false;
     }
 
     async handle(ctx: HttpContext, next: NextFn) {

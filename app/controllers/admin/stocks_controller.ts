@@ -17,6 +17,7 @@ import { computeBarrelQuantity } from '#helpers/resource_barrel_helper';
 import { distributeEvenly, distributeProportionally } from '#helpers/barrel_redistribution_helper';
 import { getWeekNumber, getWeekRange } from '#helpers/game_week_helper';
 import UserRoleEnum from '#types/enum/user_role_enum';
+import ResourceTypeEnum from '#types/enum/resource_type_enum';
 
 export default class StocksController {
     constructor(
@@ -45,19 +46,25 @@ export default class StocksController {
         const materialStockByMaterialId = new Map(materialStocks.map((s) => [s.materialId, s]));
 
         const currentWeek = getWeekNumber(DateTime.now());
+        // Statistics tab: same zero-filled, resources-ordered shape as the deliveries statistics, so ore colors/positions stay stable across weeks.
+        const ores = resources.filter((resource) => resource.type === ResourceTypeEnum.MINERAI).map((resource) => ({ resourceId: resource.id, resourceName: resource.name }));
         const weeklyDepositTotals = await this.resourceDepositRepository.getWeeklyQuantityTotals();
-        const weeklyDeposits = [];
+        const weeklyOreStats: { weekNumber: number; startDate: string; endDate: string; total: { quantity: number }; byOre: { resourceId: string; resourceName: string; quantity: number }[] }[] = [];
         for (let weekNumber = currentWeek; weekNumber >= 1; weekNumber--) {
             const { start, end } = getWeekRange(weekNumber);
             const entry = weeklyDepositTotals.get(weekNumber);
-            weeklyDeposits.push({
+            weeklyOreStats.push({
                 weekNumber,
                 startDate: start.toISODate()!,
                 endDate: end.toISODate()!,
-                totalQuantity: entry?.totalQuantity ?? 0,
-                byOre: entry?.byOre ?? [],
+                total: { quantity: entry?.totalQuantity ?? 0 },
+                byOre: ores.map((ore) => ({ ...ore, quantity: entry?.byOre.get(ore.resourceId) ?? 0 })),
             });
         }
+        const oreTotals = ores.map((ore) => ({
+            ...ore,
+            quantity: weeklyOreStats.reduce((sum, weekEntry) => sum + (weekEntry.byOre.find((entry) => entry.resourceId === ore.resourceId)?.quantity ?? 0), 0),
+        }));
 
         return inertia.render('admin/stocks/index', {
             resources: resources.map((r) => ({
@@ -69,7 +76,7 @@ export default class StocksController {
                 ...new MaterialTransformer(m).toObject(),
                 quantity: materialStockByMaterialId.get(m.id)?.quantity ?? 0,
             })),
-            weeklyDeposits,
+            stats: { ores, oreTotals, weeklyOreStats },
         });
     }
 

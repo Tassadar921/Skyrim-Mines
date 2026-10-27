@@ -12,7 +12,7 @@ import TaxTierRepository from '#repositories/tax_tier_repository';
 import UserRoleEnum from '#types/enum/user_role_enum';
 import TaxSystemEnum from '#types/enum/tax_system_enum';
 import { getWeekNumber, getWeekRange } from '#helpers/game_week_helper';
-import { computeProgressiveTax, computeFullProgressiveTax, applyTaxReductions, type TaxBracketInput, type TaxReductionFlags } from '#helpers/progressive_tax_helper';
+import { computeProgressiveTax, computeFullProgressiveTax, findTopBracket, applyTaxReductions, type TaxBracketInput, type TaxReductionFlags } from '#helpers/progressive_tax_helper';
 import { updateCastellanyTaxValidator } from '#validators/admin/castellany_tax';
 import { storeCompanyCapitalSnapshotValidator } from '#validators/admin/company_capital_snapshot';
 import { updateTaxBracketsValidator } from '#validators/admin/tax_brackets';
@@ -113,6 +113,11 @@ export default class DashboardController {
             const { weeklyTax, taxRate } = capitalSnapshot
                 ? { weeklyTax: Number(capitalSnapshot.weeklyTax), taxRate: capitalSnapshot.taxRate }
                 : computeLiveTax(profit, siteSetting, castellanyTax, taxBrackets, taxTiers);
+            // Snapshots recorded before the top bracket was stored fall back to the current brackets.
+            const topBracket =
+                capitalSnapshot?.topBracketIndex != null && capitalSnapshot.topBracketRate != null
+                    ? { index: capitalSnapshot.topBracketIndex, rate: capitalSnapshot.topBracketRate }
+                    : findTopBracket(profit, toTaxBracketInputs(taxBrackets));
             weeklyRecap.push({
                 weekNumber,
                 startDate: start.toISODate()!,
@@ -121,6 +126,7 @@ export default class DashboardController {
                 profit,
                 weeklyTax,
                 taxRate,
+                topBracket,
                 capital,
                 stockValue,
                 totalCapital: capital !== null && stockValue !== null ? capital + stockValue : null,
@@ -224,6 +230,7 @@ export default class DashboardController {
             };
             const weeklyTax = applyTaxReductions(baseTax, reductions);
             const taxRate = profit > 0 ? Math.round((weeklyTax / profit) * 100) : 0;
+            const topBracket = isBracketSystem ? findTopBracket(profit, toTaxBracketInputs(taxBrackets)) : null;
 
             await this.companyCapitalSnapshotRepository.create({
                 weekNumber,
@@ -231,6 +238,8 @@ export default class DashboardController {
                 stockValue: String(stockValue),
                 weeklyTax: String(weeklyTax),
                 taxRate,
+                topBracketIndex: topBracket?.index ?? null,
+                topBracketRate: topBracket?.rate ?? null,
                 donationReduction: reductions.donation,
                 sponsorshipReduction: reductions.sponsorship,
                 privilegeReduction: reductions.privilege,

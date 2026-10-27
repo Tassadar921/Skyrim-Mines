@@ -26,7 +26,11 @@ const logout = () => {
                     <div class="font-medium">{{ page.props.user.username }}</div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem v-if="page.props.user.organizationRole === 'owner' || page.props.user.organizationRole === 'admin'" class="gap-2 cursor-pointer" as-child>
+                <DropdownMenuItem
+                    v-if="page.props.user.organizationEnabled && (page.props.user.organizationRole === 'owner' || page.props.user.organizationRole === 'admin')"
+                    class="gap-2 cursor-pointer"
+                    as-child
+                >
                     <Link :href="urlFor('organization.show')">
                         <Building2 class="size-4" aria-hidden="true" />
                         {{ $t('organization.navLink') }}

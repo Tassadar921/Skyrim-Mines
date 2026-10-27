@@ -9,12 +9,23 @@ export default class OrganizationRepository extends BaseRepository<typeof Organi
         super(Organization);
     }
 
+    /** Every organization, disabled ones included — only for lookups on existing data (e.g. past orders). */
     public async all(): Promise<Organization[]> {
         return Organization.query().orderBy('name', 'asc');
     }
 
+    /** Organizations that can still be picked/used anywhere — a disabled one only shows up in the back-office organizations table. */
+    public async allEnabled(): Promise<Organization[]> {
+        return Organization.query().where('enabled', true).orderBy('name', 'asc');
+    }
+
+    /** The organization if it exists and is enabled, null otherwise. */
+    public async findEnabled(id: string): Promise<Organization | null> {
+        return Organization.query().where('id', id).where('enabled', true).first();
+    }
+
     public async paginate(params: { page: number; perPage: number; sort: string; dir: 'asc' | 'desc'; search?: string }): Promise<{
-        data: { id: string; name: string; memberCount: number; ownerUsernames: string[] }[];
+        data: { id: string; name: string; enabled: boolean; memberCount: number; ownerUsernames: string[] }[];
         total: number;
         currentPage: number;
         lastPage: number;
@@ -43,6 +54,7 @@ export default class OrganizationRepository extends BaseRepository<typeof Organi
                 return {
                     id: organization.id,
                     name: organization.name,
+                    enabled: organization.enabled,
                     memberCount: organizationMembers.length,
                     ownerUsernames: owners.map((owner) => owner.username),
                 };
@@ -62,10 +74,11 @@ export default class OrganizationRepository extends BaseRepository<typeof Organi
         return Organization.create({ name: data.name, castellanyId: data.castellanyId ?? null });
     }
 
-    public async update(id: string, data: { name: string; castellanyId?: string | null }): Promise<Organization> {
+    public async update(id: string, data: { name: string; castellanyId?: string | null; enabled?: boolean }): Promise<Organization> {
         const organization = await Organization.findOrFail(id);
         organization.name = data.name;
         organization.castellanyId = data.castellanyId ?? null;
+        if (data.enabled !== undefined) organization.enabled = data.enabled;
         await organization.save();
         return organization;
     }

@@ -35,6 +35,7 @@ type WeeklyRecap = {
     profit: number;
     weeklyTax: number;
     taxRate: number;
+    topBracket: { index: number; rate: number } | null;
     capital: number | null;
     stockValue: number | null;
     totalCapital: number | null;
@@ -125,7 +126,7 @@ function reductionBadges(reductions: TaxReductions | null): string[] {
 
 <template>
     <div class="space-y-4">
-        <div class="flex flex-nowrap gap-4">
+        <div class="flex flex-col gap-4 lg:flex-row">
             <div class="rounded-md border p-5 space-y-4 flex-1 min-w-0">
                 <div class="text-sm font-medium">{{ t('admin.dashboard.tax.title') }}</div>
 
@@ -285,8 +286,9 @@ function reductionBadges(reductions: TaxReductions | null): string[] {
                             </div>
                         </TableHead>
                         <TableHead>{{ t('admin.dashboard.weeklyRecap.weeklyTax') }}</TableHead>
-                        <TableHead>{{ t('admin.dashboard.weeklyRecap.taxRate') }}</TableHead>
-                        <TableHead>{{ t('admin.dashboard.weeklyRecap.reductions') }}</TableHead>
+                        <TableHead v-if="taxSystem === 'progressive'">{{ t('admin.dashboard.weeklyRecap.topBracket') }}</TableHead>
+                        <TableHead v-else>{{ t('admin.dashboard.weeklyRecap.taxRate') }}</TableHead>
+                        <TableHead v-if="taxSystem === 'progressive'">{{ t('admin.dashboard.weeklyRecap.reductions') }}</TableHead>
                         <TableHead>{{ t('admin.dashboard.weeklyRecap.capital') }}</TableHead>
                         <TableHead>{{ t('admin.dashboard.weeklyRecap.stockValue') }}</TableHead>
                     </TableRow>
@@ -306,8 +308,12 @@ function reductionBadges(reductions: TaxReductions | null): string[] {
                                 {{ formatAmount(recap.profit) }}
                             </TableCell>
                             <TableCell class="text-sm">{{ formatAmount(recap.weeklyTax) }}</TableCell>
-                            <TableCell class="text-sm text-muted-foreground">{{ recap.taxRate }} %</TableCell>
-                            <TableCell>
+                            <TableCell v-if="taxSystem === 'progressive'" class="text-sm text-muted-foreground">
+                                <template v-if="recap.topBracket">{{ t('admin.dashboard.weeklyRecap.topBracketValue', { index: recap.topBracket.index, rate: recap.topBracket.rate }) }}</template>
+                                <template v-else>{{ t('admin.dashboard.weeklyRecap.notAvailable') }}</template>
+                            </TableCell>
+                            <TableCell v-else class="text-sm text-muted-foreground">{{ recap.taxRate }} %</TableCell>
+                            <TableCell v-if="taxSystem === 'progressive'">
                                 <div v-if="reductionBadges(recap.reductions).length" class="flex flex-wrap gap-1">
                                     <Badge v-for="label in reductionBadges(recap.reductions)" :key="label" variant="secondary" class="text-xs">{{ label }}</Badge>
                                 </div>
@@ -318,7 +324,7 @@ function reductionBadges(reductions: TaxReductions | null): string[] {
                         </TableRow>
                     </template>
                     <TableRow v-else>
-                        <TableCell colspan="8" class="text-center text-sm text-muted-foreground py-6">
+                        <TableCell :colspan="taxSystem === 'progressive' ? 8 : 7" class="text-center text-sm text-muted-foreground py-6">
                             {{ t('admin.dashboard.weeklyRecap.empty') }}
                         </TableCell>
                     </TableRow>

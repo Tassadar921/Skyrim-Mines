@@ -2,6 +2,8 @@ import db from '@adonisjs/lucid/services/db';
 import type { TransactionClientContract } from '@adonisjs/lucid/types/database';
 import BaseRepository from '#repositories/base/base_repository';
 import ResourceBuyback from '#models/resource_buyback';
+import ResourceBuybackShare from '#models/resource_buyback_share';
+import type Resource from '#models/resource';
 import ResourceDepositRepository from '#repositories/resource_deposit_repository';
 import ResourceBarrelAdjustmentRepository from '#repositories/resource_barrel_adjustment_repository';
 import UserRepository from '#repositories/user_repository';
@@ -44,11 +46,15 @@ export default class ResourceBuybackRepository extends BaseRepository<typeof Res
     /**
      * Buys back up to `requestedQuantity` of a resource from whatever players have outstanding
      * in the barrel, allocated proportionally to their holdings and paid out immediately.
+     * When the resource has its buyback split enabled, each depositor only gets the miner share;
+     * the shared part is split equally (to the cent) between every other active miner/foreman —
+     * or kept by the depositor when there's nobody else to share with.
      * Returns the quantity actually bought back (may be less than requested if the barrel
      * doesn't hold enough).
      */
-    public async buybackResourceFromBarrel(params: { resourceId: string; requestedQuantity: number; buyPrice: number; batchId: string; trx: TransactionClientContract }): Promise<number> {
-        const { resourceId, requestedQuantity, buyPrice, batchId, trx } = params;
+    public async buybackResourceFromBarrel(params: { resource: Resource; requestedQuantity: number; batchId: string; trx: TransactionClientContract }): Promise<number> {
+        const { resource, requestedQuantity, batchId, trx } = params;
+        const resourceId = resource.id;
         if (requestedQuantity <= 0) return 0;
 
         const [depositedByUser, boughtBackByUser, adjustedByUser] = await Promise.all([
@@ -68,36 +74,34 @@ export default class ResourceBuybackRepository extends BaseRepository<typeof Res
         const quantity = Math.min(requestedQuantity, totalOutstanding);
         if (quantity <= 0) return 0;
 
+        const buyPriceCents = Math.round(Number(resource.buyPrice) * 100);
+        const sharedShareCents = resource.buybackSplitEnabled ? Math.round(Number(resource.sharedShare ?? 0) * 100) : 0;
+        const poolIds = sharedShareCents > 0 ? await this.userRepository.findSharedBuybackPoolIds(trx) : [];
+
         const allocations = allocateProportionally(quantity, outstandingByUser);
-        const buybackEntries: { batchId: string; userId: string; resourceId: string; quantity: number; amount: number }[] = [];
         for (const [userId, allocatedQuantity] of allocations) {
             if (allocatedQuantity <= 0) continue;
-            const amount = allocatedQuantity * buyPrice;
-            buybackEntries.push({ batchId, userId, resourceId, quantity: allocatedQuantity, amount });
-            await this.userRepository.incrementBalance(userId, amount, trx);
+
+            const amountCents = allocatedQuantity * buyPriceCents;
+            const recipients = poolIds.filter((id) => id !== userId);
+            const sharedCents = recipients.length ? allocatedQuantity * sharedShareCents : 0;
+
+            const buyback = await ResourceBuyback.create(
+                { batchId, userId, resourceId, quantity: allocatedQuantity, amount: (amountCents / 100).toFixed(2), sharedAmount: (sharedCents / 100).toFixed(2) },
+                { client: trx },
+            );
+            await this.userRepository.incrementBalance(userId, (amountCents - sharedCents) / 100, trx);
+
+            if (sharedCents <= 0) continue;
+            const sharesCents = allocateProportionally(sharedCents, new Map(recipients.map((id) => [id, 1])));
+            for (const [recipientId, shareCents] of sharesCents) {
+                if (shareCents <= 0) continue;
+                await ResourceBuybackShare.create({ resourceBuybackId: buyback.id, userId: recipientId, amount: (shareCents / 100).toFixed(2) }, { client: trx });
+                await this.userRepository.incrementBalance(recipientId, shareCents / 100, trx);
+            }
         }
 
-        await this.createMany(buybackEntries, trx);
         return quantity;
-    }
-
-    public async createMany(entries: { batchId: string; userId: string; resourceId: string; quantity: number; amount: number }[], trx?: TransactionClientContract): Promise<void> {
-        if (!entries.length) return;
-
-        const payloads = entries.map((entry) => ({ ...entry, amount: String(entry.amount) }));
-
-        if (trx) {
-            for (const payload of payloads) {
-                await ResourceBuyback.create(payload, { client: trx });
-            }
-            return;
-        }
-
-        await db.transaction(async (newTrx) => {
-            for (const payload of payloads) {
-                await ResourceBuyback.create(payload, { client: newTrx });
-            }
-        });
     }
 
     public async sumByResource(): Promise<Map<string, number>> {

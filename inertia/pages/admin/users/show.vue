@@ -51,6 +51,8 @@ const FOREMAN_ASSIGNABLE_ROLES = ['staff', 'former_staff', 'contractor', 'client
 // A foreman can only manage (edit/delete) accounts whose current role they're also allowed to assign —
 // owner and foreman accounts stay reserved for owners.
 const canManageTarget = computed(() => isAdmin.value || (isManager.value && (FOREMAN_ASSIGNABLE_ROLES as readonly string[]).includes(props.targetUser.role)));
+// Balances are the exception: a foreman can also edit/pay foreman balances, their own included.
+const canManageBalance = computed(() => canManageTarget.value || (isManager.value && props.targetUser.role === 'foreman'));
 // When the select is disabled (foreman viewing an account they can't manage), keep every role
 // listed so the current value still renders correctly instead of showing blank.
 const assignableRoles = computed(() => (isAdmin.value || !canManageTarget.value ? ALL_ROLES : FOREMAN_ASSIGNABLE_ROLES));
@@ -98,7 +100,7 @@ function payBalance() {
     isSubmittingBalance.value = true;
     router.put(
         urlFor('admin.users.updateBalance', { id: props.targetUser.id }),
-        { balance: 0 },
+        { balance: 0, action: 'pay' },
         {
             preserveScroll: true,
             onSuccess: () => {
@@ -166,7 +168,7 @@ function updateBarrelQuantity(entry: BarrelEntry, value: number) {
 
 <template>
     <div class="space-y-4">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-wrap items-center justify-between gap-2">
             <Button variant="outline" class="gap-2" as-child>
                 <Link :href="urlFor('admin.users.index')">
                     <ArrowLeft class="size-4" />
@@ -240,12 +242,12 @@ function updateBarrelQuantity(entry: BarrelEntry, value: number) {
             <Label for="balance">{{ $t('admin.users.show.fields.balance') }}</Label>
             <div class="flex items-center gap-2">
                 <div class="w-40">
-                    <Input id="balance" v-model.number="balance" type="number" step="0.01" min="0" :readonly="!canManageTarget" />
+                    <Input id="balance" v-model.number="balance" type="number" step="0.01" min="0" :readonly="!canManageBalance" />
                 </div>
-                <Button v-if="canManageTarget" size="sm" :loading="isSubmittingBalance" :disabled="isSubmittingBalance" @click="submitBalance">
+                <Button v-if="canManageBalance" size="sm" :loading="isSubmittingBalance" :disabled="isSubmittingBalance" @click="submitBalance">
                     {{ $t('admin.users.show.balance.save') }}
                 </Button>
-                <AlertDialog v-if="canManageTarget">
+                <AlertDialog v-if="canManageBalance">
                     <AlertDialogTrigger as-child>
                         <Button variant="outline" size="sm" class="gap-1" :disabled="isSubmittingBalance || balance <= 0">
                             <HandCoins class="size-4" />

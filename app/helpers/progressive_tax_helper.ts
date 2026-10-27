@@ -24,6 +24,18 @@ export function computeProgressiveTax(profit: number, brackets: TaxBracketInput[
 }
 
 /**
+ * Highest bracket reached by `profit` under the marginal system: its 1-based position and rate.
+ * Null when there's no profit (nothing is taxed) or no brackets configured.
+ */
+export function findTopBracket(profit: number, brackets: TaxBracketInput[]): { index: number; rate: number } | null {
+    if (profit <= 0 || !brackets.length) return null;
+
+    const index = brackets.findIndex((bracket) => bracket.upperBound === null || profit <= bracket.upperBound);
+    const topIndex = index === -1 ? brackets.length - 1 : index;
+    return { index: topIndex + 1, rate: brackets[topIndex].rate };
+}
+
+/**
  * Full-slab tax computation ("taxation progressive intégrale"): the whole `profit` is taxed at
  * the single rate of the tier it falls into, not split across tiers like `computeProgressiveTax`.
  * `tiers` must be ordered ascending, with only the last tier allowed a null `upperBound` (unbounded).

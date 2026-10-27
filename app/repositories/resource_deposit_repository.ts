@@ -76,7 +76,8 @@ export default class ResourceDepositRepository extends BaseRepository<typeof Res
         return Number(result?.$extras.total ?? 0);
     }
 
-    public async getWeeklyQuantityTotals(): Promise<Map<number, { totalQuantity: number; byOre: { resourceName: string; quantity: number }[] }>> {
+    /** Per-week deposited quantity — overall (every resource) and per ore, keyed by resource id. */
+    public async getWeeklyQuantityTotals(): Promise<Map<number, { totalQuantity: number; byOre: Map<string, number> }>> {
         const [deposits, resources] = await Promise.all([ResourceDeposit.query(), Resource.query()]);
         const resourceById = new Map(resources.map((resource) => [resource.id, resource]));
 
@@ -86,19 +87,13 @@ export default class ResourceDepositRepository extends BaseRepository<typeof Res
             const entry = byWeek.get(weekNumber) ?? { totalQuantity: 0, byOre: new Map<string, number>() };
             entry.totalQuantity += deposit.quantity;
 
-            const resource = resourceById.get(deposit.resourceId);
-            if (resource?.type === ResourceTypeEnum.MINERAI) {
-                entry.byOre.set(resource.name, (entry.byOre.get(resource.name) ?? 0) + deposit.quantity);
+            if (resourceById.get(deposit.resourceId)?.type === ResourceTypeEnum.MINERAI) {
+                entry.byOre.set(deposit.resourceId, (entry.byOre.get(deposit.resourceId) ?? 0) + deposit.quantity);
             }
 
             byWeek.set(weekNumber, entry);
         }
 
-        const result = new Map<number, { totalQuantity: number; byOre: { resourceName: string; quantity: number }[] }>();
-        for (const [weekNumber, entry] of byWeek) {
-            result.set(weekNumber, { totalQuantity: entry.totalQuantity, byOre: [...entry.byOre.entries()].map(([resourceName, quantity]) => ({ resourceName, quantity })) });
-        }
-
-        return result;
+        return byWeek;
     }
 }

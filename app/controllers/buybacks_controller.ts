@@ -36,9 +36,8 @@ export default class BuybacksController {
                     if (!resource) continue;
 
                     const quantity = await this.resourceBuybackRepository.buybackResourceFromBarrel({
-                        resourceId: item.resourceId,
+                        resource,
                         requestedQuantity: item.quantity,
-                        buyPrice: Number(resource.buyPrice),
                         batchId: batch.id,
                         trx,
                     });

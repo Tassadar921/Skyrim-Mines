@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup lang="ts" generic="M extends string">
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { Line } from 'vue-chartjs';
@@ -9,8 +9,8 @@ import { useTheme } from '~/lib/use_theme';
 
 ChartJS.register(CategoryScale, LinearScale, LineElement, PointElement, Filler, Tooltip);
 
-type OreQuantity = { resourceId: string; resourceName: string; quantity: number };
-type WeeklyOreStat = { weekNumber: number; totalQuantity: number; byOre: OreQuantity[] };
+// Generic over the metric keys (e.g. deliveries: quantity/saleValue/profit, deposits: quantity only).
+type WeeklyOreStat = { weekNumber: number; total: Record<M, number>; byOre: ({ resourceId: string; resourceName: string } & Record<M, number>)[] };
 
 const { t } = useI18n();
 const { theme } = useTheme();
@@ -18,6 +18,9 @@ const { theme } = useTheme();
 const props = defineProps<{
     weeklyOreStats: WeeklyOreStat[]; // reverse-chronological (current week first)
     ores: { resourceId: string; resourceName: string }[]; // ordered like the resources list
+    metric: M;
+    title: string;
+    formatValue: (value: number) => string;
 }>();
 
 const selected = ref<string>('total');
@@ -29,8 +32,8 @@ function onSelectChange(value: AcceptableValue) {
 const chronological = computed(() => [...props.weeklyOreStats].reverse());
 
 function valueForWeek(week: WeeklyOreStat): number {
-    if (selected.value === 'total') return week.totalQuantity;
-    return week.byOre.find((entry) => entry.resourceId === selected.value)?.quantity ?? 0;
+    if (selected.value === 'total') return week.total[props.metric];
+    return week.byOre.find((entry) => entry.resourceId === selected.value)?.[props.metric] ?? 0;
 }
 
 // Same theme-aware color approach as WeeklyMetricChart.vue, duplicated here so this chart stays self-contained.
@@ -98,7 +101,7 @@ const chartOptions = computed<ChartOptions<'line'>>(() => ({
             padding: 8,
             cornerRadius: 6,
             callbacks: {
-                label: (item: TooltipItem<'line'>) => numberFormat.format(item.parsed.y ?? 0),
+                label: (item: TooltipItem<'line'>) => props.formatValue(item.parsed.y ?? 0),
             },
         },
     },
@@ -118,14 +121,14 @@ const chartOptions = computed<ChartOptions<'line'>>(() => ({
 
 <template>
     <div class="rounded-md border p-4 space-y-4">
-        <div class="flex items-center justify-between gap-4">
-            <div class="text-sm font-medium">{{ t('admin.livraisons.stats.evolution.title') }}</div>
+        <div class="flex flex-wrap items-center justify-between gap-4">
+            <div class="text-sm font-medium">{{ title }}</div>
             <Select :model-value="selected" @update:model-value="onSelectChange">
-                <SelectTrigger class="w-56">
+                <SelectTrigger class="w-56 max-w-full">
                     <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                    <SelectItem value="total">{{ t('admin.livraisons.stats.evolution.total') }}</SelectItem>
+                    <SelectItem value="total">{{ t('admin.common.stats.allOres') }}</SelectItem>
                     <SelectItem v-for="ore in ores" :key="ore.resourceId" :value="ore.resourceId">{{ ore.resourceName }}</SelectItem>
                 </SelectContent>
             </Select>

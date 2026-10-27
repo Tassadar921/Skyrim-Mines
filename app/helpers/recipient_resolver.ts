@@ -35,7 +35,9 @@ export async function resolveRecipient(
         case 'myOrganization': {
             if (!user.organizationId) return null;
             if (options.organizationRoles && !options.organizationRoles.includes(user.organizationRole as OrganizationRoleEnum)) return null;
-            const organization = await deps.organizationRepository.findOrFail(user.organizationId);
+            const organization = await deps.organizationRepository.findEnabled(user.organizationId);
+            // A disabled organization can't order anymore: its members order in their own name.
+            if (!organization) return { organizationId: null, organizationName: null, recipientUserId: user.id, requesterName: user.username };
             return { organizationId: organization.id, organizationName: organization.name, recipientUserId: user.id, requesterName: user.username };
         }
         case 'myself': {
@@ -46,15 +48,17 @@ export async function resolveRecipient(
             const client = await deps.userRepository.findOrFail(data.recipientClientId);
             if (!isClientOrAuditor(client.role)) return null;
 
-            if (client.organizationId && data.recipientScope !== 'personal') {
-                const organization = await deps.organizationRepository.findOrFail(client.organizationId);
+            // A member of a disabled organization is treated as an independent client.
+            const organization = client.organizationId && data.recipientScope !== 'personal' ? await deps.organizationRepository.findEnabled(client.organizationId) : null;
+            if (organization) {
                 return { organizationId: organization.id, organizationName: organization.name, recipientUserId: client.id, requesterName: client.username };
             }
             return { organizationId: null, organizationName: null, recipientUserId: client.id, requesterName: client.username };
         }
         case 'thirdPartyOrganization': {
             if (!data.recipientOrganizationId) return null;
-            const organization = await deps.organizationRepository.findOrFail(data.recipientOrganizationId);
+            const organization = await deps.organizationRepository.findEnabled(data.recipientOrganizationId);
+            if (!organization) return null;
             return { organizationId: organization.id, organizationName: organization.name, recipientUserId: null, requesterName: user.username };
         }
         default:

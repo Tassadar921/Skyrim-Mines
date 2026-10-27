@@ -7,6 +7,7 @@ export default class OrganizationTransformer extends BaseTransformer<Organizatio
             id: this.resource.id,
             name: this.resource.name,
             castellanyId: this.resource.castellanyId,
+            enabled: this.resource.enabled,
         };
     }
 }

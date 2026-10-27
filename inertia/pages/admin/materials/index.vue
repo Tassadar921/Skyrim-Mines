@@ -81,8 +81,8 @@ function resetFilters() {
             </Button>
         </div>
 
-        <div class="flex items-center gap-4">
-            <Input :placeholder="t('admin.materials.search')" :model-value="searchValue" class="max-w-sm" @update:model-value="onSearchInput" />
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-center">
+            <Input :placeholder="t('admin.materials.search')" :model-value="searchValue" class="w-full lg:max-w-sm" @update:model-value="onSearchInput" />
             <Button variant="ghost" size="sm" class="gap-1" :disabled="!hasActiveFilters" @click="resetFilters">
                 <FilterX class="size-4" />
                 {{ t('admin.common.resetFilters') }}

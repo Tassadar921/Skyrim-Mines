@@ -196,7 +196,11 @@
             },
             "resetFilters": "Réinitialiser les filtres",
             "expand": "Afficher",
-            "collapse": "Réduire"
+            "collapse": "Réduire",
+            "stats": {
+                "allOres": "Total (tous minerais)",
+                "other": "Autres"
+            }
         },
         "layout": {
             "logout": "Se déconnecter",
@@ -212,6 +216,7 @@
                 "barrelRentals": "Location tonneau",
                 "buybacks": "Historique des rachats",
                 "expenses": "Dépenses",
+                "balanceChanges": "Historique des soldes",
                 "commandes": "Commandes",
                 "livraisons": "Livraisons",
                 "castellanies": "Châtelleries"
@@ -284,6 +289,8 @@
                 "profitHelp": "Bénéfice des livraisons − dépenses",
                 "weeklyTax": "Taxe hebdo",
                 "taxRate": "Taux appliqué",
+                "topBracket": "Tranche d'imposition la plus haute",
+                "topBracketValue": "Tranche {index} ({rate} %)",
                 "capital": "Capital",
                 "stockValue": "Valeur du stock",
                 "totalCapital": "Capital total",
@@ -454,7 +461,8 @@
                 "noOwner": "Aucun",
                 "actions": "Actions",
                 "view": "Voir",
-                "empty": "Aucune organisation trouvée"
+                "empty": "Aucune organisation trouvée",
+                "disabled": "Désactivée"
             },
             "create": {
                 "title": "Créer une organisation",
@@ -476,7 +484,9 @@
                     "description": "{name} sera supprimée définitivement. Ses membres deviendront des clients indépendants, leurs comptes ne seront pas supprimés.",
                     "cancel": "Annuler",
                     "confirm": "Supprimer"
-                }
+                },
+                "enabled": "Organisation active",
+                "enabledHint": "Désactivée, elle n'apparaît plus nulle part ailleurs que dans ce tableau : elle ne peut plus être choisie pour une commande ou un utilisateur, ses membres perdent l'accès à leur page d'organisation et à leurs prix custom, et leurs commandes passent à leur nom personnel."
             },
             "resourcePrices": {
                 "title": "Prix de vente custom",
@@ -538,7 +548,16 @@
             "show": {
                 "title": "Ressource",
                 "back": "Retour à la liste",
-                "save": "Enregistrer les modifications"
+                "save": "Enregistrer les modifications",
+                "buybackSplit": {
+                    "title": "Partage du prix de rachat",
+                    "enabled": "Activer le partage",
+                    "hint": "Au rachat, le mineur qui a déposé touche la part mineur ; la part commune est répartie à parts égales entre tous les autres mineurs et contremaîtres actifs.",
+                    "minerShare": "Part mineur",
+                    "sharedShare": "Part commune",
+                    "total": "Total : {total} s / {buyPrice} s",
+                    "mismatch": "Les deux parts doivent totaliser exactement le prix d'achat."
+                }
             },
             "recipe": {
                 "title": "Recette de fabrication",
@@ -645,6 +664,39 @@
                 "confirm": "Supprimer"
             }
         },
+        "balanceChanges": {
+            "title": "Historique des soldes",
+            "actions": {
+                "update": "Mise à jour",
+                "pay": "Paiement",
+                "rollback": "Annulation"
+            },
+            "table": {
+                "count": "modification | modification | modifications",
+                "search": "Rechercher une personne…",
+                "allWeeks": "Toutes les semaines",
+                "allActions": "Toutes les actions",
+                "weekBadge": "Semaine {week}",
+                "date": "Date",
+                "week": "Semaine",
+                "user": "Personne",
+                "action": "Action",
+                "previousBalance": "Ancien solde",
+                "newBalance": "Nouveau solde",
+                "difference": "Écart",
+                "changedBy": "Effectué par",
+                "empty": "Aucune modification de solde trouvée",
+                "rollback": "Rollback"
+            },
+            "rolledBack": "Annulée",
+            "rollback": {
+                "label": "Annuler",
+                "title": "Annuler cette modification de solde ?",
+                "description": "L'écart de {difference} sera inversé sur le solde actuel de {username}.",
+                "cancel": "Retour",
+                "confirm": "Annuler la modification"
+            }
+        },
         "commandes": {
             "title": "Commandes",
             "table": {
@@ -720,20 +772,30 @@
                 "stats": "Statistiques"
             },
             "stats": {
+                "metrics": {
+                    "quantity": "Volume",
+                    "saleValue": "Valeur de vente",
+                    "profit": "Bénéfice"
+                },
                 "oreTotals": {
-                    "title": "Quantités livrées par minerai",
+                    "title": {
+                        "quantity": "Quantités livrées par minerai",
+                        "saleValue": "Valeur de vente par minerai",
+                        "profit": "Bénéfice par minerai"
+                    },
                     "resource": "Minerai",
-                    "quantity": "Quantité livrée",
                     "total": "Total",
                     "empty": "Aucune livraison enregistrée"
                 },
                 "evolution": {
-                    "title": "Évolution des quantités livrées",
-                    "total": "Total (tous minerais)"
+                    "title": {
+                        "quantity": "Évolution des quantités livrées",
+                        "saleValue": "Évolution de la valeur de vente",
+                        "profit": "Évolution du bénéfice"
+                    }
                 },
                 "distribution": {
                     "allWeeks": "Toutes les semaines (total)",
-                    "other": "Autres",
                     "empty": "Aucune livraison sur cette période"
                 }
             },
@@ -857,7 +919,10 @@
         },
         "stocks": {
             "title": "Stocks",
-            "description": "Vue identique à la page « Stocks » publique. Les quantités « Acheté », la quantité dans le tonneau et les quantités de tous les matériaux peuvent être modifiées ici, à la main.",
+            "tabs": {
+                "stocks": "Stocks",
+                "stats": "Statistiques"
+            },
             "save": "Enregistrer les modifications",
             "externalBuyback": {
                 "trigger": "Réaliser un rachat externe",
@@ -876,6 +941,19 @@
                     "none": "—",
                     "units": "unités"
                 }
+            },
+            "stats": {
+                "oreTotals": {
+                    "title": "Quantités déposées par minerai",
+                    "resource": "Minerai",
+                    "quantity": "Quantité déposée",
+                    "total": "Total",
+                    "empty": "Aucun dépôt enregistré"
+                },
+                "allWeeks": "Toutes les semaines (total)",
+                "weekBadge": "Semaine {week}",
+                "distributionEmpty": "Aucun dépôt sur cette période",
+                "evolutionTitle": "Évolution des quantités déposées"
             }
         }
     }

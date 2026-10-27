@@ -2,7 +2,7 @@ import { type HttpContext } from '@adonisjs/core/http';
 import { DateTime } from 'luxon';
 import logger from '@adonisjs/core/services/logger';
 import transmit from '@adonisjs/transmit/services/main';
-import DeliveryRepository from '#repositories/delivery_repository';
+import DeliveryRepository, { type DeliveryStatValues } from '#repositories/delivery_repository';
 import ResourceRepository from '#repositories/resource_repository';
 import ResourceTypeEnum from '#types/enum/resource_type_enum';
 import { indexDeliveryValidator } from '#validators/admin/deliveries';
@@ -63,23 +63,34 @@ export default class LivraisonsController {
         // across weeks regardless of which ores actually had deliveries that week.
         const allResources = await this.resourceRepository.all();
         const ores = allResources.filter((resource) => resource.type === ResourceTypeEnum.MINERAI).map((resource) => ({ resourceId: resource.id, resourceName: resource.name }));
-        const weeklyQuantityTotals = await this.deliveryRepository.getWeeklyQuantityTotals();
+        const weeklyStats = await this.deliveryRepository.getWeeklyOreStats();
+        const emptyValues = { quantity: 0, saleValue: 0, profit: 0 };
 
-        const weeklyOreStats: { weekNumber: number; totalQuantity: number; byOre: { resourceId: string; resourceName: string; quantity: number }[] }[] = [];
+        type OreStat = { resourceId: string; resourceName: string } & DeliveryStatValues;
+        const weeklyOreStats: { weekNumber: number; total: DeliveryStatValues; byOre: OreStat[] }[] = [];
         for (let weekNumber = currentWeek; weekNumber >= 1; weekNumber--) {
-            const quantityEntry = weeklyQuantityTotals.get(weekNumber);
-            const byOreForWeek = new Map(quantityEntry?.byOre.map((entry) => [entry.resourceId, entry.quantity]) ?? []);
+            const entry = weeklyStats.get(weekNumber);
+            const byOreForWeek = new Map(entry?.byOre.map((ore) => [ore.resourceId, ore]) ?? []);
             weeklyOreStats.push({
                 weekNumber,
-                totalQuantity: quantityEntry?.totalQuantity ?? 0,
-                byOre: ores.map((ore) => ({ ...ore, quantity: byOreForWeek.get(ore.resourceId) ?? 0 })),
+                total: entry?.total ?? emptyValues,
+                byOre: ores.map((ore) => {
+                    const values = byOreForWeek.get(ore.resourceId);
+                    return { ...ore, quantity: values?.quantity ?? 0, saleValue: values?.saleValue ?? 0, profit: values?.profit ?? 0 };
+                }),
             });
         }
 
-        const oreTotals = ores.map((ore) => ({
-            ...ore,
-            quantity: weeklyOreStats.reduce((sum, weekEntry) => sum + (weekEntry.byOre.find((entry) => entry.resourceId === ore.resourceId)?.quantity ?? 0), 0),
-        }));
+        const oreTotals = ores.map((ore): OreStat => {
+            const totals = { ...ore, ...emptyValues };
+            for (const weekEntry of weeklyOreStats) {
+                const values = weekEntry.byOre.find((entry) => entry.resourceId === ore.resourceId);
+                totals.quantity += values?.quantity ?? 0;
+                totals.saleValue += values?.saleValue ?? 0;
+                totals.profit += values?.profit ?? 0;
+            }
+            return totals;
+        });
 
         return inertia.render('admin/livraisons/index', {
             deliveries: deliveries.all().map((delivery) => {

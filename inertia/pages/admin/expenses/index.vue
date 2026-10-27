@@ -138,7 +138,7 @@ function deleteExpense(id: string) {
             </div>
         </div>
 
-        <div class="flex items-center justify-between">
+        <div class="flex flex-wrap items-center justify-between gap-2">
             <Badge variant="outline">{{ meta.total }} {{ t('admin.expenses.table.count', meta.total) }}</Badge>
 
             <Dialog v-if="isManager" v-model:open="open">
@@ -167,10 +167,10 @@ function deleteExpense(id: string) {
             </Dialog>
         </div>
 
-        <div class="flex items-center gap-2">
-            <Input :placeholder="t('admin.expenses.table.search')" :model-value="searchValue" class="max-w-sm" @update:model-value="onSearchInput" />
+        <div class="flex flex-col gap-2 lg:flex-row lg:items-center">
+            <Input :placeholder="t('admin.expenses.table.search')" :model-value="searchValue" class="w-full lg:max-w-sm" @update:model-value="onSearchInput" />
             <Select :model-value="filters.week ? String(filters.week) : 'all'" @update:model-value="onWeekFilterChange">
-                <SelectTrigger class="w-56">
+                <SelectTrigger class="w-full lg:w-56">
                     <SelectValue />
                 </SelectTrigger>
                 <SelectContent>

@@ -103,7 +103,7 @@ function resetFilters() {
 
 <template>
     <div class="space-y-4">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-wrap items-center justify-between gap-2">
             <Badge variant="outline">{{ meta.total }} {{ $t('admin.users.table.userCount', meta.total) }}</Badge>
             <Button v-if="isManager" as-child class="gap-2">
                 <Link :href="urlFor('admin.users.create')">
@@ -113,10 +113,10 @@ function resetFilters() {
             </Button>
         </div>
 
-        <div class="flex items-center gap-4">
-            <Input :placeholder="$t('admin.users.table.username') + '…'" :model-value="searchValue" class="max-w-sm" @update:model-value="onSearchInput" />
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-center">
+            <Input :placeholder="$t('admin.users.table.username') + '…'" :model-value="searchValue" class="w-full lg:max-w-sm" @update:model-value="onSearchInput" />
             <Select :model-value="filters.role" @update:model-value="onRoleFilterChange">
-                <SelectTrigger class="w-48">
+                <SelectTrigger class="w-full lg:w-48">
                     <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -125,7 +125,7 @@ function resetFilters() {
                 </SelectContent>
             </Select>
             <Select :model-value="filters.enabled" @update:model-value="onEnabledFilterChange">
-                <SelectTrigger class="w-40">
+                <SelectTrigger class="w-full lg:w-40">
                     <SelectValue />
                 </SelectTrigger>
                 <SelectContent>

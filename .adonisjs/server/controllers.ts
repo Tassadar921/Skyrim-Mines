@@ -5,6 +5,7 @@
 
 export const controllers = {
   admin: {
+    BalanceChanges: () => import('#controllers/admin/balance_changes_controller'),
     Barrel: () => import('#controllers/admin/barrel_controller'),
     BarrelRentals: () => import('#controllers/admin/barrel_rentals_controller'),
     Buybacks: () => import('#controllers/admin/buybacks_controller'),

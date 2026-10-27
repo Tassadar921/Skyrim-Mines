@@ -835,6 +835,30 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/company_expenses_controller').default['destroy']>>>
     }
   }
+  'admin.balanceChanges.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/admin/balance-history'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: ExtractQueryForGet<InferInput<(typeof import('#validators/admin/balance_changes').indexBalanceChangeValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/balance_changes_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/balance_changes_controller').default['index']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'admin.balanceChanges.rollback': {
+    methods: ["POST"]
+    pattern: '/admin/balance-history/:id/rollback'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/balance_changes_controller').default['rollback']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/balance_changes_controller').default['rollback']>>>
+    }
+  }
   'admin.commandes.index': {
     methods: ["GET","HEAD"]
     pattern: '/admin/commandes'

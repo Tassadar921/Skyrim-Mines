@@ -47,7 +47,7 @@ function submit() {
 
 <template>
     <div class="space-y-4 max-w-lg">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-wrap items-center justify-between gap-2">
             <Button variant="outline" class="gap-2" as-child>
                 <Link :href="urlFor('admin.materials.index')">
                     <ArrowLeft class="size-4" />

@@ -85,18 +85,21 @@ watch(
                     </SidebarFooter>
                 </Sidebar>
                 <div class="min-h-screen flex flex-col w-full min-w-0">
-                    <nav class="flex items-center justify-between border-b w-full h-20 py-5">
-                        <div class="flex items-center px-5">
+                    <nav class="flex items-center justify-between gap-2 border-b w-full h-16 sm:h-20 py-3 sm:py-5">
+                        <div class="flex items-center shrink-0 px-2 sm:px-5">
                             <SidebarTrigger :size="32" class="p-4" />
                         </div>
 
-                        <h1 class="text-xl text-amber-700 dark:text-amber-400">{{ $t('admin.title') }} {{ pageTitle ? `- ${pageTitle}` : '' }}</h1>
+                        <h1 class="min-w-0 truncate text-center text-base sm:text-xl text-amber-700 dark:text-amber-400">
+                            <span v-if="pageTitle" class="hidden sm:inline">{{ $t('admin.title') }} -</span>
+                            {{ pageTitle || $t('admin.title') }}
+                        </h1>
 
-                        <div class="px-5">
+                        <div class="shrink-0 px-2 sm:px-5">
                             <UserToolbar />
                         </div>
                     </nav>
-                    <div class="py-6 px-4">
+                    <div class="py-4 px-3 sm:py-6 sm:px-4">
                         <slot />
                     </div>
                 </div>

@@ -63,7 +63,7 @@ function submit() {
 
 <template>
     <div class="space-y-6 max-w-3xl">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-wrap items-center justify-between gap-2">
             <Button variant="outline" class="gap-2" as-child>
                 <Link :route="'admin.resources.show'" :params="{ id: resource.id }">
                     <ArrowLeft class="size-4" />

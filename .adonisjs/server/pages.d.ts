@@ -9,6 +9,7 @@ type ExtractProps<T> = Omit<
 
 declare module '@adonisjs/inertia/types' {
   export interface InertiaPages {
+    'admin/balance-changes/index': ExtractProps<(typeof import('../../inertia/pages/admin/balance-changes/index.vue'))['default']>
     'admin/barrel-rentals/index': ExtractProps<(typeof import('../../inertia/pages/admin/barrel-rentals/index.vue'))['default']>
     'admin/barrel-rentals/show': ExtractProps<(typeof import('../../inertia/pages/admin/barrel-rentals/show.vue'))['default']>
     'admin/buybacks/index': ExtractProps<(typeof import('../../inertia/pages/admin/buybacks/index.vue'))['default']>

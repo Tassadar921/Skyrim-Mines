@@ -1,4 +1,5 @@
 import vine from '@vinejs/vine';
+import BalanceChangeActionEnum from '#types/enum/balance_change_action_enum';
 import UserRoleEnum from '#types/enum/user_role_enum';
 import OrganizationRoleEnum from '#types/enum/organization_role_enum';
 
@@ -20,6 +21,7 @@ export const updateUserValidator = vine.create({
 
 export const updateUserBalanceValidator = vine.create({
     balance: vine.number().min(0),
+    action: vine.enum(Object.values(BalanceChangeActionEnum)).optional(),
 });
 
 export const updateUserAvatarValidator = vine.create({

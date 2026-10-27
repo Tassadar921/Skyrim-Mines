@@ -367,7 +367,7 @@ function submit() {
             </div>
         </div>
 
-        <div class="flex items-center justify-between gap-4 rounded-md border p-4">
+        <div class="flex flex-wrap items-center justify-between gap-4 rounded-md border p-4">
             <div class="text-lg">
                 <span class="text-slate-600 dark:text-slate-300">{{ t('commande.totalValue') }}</span>
                 <span class="font-medium text-slate-800 dark:text-slate-100 ml-2">{{ totalAmount.toFixed(2) }} s</span>

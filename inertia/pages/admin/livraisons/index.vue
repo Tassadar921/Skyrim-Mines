@@ -14,8 +14,8 @@ import { Badge } from '~/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '~/components/ui/tabs';
 import DeleteButton from '~/components/ui/DeleteButton.vue';
-import DeliveryQuantityEvolutionChart from '~/partials/livraisons/DeliveryQuantityEvolutionChart.vue';
-import DeliveryOreDistributionChart from '~/partials/livraisons/DeliveryOreDistributionChart.vue';
+import OreEvolutionChart from '~/partials/stats/OreEvolutionChart.vue';
+import OreDistributionChart from '~/partials/stats/OreDistributionChart.vue';
 import {
     AlertDialog,
     AlertDialogTrigger,
@@ -55,9 +55,11 @@ type WeeklyTotal = {
 };
 
 type OreRef = { resourceId: string; resourceName: string };
-type OreQuantity = OreRef & { quantity: number };
-type WeeklyOreStat = { weekNumber: number; totalQuantity: number; byOre: OreQuantity[] };
-type Stats = { ores: OreRef[]; oreTotals: OreQuantity[]; weeklyOreStats: WeeklyOreStat[] };
+type StatValues = { quantity: number; saleValue: number; profit: number };
+type OreStat = OreRef & StatValues;
+type WeeklyOreStat = { weekNumber: number; total: StatValues; byOre: OreStat[] };
+type Stats = { ores: OreRef[]; oreTotals: OreStat[]; weeklyOreStats: WeeklyOreStat[] };
+type StatsMetric = keyof StatValues;
 
 const { t } = useI18n();
 const { pageTitle } = useAdminLayout();
@@ -178,10 +180,22 @@ function onStatsWeekFilterChange(value: AcceptableValue) {
     statsWeekFilter.value = String(value ?? 'all');
 }
 
-const statsOreData = computed<OreQuantity[]>(() => {
-    if (statsWeekFilter.value === 'all') return props.stats.oreTotals;
+// Metric shared by the whole statistics tab: delivered volume, sale value or profit.
+const STATS_METRICS: StatsMetric[] = ['quantity', 'saleValue', 'profit'];
+const statsMetric = ref<StatsMetric>('quantity');
+
+function onStatsMetricChange(value: AcceptableValue) {
+    statsMetric.value = (value as StatsMetric) ?? 'quantity';
+}
+
+function formatStatValue(value: number): string {
+    return statsMetric.value === 'quantity' ? String(value) : `${value.toFixed(2)} s`;
+}
+
+const statsOreData = computed<(OreRef & { value: number })[]>(() => {
     const weekNumber = Number(statsWeekFilter.value);
-    return props.stats.weeklyOreStats.find((week) => week.weekNumber === weekNumber)?.byOre ?? props.stats.oreTotals;
+    const source = statsWeekFilter.value === 'all' ? props.stats.oreTotals : (props.stats.weeklyOreStats.find((week) => week.weekNumber === weekNumber)?.byOre ?? props.stats.oreTotals);
+    return source.map((ore) => ({ resourceId: ore.resourceId, resourceName: ore.resourceName, value: ore[statsMetric.value] }));
 });
 </script>
 
@@ -194,7 +208,7 @@ const statsOreData = computed<OreQuantity[]>(() => {
             </TabsList>
 
             <TabsContent value="livraisons" class="space-y-4">
-                <div class="flex items-center justify-between">
+                <div class="flex flex-wrap items-center justify-between gap-2">
                     <Badge variant="outline">{{ meta.total }} {{ t('admin.livraisons.table.count', meta.total) }}</Badge>
 
                     <AlertDialog v-if="isManager && pendingStockDeductionCount > 0">
@@ -239,10 +253,10 @@ const statsOreData = computed<OreQuantity[]>(() => {
                     </div>
                 </div>
 
-                <div class="flex items-center gap-2">
-                    <Input :placeholder="t('admin.livraisons.table.search')" :model-value="searchValue" class="max-w-sm" @update:model-value="onSearchInput" />
+                <div class="flex flex-col gap-2 lg:flex-row lg:items-center">
+                    <Input :placeholder="t('admin.livraisons.table.search')" :model-value="searchValue" class="w-full lg:max-w-sm" @update:model-value="onSearchInput" />
                     <Select :model-value="filters.week ? String(filters.week) : 'all'" @update:model-value="onWeekFilterChange">
-                        <SelectTrigger class="w-56">
+                        <SelectTrigger class="w-full lg:w-56">
                             <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -404,19 +418,29 @@ const statsOreData = computed<OreQuantity[]>(() => {
             </TabsContent>
 
             <TabsContent value="stats" class="space-y-4">
-                <div class="flex items-center justify-between gap-4">
-                    <div class="text-sm font-medium">{{ t('admin.livraisons.stats.oreTotals.title') }}</div>
-                    <Select :model-value="statsWeekFilter" @update:model-value="onStatsWeekFilterChange">
-                        <SelectTrigger class="w-56">
-                            <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all">{{ t('admin.livraisons.stats.distribution.allWeeks') }}</SelectItem>
-                            <SelectItem v-for="weeklyTotal in weeklyTotals" :key="weeklyTotal.weekNumber" :value="String(weeklyTotal.weekNumber)">
-                                {{ t('admin.livraisons.table.weekBadge', { week: weeklyTotal.weekNumber }) }}
-                            </SelectItem>
-                        </SelectContent>
-                    </Select>
+                <div class="flex flex-wrap items-center justify-between gap-4">
+                    <div class="text-sm font-medium">{{ t(`admin.livraisons.stats.oreTotals.title.${statsMetric}`) }}</div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <Select :model-value="statsMetric" @update:model-value="onStatsMetricChange">
+                            <SelectTrigger class="w-44 max-w-full">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem v-for="metric in STATS_METRICS" :key="metric" :value="metric">{{ t(`admin.livraisons.stats.metrics.${metric}`) }}</SelectItem>
+                            </SelectContent>
+                        </Select>
+                        <Select :model-value="statsWeekFilter" @update:model-value="onStatsWeekFilterChange">
+                            <SelectTrigger class="w-56 max-w-full">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">{{ t('admin.livraisons.stats.distribution.allWeeks') }}</SelectItem>
+                                <SelectItem v-for="weeklyTotal in weeklyTotals" :key="weeklyTotal.weekNumber" :value="String(weeklyTotal.weekNumber)">
+                                    {{ t('admin.livraisons.table.weekBadge', { week: weeklyTotal.weekNumber }) }}
+                                </SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
                 </div>
 
                 <div class="grid gap-4 md:grid-cols-2">
@@ -425,18 +449,18 @@ const statsOreData = computed<OreQuantity[]>(() => {
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>{{ t('admin.livraisons.stats.oreTotals.resource') }}</TableHead>
-                                    <TableHead>{{ t('admin.livraisons.stats.oreTotals.quantity') }}</TableHead>
+                                    <TableHead>{{ t(`admin.livraisons.stats.metrics.${statsMetric}`) }}</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 <template v-if="statsOreData.length">
                                     <TableRow v-for="ore in statsOreData" :key="ore.resourceId">
                                         <TableCell class="text-sm font-medium">{{ ore.resourceName }}</TableCell>
-                                        <TableCell class="text-sm text-muted-foreground">{{ ore.quantity }}</TableCell>
+                                        <TableCell class="text-sm text-muted-foreground">{{ formatStatValue(ore.value) }}</TableCell>
                                     </TableRow>
                                     <TableRow>
                                         <TableCell class="text-sm font-medium">{{ t('admin.livraisons.stats.oreTotals.total') }}</TableCell>
-                                        <TableCell class="text-sm font-medium">{{ statsOreData.reduce((sum, ore) => sum + ore.quantity, 0) }}</TableCell>
+                                        <TableCell class="text-sm font-medium">{{ formatStatValue(statsOreData.reduce((sum, ore) => sum + ore.value, 0)) }}</TableCell>
                                     </TableRow>
                                 </template>
                                 <TableRow v-else>
@@ -449,11 +473,17 @@ const statsOreData = computed<OreQuantity[]>(() => {
                     </div>
 
                     <div class="rounded-md border p-4">
-                        <DeliveryOreDistributionChart :data="statsOreData" />
+                        <OreDistributionChart :data="statsOreData" :format-value="formatStatValue" :empty-label="t('admin.livraisons.stats.distribution.empty')" />
                     </div>
                 </div>
 
-                <DeliveryQuantityEvolutionChart :weekly-ore-stats="stats.weeklyOreStats" :ores="stats.ores" />
+                <OreEvolutionChart
+                    :weekly-ore-stats="stats.weeklyOreStats"
+                    :ores="stats.ores"
+                    :metric="statsMetric"
+                    :title="t(`admin.livraisons.stats.evolution.title.${statsMetric}`)"
+                    :format-value="formatStatValue"
+                />
             </TabsContent>
         </Tabs>
     </div>

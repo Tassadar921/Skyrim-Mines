@@ -73,6 +73,8 @@ export type ScannedRoutes = {
     'admin.expenses.index': { paramsTuple?: []; params?: {} }
     'admin.expenses.store': { paramsTuple?: []; params?: {} }
     'admin.expenses.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.balanceChanges.index': { paramsTuple?: []; params?: {} }
+    'admin.balanceChanges.rollback': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.commandes.index': { paramsTuple?: []; params?: {} }
     'admin.commandes.validate': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.commandes.cancel': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -131,6 +133,7 @@ export type ScannedRoutes = {
     'admin.stocks.index': { paramsTuple?: []; params?: {} }
     'admin.buybacks.index': { paramsTuple?: []; params?: {} }
     'admin.expenses.index': { paramsTuple?: []; params?: {} }
+    'admin.balanceChanges.index': { paramsTuple?: []; params?: {} }
     'admin.commandes.index': { paramsTuple?: []; params?: {} }
     'admin.orderArchives.create': { paramsTuple?: []; params?: {} }
     'admin.livraisons.index': { paramsTuple?: []; params?: {} }
@@ -168,6 +171,7 @@ export type ScannedRoutes = {
     'admin.stocks.index': { paramsTuple?: []; params?: {} }
     'admin.buybacks.index': { paramsTuple?: []; params?: {} }
     'admin.expenses.index': { paramsTuple?: []; params?: {} }
+    'admin.balanceChanges.index': { paramsTuple?: []; params?: {} }
     'admin.commandes.index': { paramsTuple?: []; params?: {} }
     'admin.orderArchives.create': { paramsTuple?: []; params?: {} }
     'admin.livraisons.index': { paramsTuple?: []; params?: {} }
@@ -193,6 +197,7 @@ export type ScannedRoutes = {
     'admin.castellanies.store': { paramsTuple?: []; params?: {} }
     'admin.stocks.externalBuyback': { paramsTuple?: []; params?: {} }
     'admin.expenses.store': { paramsTuple?: []; params?: {} }
+    'admin.balanceChanges.rollback': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.orderArchives.store': { paramsTuple?: []; params?: {} }
     'admin.livraisons.deductStockAll': { paramsTuple?: []; params?: {} }
     'admin.barrelRentals.store': { paramsTuple?: []; params?: {} }

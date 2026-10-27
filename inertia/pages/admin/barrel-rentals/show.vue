@@ -83,7 +83,7 @@ function submitPayment() {
 
 <template>
     <div class="space-y-6">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-wrap items-center justify-between gap-2">
             <Button variant="outline" class="gap-2" as-child>
                 <Link :href="urlFor('admin.barrelRentals.index')">
                     <ArrowLeft class="size-4" />
@@ -101,7 +101,7 @@ function submitPayment() {
             />
         </div>
 
-        <div class="flex items-center gap-3">
+        <div class="flex flex-wrap items-center gap-3">
             <h2 class="text-lg font-medium">{{ props.rental.label }}</h2>
             <span v-if="props.rental.username" class="inline-flex items-center gap-2 text-sm text-muted-foreground">
                 {{ props.rental.username }}

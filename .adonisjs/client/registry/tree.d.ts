@@ -115,6 +115,10 @@ export interface ApiDefinition {
       store: typeof routes['admin.expenses.store']
       destroy: typeof routes['admin.expenses.destroy']
     }
+    balanceChanges: {
+      index: typeof routes['admin.balanceChanges.index']
+      rollback: typeof routes['admin.balanceChanges.rollback']
+    }
     commandes: {
       index: typeof routes['admin.commandes.index']
       validate: typeof routes['admin.commandes.validate']

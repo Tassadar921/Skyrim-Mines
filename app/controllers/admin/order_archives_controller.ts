@@ -13,7 +13,7 @@ import CastellanyTransformer from '#transformers/castellany_transformer';
 import OrganizationRoleEnum from '#types/enum/organization_role_enum';
 import { createOrderArchiveValidator } from '#validators/admin/order_archives';
 import { resolveRecipient } from '#helpers/recipient_resolver';
-import { getWeekNumber, getWeekRange } from '#helpers/game_week_helper';
+import { GAME_TIMEZONE, getWeekNumber, getWeekRange } from '#helpers/game_week_helper';
 
 const ORGANIZATION_ORDER_ROLES = [OrganizationRoleEnum.OWNER, OrganizationRoleEnum.ADMIN];
 
@@ -32,7 +32,7 @@ export default class OrderArchivesController {
         const [resources, clientUsers, allOrganizations, allResourcePrices, castellanies] = await Promise.all([
             this.resourceRepository.all(),
             this.userRepository.findAllClients(),
-            this.organizationRepository.all(),
+            this.organizationRepository.allEnabled(),
             this.organizationResourcePriceRepository.allGroupedByOrganization(),
             this.castellanyRepository.all(),
         ]);
@@ -51,7 +51,8 @@ export default class OrderArchivesController {
             clients: clientUsers.map((client) => ({
                 id: client.id,
                 username: client.username,
-                organizationId: client.organizationId,
+                // Members of a disabled organization are offered as independent clients.
+                organizationId: client.organizationId && organizationNameById.has(client.organizationId) ? client.organizationId : null,
                 organizationName: client.organizationId ? (organizationNameById.get(client.organizationId) ?? null) : null,
                 defaultCastellanyId: client.organizationId ? (organizationCastellanyById.get(client.organizationId) ?? null) : null,
             })),
@@ -140,7 +141,8 @@ export default class OrderArchivesController {
 
             const remaining = await this.deliveryRepository.remainingQuantities(order.id);
             const deliveryLines = remaining.map((line) => ({ orderLineId: line.orderLineId, quantity: line.remainingQuantity }));
-            const deliveredAt = getWeekRange(deliveryWeek).start;
+            // Current week: archived as delivered right now. Past week: Monday 00:01 (game time) of that week.
+            const deliveredAt = deliveryWeek === currentWeek ? DateTime.now() : DateTime.fromISO(getWeekRange(deliveryWeek).start.toISODate()!, { zone: GAME_TIMEZONE }).set({ minute: 1 });
 
             const delivery = await this.deliveryRepository.createForOrder(order.id, admin.id, deliveryLines, { deliveredAt, castellanyId: castellanyId ?? null });
 

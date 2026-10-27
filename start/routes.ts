@@ -47,6 +47,7 @@ const readOnly = middleware.admin({ roles: [UserRoleEnum.ADMIN, UserRoleEnum.AUD
 // users, organizations, stocks, barrel rentals, expenses, commandes, livraisons.
 const foremanAccess = middleware.admin({ roles: [UserRoleEnum.ADMIN, UserRoleEnum.AUDITOR, UserRoleEnum.FOREMAN] });
 const foremanManage = middleware.admin({ roles: [UserRoleEnum.ADMIN, UserRoleEnum.FOREMAN] });
+const adminOnly = middleware.admin({ roles: [UserRoleEnum.ADMIN] });
 
 router
     .group((): void => {
@@ -110,6 +111,9 @@ router
         router.get('/expenses', [controllers.admin.CompanyExpenses, 'index']).as('admin.expenses.index').use(foremanAccess);
         router.post('/expenses', [controllers.admin.CompanyExpenses, 'store']).as('admin.expenses.store').use(foremanManage);
         router.delete('/expenses/:id', [controllers.admin.CompanyExpenses, 'destroy']).as('admin.expenses.destroy').use(foremanManage);
+
+        router.get('/balance-history', [controllers.admin.BalanceChanges, 'index']).as('admin.balanceChanges.index').use(readOnly);
+        router.post('/balance-history/:id/rollback', [controllers.admin.BalanceChanges, 'rollback']).as('admin.balanceChanges.rollback').use(adminOnly);
 
         router.get('/commandes', [controllers.admin.Commandes, 'index']).as('admin.commandes.index').use(foremanAccess);
         router.patch('/commandes/:id/validate', [controllers.admin.Commandes, 'validate']).as('admin.commandes.validate').use(foremanManage);

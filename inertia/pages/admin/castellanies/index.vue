@@ -75,7 +75,7 @@ function resetFilters() {
 
 <template>
     <div class="space-y-4">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-wrap items-center justify-between gap-2">
             <Badge variant="outline">{{ meta.total }}</Badge>
             <Button v-if="isAdmin" as-child class="gap-2">
                 <Link :href="urlFor('admin.castellanies.create')">
@@ -85,8 +85,8 @@ function resetFilters() {
             </Button>
         </div>
 
-        <div class="flex items-center gap-4">
-            <Input :placeholder="t('admin.castellanies.table.name') + '…'" :model-value="searchValue" class="max-w-sm" @update:model-value="onSearchInput" />
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-center">
+            <Input :placeholder="t('admin.castellanies.table.name') + '…'" :model-value="searchValue" class="w-full lg:max-w-sm" @update:model-value="onSearchInput" />
             <Button variant="ghost" size="sm" class="gap-1" :disabled="!hasActiveFilters" @click="resetFilters">
                 <FilterX class="size-4" />
                 {{ t('admin.common.resetFilters') }}

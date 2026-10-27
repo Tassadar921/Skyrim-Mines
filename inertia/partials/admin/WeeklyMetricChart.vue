@@ -146,10 +146,10 @@ const chartOptions = computed<ChartOptions<'line'>>(() => ({
 
 <template>
     <div class="rounded-md border p-4 space-y-4">
-        <div class="flex items-center justify-between gap-4">
+        <div class="flex flex-wrap items-center justify-between gap-4">
             <div class="text-sm font-medium">{{ t('admin.dashboard.chart.title') }}</div>
             <Select :model-value="selectedMetric" @update:model-value="onMetricChange">
-                <SelectTrigger class="w-56">
+                <SelectTrigger class="w-56 max-w-full">
                     <SelectValue />
                 </SelectTrigger>
                 <SelectContent>

@@ -42,12 +42,18 @@ export default class ResourceRepository extends BaseRepository<typeof Resource> 
         });
     }
 
-    public async update(id: string, data: { name: string; type: ResourceTypeEnum; buyPrice: string; sellPrice: string }): Promise<Resource> {
+    public async update(
+        id: string,
+        data: { name: string; type: ResourceTypeEnum; buyPrice: string; sellPrice: string; buybackSplit: { minerShare: string; sharedShare: string } | null },
+    ): Promise<Resource> {
         const resource = await Resource.findOrFail(id);
         resource.name = data.name;
         resource.type = data.type;
         resource.buyPrice = data.buyPrice;
         resource.sellPrice = data.sellPrice;
+        resource.buybackSplitEnabled = data.buybackSplit !== null;
+        resource.minerShare = data.buybackSplit?.minerShare ?? null;
+        resource.sharedShare = data.buybackSplit?.sharedShare ?? null;
         await resource.save();
         return resource;
     }

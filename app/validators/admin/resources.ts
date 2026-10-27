@@ -8,7 +8,15 @@ export const createResourceValidator = vine.create({
     sellPrice: vine.number().min(0),
 });
 
-export const updateResourceValidator = createResourceValidator;
+export const updateResourceValidator = vine.create({
+    name: vine.string().trim().minLength(1).maxLength(100),
+    type: vine.enum(Object.values(ResourceTypeEnum)),
+    buyPrice: vine.number().min(0),
+    sellPrice: vine.number().min(0),
+    buybackSplitEnabled: vine.boolean().optional(),
+    minerShare: vine.number().min(0).optional(),
+    sharedShare: vine.number().min(0).optional(),
+});
 
 export const indexResourceValidator = vine.create({
     mineraiPage: vine.number().min(1).optional(),

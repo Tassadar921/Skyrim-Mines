@@ -29,6 +29,8 @@ export type DeliveryLineInput = {
     quantity: number;
 };
 
+export type DeliveryStatValues = { quantity: number; saleValue: number; profit: number };
+
 export default class DeliveryRepository extends BaseRepository<typeof Delivery> {
     constructor(
         private readonly resourceRecipeLineRepository: ResourceRecipeLineRepository = new ResourceRecipeLineRepository(),
@@ -183,9 +185,8 @@ export default class DeliveryRepository extends BaseRepository<typeof Delivery> 
                 }
 
                 const boughtBack = await this.resourceBuybackRepository.buybackResourceFromBarrel({
-                    resourceId: line.resourceId,
+                    resource,
                     requestedQuantity: shortfall,
-                    buyPrice: Number(resource.buyPrice),
                     batchId,
                     trx,
                 });
@@ -267,7 +268,8 @@ export default class DeliveryRepository extends BaseRepository<typeof Delivery> 
         return q.paginate(page, perPage);
     }
 
-    public async getWeeklyQuantityTotals(): Promise<Map<number, { totalQuantity: number; byOre: { resourceId: string; resourceName: string; quantity: number }[] }>> {
+    /** Per-week delivered quantity, sale value and profit — overall (every resource) and per ore. Lines without a known cost count as 0 profit. */
+    public async getWeeklyOreStats(): Promise<Map<number, { total: DeliveryStatValues; byOre: (DeliveryStatValues & { resourceId: string; resourceName: string })[] }>> {
         const rows = await db
             .from('deliveries')
             .join('delivery_lines', 'delivery_lines.delivery_id', 'deliveries.id')
@@ -278,15 +280,19 @@ export default class DeliveryRepository extends BaseRepository<typeof Delivery> 
                 'delivery_lines.resource_type as resourceType',
             )
             .sum('delivery_lines.quantity as quantity')
+            .select(db.raw('SUM(delivery_lines.quantity * delivery_lines.unit_price) as "saleValue"'))
+            .select(db.raw('SUM(delivery_lines.profit) as "profit"'))
             .groupBy('deliveries.delivered_week_number', 'delivery_lines.resource_id', 'delivery_lines.resource_name', 'delivery_lines.resource_type');
 
-        const result = new Map<number, { totalQuantity: number; byOre: { resourceId: string; resourceName: string; quantity: number }[] }>();
+        const result = new Map<number, { total: DeliveryStatValues; byOre: (DeliveryStatValues & { resourceId: string; resourceName: string })[] }>();
         for (const row of rows) {
-            const quantity = Number(row.quantity);
-            const entry = result.get(row.weekNumber) ?? { totalQuantity: 0, byOre: [] };
-            entry.totalQuantity += quantity;
+            const values: DeliveryStatValues = { quantity: Number(row.quantity), saleValue: Number(row.saleValue ?? 0), profit: Number(row.profit ?? 0) };
+            const entry = result.get(row.weekNumber) ?? { total: { quantity: 0, saleValue: 0, profit: 0 }, byOre: [] };
+            entry.total.quantity += values.quantity;
+            entry.total.saleValue += values.saleValue;
+            entry.total.profit += values.profit;
             if (row.resourceType === ResourceTypeEnum.MINERAI && row.resourceId) {
-                entry.byOre.push({ resourceId: row.resourceId, resourceName: row.resourceName, quantity });
+                entry.byOre.push({ resourceId: row.resourceId, resourceName: row.resourceName, ...values });
             }
             result.set(row.weekNumber, entry);
         }

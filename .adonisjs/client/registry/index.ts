@@ -420,6 +420,18 @@ const routes = {
     tokens: [{"old":"/admin/expenses/:id","type":0,"val":"admin","end":""},{"old":"/admin/expenses/:id","type":0,"val":"expenses","end":""},{"old":"/admin/expenses/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['admin.expenses.destroy']['types'],
   },
+  'admin.balanceChanges.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/admin/balance-history',
+    tokens: [{"old":"/admin/balance-history","type":0,"val":"admin","end":""},{"old":"/admin/balance-history","type":0,"val":"balance-history","end":""}],
+    types: placeholder as Registry['admin.balanceChanges.index']['types'],
+  },
+  'admin.balanceChanges.rollback': {
+    methods: ["POST"],
+    pattern: '/admin/balance-history/:id/rollback',
+    tokens: [{"old":"/admin/balance-history/:id/rollback","type":0,"val":"admin","end":""},{"old":"/admin/balance-history/:id/rollback","type":0,"val":"balance-history","end":""},{"old":"/admin/balance-history/:id/rollback","type":1,"val":"id","end":""},{"old":"/admin/balance-history/:id/rollback","type":0,"val":"rollback","end":""}],
+    types: placeholder as Registry['admin.balanceChanges.rollback']['types'],
+  },
   'admin.commandes.index': {
     methods: ["GET","HEAD"],
     pattern: '/admin/commandes',

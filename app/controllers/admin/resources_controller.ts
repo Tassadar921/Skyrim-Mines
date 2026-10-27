@@ -74,12 +74,21 @@ export default class ResourcesController {
     public async update({ request, params, response, session, i18n }: HttpContext) {
         const data = await request.validateUsing(updateResourceValidator);
 
+        // Split shares must add up exactly (to the cent) to the buy price.
+        const toCents = (value: number) => Math.round(value * 100);
+        const buybackSplit = data.buybackSplitEnabled ? { minerShare: data.minerShare ?? 0, sharedShare: data.sharedShare ?? 0 } : null;
+        if (buybackSplit && toCents(buybackSplit.minerShare) + toCents(buybackSplit.sharedShare) !== toCents(data.buyPrice)) {
+            session.flash('error', i18n.t('messages.admin.resources.update.buybackSplitMismatch'));
+            return response.redirect().back();
+        }
+
         try {
             await this.resourceRepository.update(params.id, {
                 name: data.name,
                 type: data.type,
                 buyPrice: String(data.buyPrice),
                 sellPrice: String(data.sellPrice),
+                buybackSplit: buybackSplit && { minerShare: buybackSplit.minerShare.toFixed(2), sharedShare: buybackSplit.sharedShare.toFixed(2) },
             });
             session.flash('success', i18n.t('messages.admin.resources.update.success'));
         } catch (e) {

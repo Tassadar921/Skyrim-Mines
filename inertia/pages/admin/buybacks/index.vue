@@ -139,7 +139,7 @@ function resetFilters() {
 
 <template>
     <div class="space-y-4">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-wrap items-center justify-between gap-2">
             <Badge variant="outline">{{ meta.total }} {{ t('admin.buybacks.table.count', meta.total) }}</Badge>
         </div>
 
@@ -165,10 +165,10 @@ function resetFilters() {
             </div>
         </div>
 
-        <div class="flex items-center gap-2">
-            <Input :placeholder="t('admin.buybacks.table.search')" :model-value="searchValue" class="max-w-sm" @update:model-value="onSearchInput" />
+        <div class="flex flex-col gap-2 lg:flex-row lg:items-center">
+            <Input :placeholder="t('admin.buybacks.table.search')" :model-value="searchValue" class="w-full lg:max-w-sm" @update:model-value="onSearchInput" />
             <Select :model-value="filters.week ? String(filters.week) : 'all'" @update:model-value="onWeekFilterChange">
-                <SelectTrigger class="w-56">
+                <SelectTrigger class="w-full lg:w-56">
                     <SelectValue />
                 </SelectTrigger>
                 <SelectContent>

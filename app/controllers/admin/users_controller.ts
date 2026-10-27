@@ -10,6 +10,7 @@ import ResourceBarrelAdjustmentRepository from '#repositories/resource_barrel_ad
 import UserTransformer from '#transformers/user_transformer';
 import OrganizationTransformer from '#transformers/organization_transformer';
 import UserRoleEnum from '#types/enum/user_role_enum';
+import BalanceChangeActionEnum from '#types/enum/balance_change_action_enum';
 import type OrganizationRoleEnum from '#types/enum/organization_role_enum';
 import { isClientOrAuditor } from '#helpers/user_role_helper';
 import { computeBarrelQuantity } from '#helpers/resource_barrel_helper';
@@ -18,6 +19,7 @@ import { indexUserValidator, updateUserValidator, createUserValidator, updateUse
 
 /** Roles a foreman (contremaître) is allowed to assign or act on — owner and foreman accounts stay reserved for owners. */
 const FOREMAN_ASSIGNABLE_ROLES: UserRoleEnum[] = [UserRoleEnum.STAFF, UserRoleEnum.FORMER_STAFF, UserRoleEnum.CONTRACTOR, UserRoleEnum.CLIENT];
+const FOREMAN_BALANCE_ROLES: UserRoleEnum[] = [...FOREMAN_ASSIGNABLE_ROLES, UserRoleEnum.FOREMAN];
 
 export default class UsersController {
     constructor(
@@ -182,7 +184,7 @@ export default class UsersController {
     }
 
     public async updateBalance({ request, params, response, session, i18n, auth }: HttpContext) {
-        const { balance } = await request.validateUsing(updateUserBalanceValidator);
+        const { balance, action } = await request.validateUsing(updateUserBalanceValidator);
 
         try {
             const user = await this.userRepository.findOrFail(params.id);
@@ -191,12 +193,13 @@ export default class UsersController {
                 return response.redirect().back();
             }
 
-            if (auth.user!.role === UserRoleEnum.FOREMAN && !FOREMAN_ASSIGNABLE_ROLES.includes(user.role as UserRoleEnum)) {
+            // Unlike the rest of the profile, a foreman may also manage foreman balances (their own included).
+            if (auth.user!.role === UserRoleEnum.FOREMAN && !FOREMAN_BALANCE_ROLES.includes(user.role as UserRoleEnum)) {
                 session.flash('error', i18n.t('messages.admin.users.update.roleNotAllowed'));
                 return response.redirect().back();
             }
 
-            await this.userRepository.setBalance(params.id, balance);
+            await this.userRepository.setBalance(params.id, balance, { action: action ?? BalanceChangeActionEnum.UPDATE, changedBy: auth.user! });
             session.flash('success', i18n.t('messages.admin.users.balance.success'));
         } catch (e) {
             logger.error({ err: e }, 'users.updateBalance failed');
@@ -207,7 +210,7 @@ export default class UsersController {
     }
 
     public async create({ inertia }: HttpContext) {
-        const organizations = await this.organizationRepository.all();
+        const organizations = await this.organizationRepository.allEnabled();
 
         return inertia.render('admin/users/create', {
             organizations: organizations.map((o) => new OrganizationTransformer(o).toObject()),
@@ -240,7 +243,7 @@ export default class UsersController {
                 }
 
                 if (data.organizationMode === 'existing') {
-                    if (!data.organizationId) {
+                    if (!data.organizationId || !(await this.organizationRepository.findEnabled(data.organizationId))) {
                         session.flash('error', i18n.t('messages.admin.users.create.missingOrganization'));
                         return response.redirect().back();
                     }

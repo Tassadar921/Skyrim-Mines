@@ -156,7 +156,8 @@
             },
             "update": {
                 "success": "Ressource mise à jour avec succès",
-                "error": "Erreur lors de la mise à jour de la ressource"
+                "error": "Erreur lors de la mise à jour de la ressource",
+                "buybackSplitMismatch": "La part mineur et la part commune doivent totaliser exactement le prix d'achat"
             },
             "destroy": {
                 "success": "Ressource supprimée avec succès",
@@ -258,6 +259,14 @@
             "destroy": {
                 "success": "Dépense supprimée avec succès",
                 "error": "Erreur lors de la suppression de la dépense"
+            }
+        },
+        "balanceChanges": {
+            "rollback": {
+                "success": "Modification de solde annulée",
+                "notAllowed": "Cette modification a déjà été annulée ou ne peut pas l'être",
+                "negative": "Annulation impossible : le solde actuel deviendrait négatif",
+                "error": "Erreur lors de l'annulation de la modification de solde"
             }
         }
     },

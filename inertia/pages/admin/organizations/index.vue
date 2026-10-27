@@ -20,7 +20,7 @@ const { pageTitle } = useAdminLayout();
 const { isManager } = useAuth();
 pageTitle.value = t('admin.organizations.title');
 
-type OrganizationLine = { id: string; name: string; memberCount: number; ownerUsernames: string[] };
+type OrganizationLine = { id: string; name: string; enabled: boolean; memberCount: number; ownerUsernames: string[] };
 
 const props = defineProps<{
     organizations: OrganizationLine[];
@@ -77,7 +77,7 @@ function resetFilters() {
 
 <template>
     <div class="space-y-4">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-wrap items-center justify-between gap-2">
             <Badge variant="outline">{{ meta.total }} {{ t('admin.organizations.table.count', meta.total) }}</Badge>
             <Button v-if="isManager" as-child class="gap-2">
                 <Link :href="urlFor('admin.organizations.create')">
@@ -87,8 +87,8 @@ function resetFilters() {
             </Button>
         </div>
 
-        <div class="flex items-center gap-2">
-            <Input :placeholder="t('admin.organizations.table.search')" :model-value="searchValue" class="max-w-sm" @update:model-value="onSearchInput" />
+        <div class="flex flex-col gap-2 lg:flex-row lg:items-center">
+            <Input :placeholder="t('admin.organizations.table.search')" :model-value="searchValue" class="w-full lg:max-w-sm" @update:model-value="onSearchInput" />
             <Button variant="ghost" size="sm" class="gap-1" :disabled="!hasActiveFilters" @click="resetFilters">
                 <FilterX class="size-4" />
                 {{ t('admin.common.resetFilters') }}
@@ -113,7 +113,12 @@ function resetFilters() {
                 <TableBody>
                     <template v-if="props.organizations.length">
                         <TableRow v-for="organization in props.organizations" :key="organization.id">
-                            <TableCell class="text-sm font-medium">{{ organization.name }}</TableCell>
+                            <TableCell class="text-sm font-medium">
+                                <div class="flex items-center gap-2">
+                                    {{ organization.name }}
+                                    <Badge v-if="!organization.enabled" variant="secondary" class="text-xs">{{ t('admin.organizations.table.disabled') }}</Badge>
+                                </div>
+                            </TableCell>
                             <TableCell class="text-sm text-muted-foreground">{{ organization.memberCount }}</TableCell>
                             <TableCell class="text-sm text-muted-foreground">
                                 <span v-if="organization.ownerUsernames.length">{{ organization.ownerUsernames.join(', ') }}</span>

@@ -7,7 +7,7 @@ import { useTheme } from '~/lib/use_theme';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-type OreQuantity = { resourceId: string; resourceName: string; quantity: number };
+type OreValue = { resourceId: string; resourceName: string; value: number };
 
 const { t } = useI18n();
 const { theme } = useTheme();
@@ -15,7 +15,10 @@ const { theme } = useTheme();
 const props = defineProps<{
     // Ordered like the resources list, zero-filled (every ore present) — the fixed order is what
     // keeps a given ore's color stable across weeks, regardless of which ones are non-zero.
-    data: OreQuantity[];
+    // Negative values (e.g. a loss-making ore when showing profit) can't be drawn as slices and are left out.
+    data: OreValue[];
+    formatValue: (value: number) => string;
+    emptyLabel: string;
 }>();
 
 // Categorical hues are assigned in this fixed order and never cycled: beyond 5 slices, the tail
@@ -46,24 +49,22 @@ const colors = computed(() => {
 
 const slices = computed(() => {
     const indexed = props.data.map((entry, index) => ({ ...entry, colorIndex: index }));
-    const nonZero = indexed.filter((entry) => entry.quantity > 0);
+    const nonZero = indexed.filter((entry) => entry.value > 0);
 
     if (nonZero.length <= MAX_NAMED_SLICES) return nonZero;
 
     const named = nonZero.slice(0, MAX_NAMED_SLICES - 1);
-    const otherQuantity = nonZero.slice(MAX_NAMED_SLICES - 1).reduce((sum, entry) => sum + entry.quantity, 0);
-    return [...named, { resourceId: 'other', resourceName: t('admin.livraisons.stats.distribution.other'), quantity: otherQuantity, colorIndex: -1 }];
+    const otherValue = nonZero.slice(MAX_NAMED_SLICES - 1).reduce((sum, entry) => sum + entry.value, 0);
+    return [...named, { resourceId: 'other', resourceName: t('admin.common.stats.other'), value: otherValue, colorIndex: -1 }];
 });
 
-const total = computed(() => slices.value.reduce((sum, entry) => sum + entry.quantity, 0));
-
-const numberFormat = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 });
+const total = computed(() => slices.value.reduce((sum, entry) => sum + entry.value, 0));
 
 const chartData = computed<ChartData<'pie'>>(() => ({
     labels: slices.value.map((entry) => entry.resourceName),
     datasets: [
         {
-            data: slices.value.map((entry) => entry.quantity),
+            data: slices.value.map((entry) => entry.value),
             backgroundColor: slices.value.map((entry) => (entry.colorIndex >= 0 ? colors.value.chart[entry.colorIndex] : colors.value.other)),
             borderColor: colors.value.border,
             borderWidth: 2,
@@ -92,7 +93,7 @@ const chartOptions = computed<ChartOptions<'pie'>>(() => ({
                 label: (item: TooltipItem<'pie'>) => {
                     const value = Number(item.parsed ?? 0);
                     const percent = total.value > 0 ? Math.round((value / total.value) * 100) : 0;
-                    return ` ${numberFormat.format(value)} (${percent} %)`;
+                    return ` ${props.formatValue(value)} (${percent} %)`;
                 },
             },
         },
@@ -103,6 +104,6 @@ const chartOptions = computed<ChartOptions<'pie'>>(() => ({
 <template>
     <div class="h-72">
         <Pie v-if="total > 0" :data="chartData" :options="chartOptions" />
-        <div v-else class="h-full flex items-center justify-center text-sm text-muted-foreground">{{ t('admin.livraisons.stats.distribution.empty') }}</div>
+        <div v-else class="h-full flex items-center justify-center text-sm text-muted-foreground">{{ emptyLabel }}</div>
     </div>
 </template>

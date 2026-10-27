@@ -13,7 +13,11 @@ export const createOrganizationValidator = vine.create({
     castellanyId: vine.string().uuid().optional(),
 });
 
-export const updateOrganizationValidator = createOrganizationValidator;
+export const updateOrganizationValidator = vine.create({
+    name: vine.string().trim().minLength(1).maxLength(100),
+    castellanyId: vine.string().uuid().optional(),
+    enabled: vine.boolean().optional(),
+});
 
 export const storeOrganizationMemberValidator = vine.create({
     mode: vine.enum(['new', 'existing']).optional(),
