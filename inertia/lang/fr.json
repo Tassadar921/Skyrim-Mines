@@ -198,8 +198,7 @@
             "expand": "Afficher",
             "collapse": "Réduire",
             "stats": {
-                "allOres": "Total (tous minerais)",
-                "other": "Autres"
+                "allOres": "Total (tous minerais)"
             }
         },
         "layout": {

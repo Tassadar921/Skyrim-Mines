@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useI18n } from 'vue-i18n';
 import { Pie } from 'vue-chartjs';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, type ChartData, type ChartOptions, type TooltipItem } from 'chart.js';
 import { useTheme } from '~/lib/use_theme';
@@ -9,7 +8,6 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 
 type OreValue = { resourceId: string; resourceName: string; value: number };
 
-const { t } = useI18n();
 const { theme } = useTheme();
 
 const props = defineProps<{
@@ -21,12 +19,9 @@ const props = defineProps<{
     emptyLabel: string;
 }>();
 
-// Categorical hues are assigned in this fixed order and never cycled: beyond 5 slices, the tail
-// folds into a single neutral "Autres" slice rather than generating more colors.
-const MAX_NAMED_SLICES = 5;
-
+// Every ore gets its own slice. The first 5 use the theme's chart colors; further ores get generated
+// hues (golden-angle spacing), still keyed on the ore's position so its color stays stable across weeks.
 const FALLBACK_CHART_COLORS = ['oklch(0.646 0.222 41.116)', 'oklch(0.6 0.118 184.704)', 'oklch(0.398 0.07 227.392)', 'oklch(0.828 0.189 84.429)', 'oklch(0.769 0.188 70.08)'];
-const FALLBACK_OTHER = 'oklch(0.551 0 0)';
 const FALLBACK_BORDER = 'oklch(1 0 0)';
 const FALLBACK_TEXT = 'oklch(0.554 0.046 257.417)';
 
@@ -39,7 +34,6 @@ const colors = computed(() => {
     void theme.value;
     return {
         chart: [1, 2, 3, 4, 5].map((n) => readCssVar(`--chart-${n}`) ?? FALLBACK_CHART_COLORS[n - 1]),
-        other: readCssVar('--muted-foreground') ?? FALLBACK_OTHER,
         border: readCssVar('--card') ?? FALLBACK_BORDER,
         tooltipBorder: readCssVar('--border') ?? FALLBACK_BORDER,
         text: readCssVar('--muted-foreground') ?? FALLBACK_TEXT,
@@ -47,16 +41,11 @@ const colors = computed(() => {
     };
 });
 
-const slices = computed(() => {
-    const indexed = props.data.map((entry, index) => ({ ...entry, colorIndex: index }));
-    const nonZero = indexed.filter((entry) => entry.value > 0);
+function colorFor(index: number): string {
+    return colors.value.chart[index] ?? `oklch(0.68 0.15 ${Math.round((index * 137.508) % 360)})`;
+}
 
-    if (nonZero.length <= MAX_NAMED_SLICES) return nonZero;
-
-    const named = nonZero.slice(0, MAX_NAMED_SLICES - 1);
-    const otherValue = nonZero.slice(MAX_NAMED_SLICES - 1).reduce((sum, entry) => sum + entry.value, 0);
-    return [...named, { resourceId: 'other', resourceName: t('admin.common.stats.other'), value: otherValue, colorIndex: -1 }];
-});
+const slices = computed(() => props.data.map((entry, index) => ({ ...entry, colorIndex: index })).filter((entry) => entry.value > 0));
 
 const total = computed(() => slices.value.reduce((sum, entry) => sum + entry.value, 0));
 
@@ -65,7 +54,7 @@ const chartData = computed<ChartData<'pie'>>(() => ({
     datasets: [
         {
             data: slices.value.map((entry) => entry.value),
-            backgroundColor: slices.value.map((entry) => (entry.colorIndex >= 0 ? colors.value.chart[entry.colorIndex] : colors.value.other)),
+            backgroundColor: slices.value.map((entry) => colorFor(entry.colorIndex)),
             borderColor: colors.value.border,
             borderWidth: 2,
         },
