@@ -41,7 +41,8 @@ export default class OrderArchivesController {
 
         const currentWeek = getWeekNumber(DateTime.now());
         const availableWeeks = [];
-        for (let weekNumber = currentWeek; weekNumber >= 1; weekNumber--) {
+        // Archiving is limited to last week, the current week and next week (N-1 to N+1).
+        for (let weekNumber = currentWeek + 1; weekNumber >= Math.max(1, currentWeek - 1); weekNumber--) {
             const { start, end } = getWeekRange(weekNumber);
             availableWeeks.push({ weekNumber, startDate: start.toISODate()!, endDate: end.toISODate()! });
         }
@@ -74,13 +75,15 @@ export default class OrderArchivesController {
         }
 
         const currentWeek = getWeekNumber(DateTime.now());
+        const minWeek = Math.max(1, currentWeek - 1);
+        const maxWeek = currentWeek + 1;
 
-        if (orderWeek > currentWeek) {
+        if (orderWeek < minWeek || orderWeek > maxWeek) {
             session.flash('error', i18n.t('messages.admin.orderArchives.create.invalidOrderWeek'));
             return response.redirect().back();
         }
 
-        if (deliveryWeek < orderWeek || deliveryWeek > currentWeek) {
+        if (deliveryWeek < orderWeek || deliveryWeek > maxWeek) {
             session.flash('error', i18n.t('messages.admin.orderArchives.create.invalidDeliveryWeek'));
             return response.redirect().back();
         }
@@ -141,7 +144,7 @@ export default class OrderArchivesController {
 
             const remaining = await this.deliveryRepository.remainingQuantities(order.id);
             const deliveryLines = remaining.map((line) => ({ orderLineId: line.orderLineId, quantity: line.remainingQuantity }));
-            // Current week: archived as delivered right now. Past week: Monday 00:01 (game time) of that week.
+            // Current week: archived as delivered right now. Past or next week: Monday 00:01 (game time) of that week.
             const deliveredAt = deliveryWeek === currentWeek ? DateTime.now() : DateTime.fromISO(getWeekRange(deliveryWeek).start.toISODate()!, { zone: GAME_TIMEZONE }).set({ minute: 1 });
 
             const delivery = await this.deliveryRepository.createForOrder(order.id, admin.id, deliveryLines, { deliveredAt, castellanyId: castellanyId ?? null });

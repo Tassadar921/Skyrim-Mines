@@ -137,6 +137,13 @@ router
         router.post('/barrel-rentals/:id/payments', [controllers.admin.BarrelRentals, 'storePayment']).as('admin.barrelRentals.payments.store').use(foremanManage);
         router.delete('/barrel-rentals/payments/:id', [controllers.admin.BarrelRentals, 'destroyPayment']).as('admin.barrelRentals.payments.destroy').use(foremanManage);
 
+        // Owners' agenda: neither auditors nor foremen get it.
+        router.get('/agenda', [controllers.admin.Agenda, 'index']).as('admin.agenda.index').use(adminOnly);
+        router.post('/agenda', [controllers.admin.Agenda, 'store']).as('admin.agenda.store').use(adminOnly);
+        router.put('/agenda/:id', [controllers.admin.Agenda, 'update']).as('admin.agenda.update').use(adminOnly);
+        router.post('/agenda/:id/assign', [controllers.admin.Agenda, 'assign']).as('admin.agenda.assign').use(adminOnly);
+        router.delete('/agenda/:id', [controllers.admin.Agenda, 'destroy']).as('admin.agenda.destroy').use(adminOnly);
+
         router.get('/organizations', [controllers.admin.Organizations, 'index']).as('admin.organizations.index').use(foremanAccess);
         router.get('/organizations/create', [controllers.admin.Organizations, 'create']).as('admin.organizations.create').use(foremanManage);
         router.post('/organizations', [controllers.admin.Organizations, 'store']).as('admin.organizations.store').use(foremanManage);

@@ -44,5 +44,6 @@ declare module '@adonisjs/inertia/types' {
     'organization/show': ExtractProps<(typeof import('../../inertia/pages/organization/show.vue'))['default']>
     'stocks': ExtractProps<(typeof import('../../inertia/pages/stocks.vue'))['default']>
     'tarifs': ExtractProps<(typeof import('../../inertia/pages/tarifs.vue'))['default']>
+    'admin/agenda/index': ExtractProps<(typeof import('../../inertia/pages/admin/agenda/index.vue'))['default']>
   }
 }

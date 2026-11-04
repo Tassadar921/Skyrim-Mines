@@ -149,6 +149,13 @@ export interface ApiDefinition {
         destroy: typeof routes['admin.barrelRentals.payments.destroy']
       }
     }
+    agenda: {
+      index: typeof routes['admin.agenda.index']
+      store: typeof routes['admin.agenda.store']
+      update: typeof routes['admin.agenda.update']
+      assign: typeof routes['admin.agenda.assign']
+      destroy: typeof routes['admin.agenda.destroy']
+    }
     organizations: {
       index: typeof routes['admin.organizations.index']
       create: typeof routes['admin.organizations.create']

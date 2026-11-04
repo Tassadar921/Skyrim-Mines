@@ -105,9 +105,7 @@ export default class DashboardController {
             const { start, end } = getWeekRange(weekNumber);
             const profit = computeProfitForWeek(weekNumber, weeklyTotals);
             const capitalSnapshot = capitalSnapshotsByWeek.get(weekNumber);
-            const capital = capitalSnapshot ? Number(capitalSnapshot.capital) : null;
-            const stockValue = capitalSnapshot ? Number(capitalSnapshot.stockValue) : null;
-            // Once a week has been recorded (capital/stock snapshot), its tax and rate are frozen at
+            // Once a week has been recorded (weekly snapshot), its tax and rate are frozen at
             // the value in effect at that time; only un-recorded weeks (normally just the current one)
             // reflect the live tax system, so changing the rate/brackets/tiers never rewrites past weeks.
             const { weeklyTax, taxRate } = capitalSnapshot
@@ -127,9 +125,6 @@ export default class DashboardController {
                 weeklyTax,
                 taxRate,
                 topBracket,
-                capital,
-                stockValue,
-                totalCapital: capital !== null && stockValue !== null ? capital + stockValue : null,
                 reductions: capitalSnapshot ? { donation: capitalSnapshot.donationReduction, sponsorship: capitalSnapshot.sponsorshipReduction, privilege: capitalSnapshot.privilegeReduction } : null,
             });
         }
@@ -199,8 +194,14 @@ export default class DashboardController {
     }
 
     public async storeCapitalSnapshot({ request, response, session, i18n }: HttpContext) {
-        const { capital, stockValue, donationReduction, sponsorshipReduction, privilegeReduction } = await request.validateUsing(storeCompanyCapitalSnapshotValidator);
-        const weekNumber = getWeekNumber(DateTime.now());
+        const { weekNumber: requestedWeek, donationReduction, sponsorshipReduction, privilegeReduction } = await request.validateUsing(storeCompanyCapitalSnapshotValidator);
+        const currentWeek = getWeekNumber(DateTime.now());
+        // Past weeks may be recorded afterwards (catch-up); future weeks are still open and cannot be frozen.
+        const weekNumber = requestedWeek ?? currentWeek;
+        if (weekNumber > currentWeek) {
+            session.flash('error', i18n.t('messages.admin.dashboard.capitalSnapshot.store.invalidWeek'));
+            return response.redirect().back();
+        }
 
         try {
             const existing = await this.companyCapitalSnapshotRepository.findOneBy({ weekNumber });
@@ -234,8 +235,6 @@ export default class DashboardController {
 
             await this.companyCapitalSnapshotRepository.create({
                 weekNumber,
-                capital: String(capital),
-                stockValue: String(stockValue),
                 weeklyTax: String(weeklyTax),
                 taxRate,
                 topBracketIndex: topBracket?.index ?? null,

@@ -1075,6 +1075,66 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/barrel_rentals_controller').default['destroyPayment']>>>
     }
   }
+  'admin.agenda.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/admin/agenda'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: ExtractQueryForGet<InferInput<(typeof import('#validators/admin/agenda_events').indexAgendaEventValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/agenda_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/agenda_controller').default['index']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'admin.agenda.store': {
+    methods: ["POST"]
+    pattern: '/admin/agenda'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/admin/agenda_events').storeAgendaEventValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/admin/agenda_events').storeAgendaEventValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/agenda_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/agenda_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'admin.agenda.update': {
+    methods: ["PUT"]
+    pattern: '/admin/agenda/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/admin/agenda_events').storeAgendaEventValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/admin/agenda_events').storeAgendaEventValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/agenda_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/agenda_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'admin.agenda.assign': {
+    methods: ["POST"]
+    pattern: '/admin/agenda/:id/assign'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/admin/agenda_events').assignAgendaEventValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/admin/agenda_events').assignAgendaEventValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/agenda_controller').default['assign']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/agenda_controller').default['assign']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'admin.agenda.destroy': {
+    methods: ["DELETE"]
+    pattern: '/admin/agenda/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/agenda_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/agenda_controller').default['destroy']>>>
+    }
+  }
   'admin.organizations.index': {
     methods: ["GET","HEAD"]
     pattern: '/admin/organizations'

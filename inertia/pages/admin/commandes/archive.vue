@@ -136,8 +136,11 @@ watch(effectiveOrganizationId, (organizationId) => {
     form.castellanyId = organization?.castellanyId ?? PICKUP;
 });
 
-const orderWeekValid = computed(() => Number.isInteger(form.orderWeek) && form.orderWeek >= 1 && form.orderWeek <= props.currentWeek);
-const deliveryWeekValid = computed(() => Number.isInteger(form.deliveryWeek) && form.deliveryWeek >= form.orderWeek && form.deliveryWeek <= props.currentWeek);
+// Archiving is limited to last week through next week (N-1 to N+1); the current week stays the default.
+const minWeek = computed(() => Math.max(1, props.currentWeek - 1));
+const maxWeek = computed(() => props.currentWeek + 1);
+const orderWeekValid = computed(() => Number.isInteger(form.orderWeek) && form.orderWeek >= minWeek.value && form.orderWeek <= maxWeek.value);
+const deliveryWeekValid = computed(() => Number.isInteger(form.deliveryWeek) && form.deliveryWeek >= form.orderWeek && form.deliveryWeek <= maxWeek.value);
 
 const deliveryWeekOptions = computed(() => props.availableWeeks.filter((week) => week.weekNumber >= form.orderWeek));
 
@@ -261,6 +264,7 @@ function submit() {
                             <SelectItem v-for="week in availableWeeks" :key="week.weekNumber" :value="String(week.weekNumber)">
                                 {{ formatWeekRange(week) }}
                                 <span v-if="week.weekNumber === currentWeek" class="text-muted-foreground">({{ t('admin.common.weekly.current') }})</span>
+                                <span v-else-if="week.weekNumber === currentWeek + 1" class="text-muted-foreground">({{ t('admin.common.weekly.next') }})</span>
                             </SelectItem>
                         </SelectContent>
                     </Select>
@@ -276,6 +280,7 @@ function submit() {
                             <SelectItem v-for="week in deliveryWeekOptions" :key="week.weekNumber" :value="String(week.weekNumber)">
                                 {{ formatWeekRange(week) }}
                                 <span v-if="week.weekNumber === currentWeek" class="text-muted-foreground">({{ t('admin.common.weekly.current') }})</span>
+                                <span v-else-if="week.weekNumber === currentWeek + 1" class="text-muted-foreground">({{ t('admin.common.weekly.next') }})</span>
                             </SelectItem>
                         </SelectContent>
                     </Select>

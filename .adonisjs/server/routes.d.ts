@@ -93,6 +93,11 @@ export type ScannedRoutes = {
     'admin.barrelRentals.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.barrelRentals.payments.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.barrelRentals.payments.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.agenda.index': { paramsTuple?: []; params?: {} }
+    'admin.agenda.store': { paramsTuple?: []; params?: {} }
+    'admin.agenda.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.agenda.assign': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.agenda.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.organizations.index': { paramsTuple?: []; params?: {} }
     'admin.organizations.create': { paramsTuple?: []; params?: {} }
     'admin.organizations.store': { paramsTuple?: []; params?: {} }
@@ -139,6 +144,7 @@ export type ScannedRoutes = {
     'admin.livraisons.index': { paramsTuple?: []; params?: {} }
     'admin.barrelRentals.index': { paramsTuple?: []; params?: {} }
     'admin.barrelRentals.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.agenda.index': { paramsTuple?: []; params?: {} }
     'admin.organizations.index': { paramsTuple?: []; params?: {} }
     'admin.organizations.create': { paramsTuple?: []; params?: {} }
     'admin.organizations.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -177,6 +183,7 @@ export type ScannedRoutes = {
     'admin.livraisons.index': { paramsTuple?: []; params?: {} }
     'admin.barrelRentals.index': { paramsTuple?: []; params?: {} }
     'admin.barrelRentals.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.agenda.index': { paramsTuple?: []; params?: {} }
     'admin.organizations.index': { paramsTuple?: []; params?: {} }
     'admin.organizations.create': { paramsTuple?: []; params?: {} }
     'admin.organizations.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -202,6 +209,8 @@ export type ScannedRoutes = {
     'admin.livraisons.deductStockAll': { paramsTuple?: []; params?: {} }
     'admin.barrelRentals.store': { paramsTuple?: []; params?: {} }
     'admin.barrelRentals.payments.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.agenda.store': { paramsTuple?: []; params?: {} }
+    'admin.agenda.assign': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.organizations.store': { paramsTuple?: []; params?: {} }
     'admin.organizations.members.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
@@ -232,6 +241,7 @@ export type ScannedRoutes = {
     'admin.livraisons.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.barrelRentals.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.barrelRentals.payments.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.agenda.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.organizations.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.organizations.members.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'memberId': ParamValue} }
     'admin.organizations.resourcePrices.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'resourceId': ParamValue} }
@@ -250,6 +260,7 @@ export type ScannedRoutes = {
     'admin.materials.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.castellanies.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.barrelRentals.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.agenda.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.organizations.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.organizations.resourcePrices.update': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'resourceId': ParamValue} }
   }

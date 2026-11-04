@@ -540,6 +540,36 @@ const routes = {
     tokens: [{"old":"/admin/barrel-rentals/payments/:id","type":0,"val":"admin","end":""},{"old":"/admin/barrel-rentals/payments/:id","type":0,"val":"barrel-rentals","end":""},{"old":"/admin/barrel-rentals/payments/:id","type":0,"val":"payments","end":""},{"old":"/admin/barrel-rentals/payments/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['admin.barrelRentals.payments.destroy']['types'],
   },
+  'admin.agenda.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/admin/agenda',
+    tokens: [{"old":"/admin/agenda","type":0,"val":"admin","end":""},{"old":"/admin/agenda","type":0,"val":"agenda","end":""}],
+    types: placeholder as Registry['admin.agenda.index']['types'],
+  },
+  'admin.agenda.store': {
+    methods: ["POST"],
+    pattern: '/admin/agenda',
+    tokens: [{"old":"/admin/agenda","type":0,"val":"admin","end":""},{"old":"/admin/agenda","type":0,"val":"agenda","end":""}],
+    types: placeholder as Registry['admin.agenda.store']['types'],
+  },
+  'admin.agenda.update': {
+    methods: ["PUT"],
+    pattern: '/admin/agenda/:id',
+    tokens: [{"old":"/admin/agenda/:id","type":0,"val":"admin","end":""},{"old":"/admin/agenda/:id","type":0,"val":"agenda","end":""},{"old":"/admin/agenda/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['admin.agenda.update']['types'],
+  },
+  'admin.agenda.assign': {
+    methods: ["POST"],
+    pattern: '/admin/agenda/:id/assign',
+    tokens: [{"old":"/admin/agenda/:id/assign","type":0,"val":"admin","end":""},{"old":"/admin/agenda/:id/assign","type":0,"val":"agenda","end":""},{"old":"/admin/agenda/:id/assign","type":1,"val":"id","end":""},{"old":"/admin/agenda/:id/assign","type":0,"val":"assign","end":""}],
+    types: placeholder as Registry['admin.agenda.assign']['types'],
+  },
+  'admin.agenda.destroy': {
+    methods: ["DELETE"],
+    pattern: '/admin/agenda/:id',
+    tokens: [{"old":"/admin/agenda/:id","type":0,"val":"admin","end":""},{"old":"/admin/agenda/:id","type":0,"val":"agenda","end":""},{"old":"/admin/agenda/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['admin.agenda.destroy']['types'],
+  },
   'admin.organizations.index': {
     methods: ["GET","HEAD"],
     pattern: '/admin/organizations',

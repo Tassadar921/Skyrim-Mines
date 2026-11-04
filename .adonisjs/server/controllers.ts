@@ -22,6 +22,7 @@ export const controllers = {
     SiteSettings: () => import('#controllers/admin/site_settings_controller'),
     Stocks: () => import('#controllers/admin/stocks_controller'),
     Users: () => import('#controllers/admin/users_controller'),
+    Agenda: () => import('#controllers/admin/agenda_controller'),
   },
   Auth: () => import('#controllers/auth_controller'),
   Buybacks: () => import('#controllers/buybacks_controller'),

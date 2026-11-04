@@ -7,6 +7,39 @@
 import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 
+export class AgendaEventSchema extends BaseModel {
+  static $columns = ['allDay', 'assignedToId', 'createdAt', 'description', 'endsAt', 'id', 'isShared', 'needsAssignee', 'ownerId', 'recurrenceEndsOn', 'recursWeekly', 'startsAt', 'title', 'updatedAt'] as const
+  $columns = AgendaEventSchema.$columns
+  @column()
+  declare allDay: boolean
+  @column()
+  declare assignedToId: string | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare description: string | null
+  @column.dateTime()
+  declare endsAt: DateTime
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare isShared: boolean
+  @column()
+  declare needsAssignee: boolean
+  @column()
+  declare ownerId: string
+  @column.date()
+  declare recurrenceEndsOn: DateTime | null
+  @column()
+  declare recursWeekly: boolean
+  @column.dateTime()
+  declare startsAt: DateTime
+  @column()
+  declare title: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class BarrelRentalPaymentSchema extends BaseModel {
   static $columns = ['amountPaid', 'createdAt', 'id', 'rentalId', 'updatedAt', 'weekNumber'] as const
   $columns = BarrelRentalPaymentSchema.$columns
@@ -68,10 +101,8 @@ export class CastellanyTaxSchema extends BaseModel {
 }
 
 export class CompanyCapitalSnapshotSchema extends BaseModel {
-  static $columns = ['capital', 'createdAt', 'donationReduction', 'id', 'privilegeReduction', 'sponsorshipReduction', 'stockValue', 'taxRate', 'topBracketIndex', 'topBracketRate', 'updatedAt', 'weekNumber', 'weeklyTax'] as const
+  static $columns = ['createdAt', 'donationReduction', 'id', 'privilegeReduction', 'sponsorshipReduction', 'taxRate', 'topBracketIndex', 'topBracketRate', 'updatedAt', 'weekNumber', 'weeklyTax'] as const
   $columns = CompanyCapitalSnapshotSchema.$columns
-  @column()
-  declare capital: string
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
   @column()
@@ -82,8 +113,6 @@ export class CompanyCapitalSnapshotSchema extends BaseModel {
   declare privilegeReduction: boolean
   @column()
   declare sponsorshipReduction: boolean
-  @column()
-  declare stockValue: string
   @column()
   declare taxRate: number
   @column()

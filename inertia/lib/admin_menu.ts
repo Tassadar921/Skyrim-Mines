@@ -1,7 +1,7 @@
 import type { Component } from 'vue';
 import type { useI18n } from 'vue-i18n';
 import type { urlFor } from '~/client';
-import { BarChart2, Home, Users, Pickaxe, Package, HandCoins, History, Building2, ShoppingCart, Truck, Landmark, Boxes, Receipt, Settings, Wallet } from '@lucide/vue';
+import { BarChart2, Home, Users, Pickaxe, Package, HandCoins, History, Building2, ShoppingCart, Truck, Landmark, Boxes, Receipt, Settings, Wallet, CalendarDays } from '@lucide/vue';
 
 type RouteName = Parameters<typeof urlFor>[0];
 
@@ -16,10 +16,13 @@ export type MenuItem = {
 type MenuItemDef = MenuItem & { hiddenForRoles?: string[] };
 
 const FOREMAN_RESTRICTED = ['foreman'];
+/** Owners only (role "admin"): hidden from auditors and foremen. */
+const OWNERS_ONLY = ['foreman', 'auditor'];
 
 export const getItems = (t: ReturnType<typeof useI18n>['t'], role: string | undefined): MenuItem[] => {
     const items: MenuItemDef[] = [
         { title: t('admin.layout.menu.dashboard'), route: 'admin.dashboard', icon: BarChart2, exact: true },
+        { title: t('admin.layout.menu.agenda'), route: 'admin.agenda.index', icon: CalendarDays, hiddenForRoles: OWNERS_ONLY },
         { title: t('admin.layout.menu.users'), route: 'admin.users.index', icon: Users },
         { title: t('admin.layout.menu.organizations'), route: 'admin.organizations.index', icon: Building2 },
         { title: t('admin.layout.menu.resources'), route: 'admin.resources.index', icon: Pickaxe, hiddenForRoles: FOREMAN_RESTRICTED },

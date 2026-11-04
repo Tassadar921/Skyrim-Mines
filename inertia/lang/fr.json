@@ -192,7 +192,8 @@
         "title": "Admin",
         "common": {
             "weekly": {
-                "current": "Actuelle"
+                "current": "Actuelle",
+                "next": "Prochaine"
             },
             "resetFilters": "Réinitialiser les filtres",
             "expand": "Afficher",
@@ -206,6 +207,7 @@
             "menu": {
                 "home": "Page d'accueil",
                 "dashboard": "Tableau de bord",
+                "agenda": "Agenda",
                 "siteSettings": "Paramètres",
                 "users": "Utilisateurs",
                 "organizations": "Organisations",
@@ -248,14 +250,14 @@
                 "summary": "{count} palier | {count} paliers"
             },
             "capitalSnapshot": {
-                "title": "Capital & stock de la semaine",
-                "capital": "Capital",
-                "stockValue": "Valeur du stock",
-                "totalCapital": "Capital total",
-                "notEntered": "Pas encore renseigné pour cette semaine",
-                "save": "Enregistrer",
+                "title": "Clôture de la semaine",
+                "recorded": "Semaine enregistrée : taxe et taux figés",
+                "notEntered": "Pas encore enregistrée : la taxe suit le barème actuel",
+                "save": "Enregistrer la semaine",
+                "saveWeek": "Enregistrer la semaine S{week}",
+                "catchUpHint": "{count} semaine non enregistrée : choisissez celle à clôturer (taxe calculée avec le barème actuel). | {count} semaines non enregistrées : choisissez celle à clôturer (taxe calculée avec le barème actuel).",
                 "taxReductions": {
-                    "title": "Réductions fiscales du registre (semaine en cours)",
+                    "title": "Réductions fiscales du registre",
                     "hint": "Ces réductions s'appliquent sur la taxe hebdomadaire calculée, uniquement avec le système fiscal par tranches progressives.",
                     "donation": {
                         "label": "Donation de marchandises en quantité (−15 %)",
@@ -290,9 +292,6 @@
                 "taxRate": "Taux appliqué",
                 "topBracket": "Tranche d'imposition la plus haute",
                 "topBracketValue": "Tranche {index} ({rate} %)",
-                "capital": "Capital",
-                "stockValue": "Valeur du stock",
-                "totalCapital": "Capital total",
                 "reductions": "Réductions",
                 "reductionsNone": "—",
                 "empty": "Aucune donnée pour le moment",
@@ -628,6 +627,74 @@
                 "quantity": "Quantité",
                 "unitPrice": "Prix de rachat unitaire",
                 "amount": "Montant"
+            }
+        },
+        "agenda": {
+            "title": "Agenda",
+            "today": "Aujourd'hui",
+            "previous": "Période précédente",
+            "next": "Période suivante",
+            "views": {
+                "month": "Mois",
+                "week": "Semaine",
+                "day": "Jour"
+            },
+            "fullscreen": {
+                "enter": "Plein écran",
+                "exit": "Quitter le plein écran"
+            },
+            "allDayRow": "Journée",
+            "add": "Nouvel événement",
+            "edit": "Modifier l'événement",
+            "weekdays": {
+                "mon": "Lun",
+                "tue": "Mar",
+                "wed": "Mer",
+                "thu": "Jeu",
+                "fri": "Ven",
+                "sat": "Sam",
+                "sun": "Dim"
+            },
+            "filters": {
+                "all": "Tous",
+                "personal": "Personnel",
+                "shared": "Partagé"
+            },
+            "more": "+{count} autre | +{count} autres",
+            "noEvents": "Aucun événement ce jour-là",
+            "allDay": "Toute la journée",
+            "sharedBy": "Partagé par {name}",
+            "fields": {
+                "title": "Titre",
+                "description": "Description",
+                "allDay": "Toute la journée",
+                "startsAt": "Début",
+                "endsAt": "Fin",
+                "recursWeekly": "Répéter chaque semaine",
+                "recurrenceEndsOn": "Jusqu'au (facultatif)",
+                "recurrenceHint": "Sans date de fin, l'événement se répète indéfiniment. Modifier ou supprimer une occurrence s'applique à toute la série.",
+                "isShared": "Agenda partagé entre propriétaires",
+                "isSharedHint": "Visible et modifiable par tous les propriétaires. Sinon, seul vous le voyez.",
+                "isSharedLocked": "Seul le créateur de l'événement peut changer sa visibilité.",
+                "needsAssignee": "À attribuer",
+                "needsAssigneeHint": "L'événement sera signalé à tous les propriétaires jusqu'à ce que l'un d'eux s'en occupe."
+            },
+            "unassigned": {
+                "title": "{count} événement à attribuer : quelqu'un doit s'en occuper | {count} événements à attribuer : quelqu'un doit s'en occuper",
+                "badge": "À attribuer",
+                "dialogTitle": "Cet événement attend que quelqu'un s'en occupe",
+                "takePersonal": "Je m'en occupe",
+                "takeShared": "Je m'en occupe, en restant partagé",
+                "hint": "« Je m'en occupe » le déplace dans votre agenda personnel. « En restant partagé » le laisse visible par tous les propriétaires, avec vous comme responsable.",
+                "takenBy": "Pris en charge par {name}"
+            },
+            "submit": "Enregistrer",
+            "delete": {
+                "label": "Supprimer",
+                "title": "Supprimer cet événement ?",
+                "description": "Cette action est irréversible et supprimera définitivement l'événement « {title} ».",
+                "cancel": "Annuler",
+                "confirm": "Supprimer"
             }
         },
         "expenses": {

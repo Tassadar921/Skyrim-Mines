@@ -46,6 +46,8 @@ const actualType = computed(() => {
 });
 
 const hasValue = computed(() => props.modelValue !== undefined && props.modelValue !== null && props.modelValue !== '');
+// Date/time inputs always render their own format mask (e.g. mm/dd/yyyy), so their label must stay floated even when empty.
+const hasNativeMask = computed(() => ['date', 'time', 'datetime-local'].includes(props.type));
 const showError = computed(() => !!props.error && touched.value);
 const inputId = computed(() => props.id ?? props.name);
 
@@ -111,7 +113,7 @@ const togglePassword = () => {
                 :class="
                     cn(
                         'absolute pointer-events-none z-10 font-medium transition-all duration-200 ease-in-out',
-                        isFocused || hasValue ? 'bottom-9 left-1 text-xs text-foreground' : 'bottom-1.5 left-3 text-base text-muted-foreground',
+                        isFocused || hasValue || hasNativeMask ? 'bottom-9 left-1 text-xs text-foreground' : 'bottom-1.5 left-3 text-base text-muted-foreground',
                     )
                 "
             >
