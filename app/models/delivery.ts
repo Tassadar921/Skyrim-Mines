@@ -4,6 +4,7 @@ import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations';
 import Order from '#models/order';
 import DeliveryLine from '#models/delivery_line';
 import Castellany from '#models/castellany';
+import User from '#models/user';
 
 export default class Delivery extends DeliverySchema {
     @belongsTo(() => Order, { foreignKey: 'orderId' })
@@ -14,4 +15,7 @@ export default class Delivery extends DeliverySchema {
 
     @belongsTo(() => Castellany, { foreignKey: 'castellanyId' })
     declare castellany: BelongsTo<typeof Castellany>;
+
+    @belongsTo(() => User, { foreignKey: 'deliveredByUserId' })
+    declare deliveredBy: BelongsTo<typeof User>;
 }

@@ -9,9 +9,6 @@ export interface ApiDefinition {
   tarifs: typeof routes['tarifs']
   stocks: typeof routes['stocks']
   organigramme: typeof routes['organigramme']
-  livraisons: {
-    store: typeof routes['livraisons.store']
-  }
   deposits: {
     store: typeof routes['deposits.store']
     update: typeof routes['deposits.update']
@@ -118,11 +115,6 @@ export interface ApiDefinition {
     balanceChanges: {
       index: typeof routes['admin.balanceChanges.index']
       rollback: typeof routes['admin.balanceChanges.rollback']
-    }
-    commandes: {
-      index: typeof routes['admin.commandes.index']
-      validate: typeof routes['admin.commandes.validate']
-      cancel: typeof routes['admin.commandes.cancel']
     }
     orderArchives: {
       create: typeof routes['admin.orderArchives.create']

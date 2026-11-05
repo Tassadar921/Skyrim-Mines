@@ -3,7 +3,6 @@ import db from '@adonisjs/lucid/services/db';
 import BaseRepository from '#repositories/base/base_repository';
 import Order from '#models/order';
 import OrderLine from '#models/order_line';
-import OrderStatusEnum from '#types/enum/order_status_enum';
 import { getWeekNumber } from '#helpers/game_week_helper';
 
 export type OrderLineInput = {
@@ -22,29 +21,6 @@ export default class OrderRepository extends BaseRepository<typeof Order> {
 
     public async findOrFail(id: string): Promise<Order> {
         return Order.query().where('id', id).preload('file').preload('lines').firstOrFail();
-    }
-
-    public async paginate(params: { page: number; perPage: number; sort: string; dir: 'asc' | 'desc'; search?: string; status?: OrderStatusEnum }) {
-        const { page, perPage, sort, dir, search, status } = params;
-        const allowedSorts: Record<string, string> = {
-            number: 'number',
-            createdAt: 'created_at',
-            requesterName: 'requester_name',
-            organizationName: 'organization_name',
-            totalAmount: 'total_amount',
-        };
-        const sortColumn = allowedSorts[sort] ?? 'created_at';
-
-        const q = Order.query().preload('file').preload('lines').orderBy(sortColumn, dir);
-        if (search) {
-            q.where((builder) => {
-                builder.whereILike('requesterName', `%${search}%`).orWhereILike('organizationName', `%${search}%`);
-            });
-        }
-        if (status) {
-            q.where('status', status);
-        }
-        return q.paginate(page, perPage);
     }
 
     public async createWithLines(data: {
@@ -99,18 +75,5 @@ export default class OrderRepository extends BaseRepository<typeof Order> {
 
     public async setFile(id: string, fileId: string): Promise<void> {
         await Order.query().where('id', id).update({ fileId });
-    }
-
-    public async findToDeliver(): Promise<Order[]> {
-        return Order.query().where('status', OrderStatusEnum.TO_DELIVER).preload('file').preload('lines').orderBy('created_at', 'asc');
-    }
-
-    public async transitionStatus(id: string, from: OrderStatusEnum[], to: OrderStatusEnum): Promise<boolean> {
-        const order = await Order.findOrFail(id);
-        if (!from.includes(order.status as OrderStatusEnum)) return false;
-
-        order.status = to;
-        await order.save();
-        return true;
     }
 }

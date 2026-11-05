@@ -313,26 +313,9 @@
             "error": "Erreur lors du rachat"
         }
     },
-    "commandes": {
-        "show": {
-            "forbidden": "L'accès à cette commande vous est interdit"
-        },
-        "cancel": {
-            "success": "Commande annulée avec succès",
-            "error": "Cette commande ne peut plus être annulée"
-        },
-        "validate": {
-            "success": "Commande validée avec succès",
-            "error": "Cette commande ne peut pas être validée"
-        }
-    },
     "livraisons": {
-        "create": {
-            "success": "Livraison enregistrée avec succès",
-            "error": "Erreur lors de l'enregistrement de la livraison"
-        },
         "delete": {
-            "success": "Livraison supprimée avec succès",
+            "success": "Livraison et commande associée supprimées avec succès",
             "error": "Erreur lors de la suppression de la livraison"
         }
     },

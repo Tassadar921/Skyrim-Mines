@@ -9,6 +9,7 @@ type ExtractProps<T> = Omit<
 
 declare module '@adonisjs/inertia/types' {
   export interface InertiaPages {
+    'admin/agenda/index': ExtractProps<(typeof import('../../inertia/pages/admin/agenda/index.vue'))['default']>
     'admin/balance-changes/index': ExtractProps<(typeof import('../../inertia/pages/admin/balance-changes/index.vue'))['default']>
     'admin/barrel-rentals/index': ExtractProps<(typeof import('../../inertia/pages/admin/barrel-rentals/index.vue'))['default']>
     'admin/barrel-rentals/show': ExtractProps<(typeof import('../../inertia/pages/admin/barrel-rentals/show.vue'))['default']>
@@ -17,7 +18,6 @@ declare module '@adonisjs/inertia/types' {
     'admin/castellanies/index': ExtractProps<(typeof import('../../inertia/pages/admin/castellanies/index.vue'))['default']>
     'admin/castellanies/show': ExtractProps<(typeof import('../../inertia/pages/admin/castellanies/show.vue'))['default']>
     'admin/commandes/archive': ExtractProps<(typeof import('../../inertia/pages/admin/commandes/archive.vue'))['default']>
-    'admin/commandes/index': ExtractProps<(typeof import('../../inertia/pages/admin/commandes/index.vue'))['default']>
     'admin/dashboard': ExtractProps<(typeof import('../../inertia/pages/admin/dashboard.vue'))['default']>
     'admin/expenses/index': ExtractProps<(typeof import('../../inertia/pages/admin/expenses/index.vue'))['default']>
     'admin/livraisons/index': ExtractProps<(typeof import('../../inertia/pages/admin/livraisons/index.vue'))['default']>
@@ -44,6 +44,5 @@ declare module '@adonisjs/inertia/types' {
     'organization/show': ExtractProps<(typeof import('../../inertia/pages/organization/show.vue'))['default']>
     'stocks': ExtractProps<(typeof import('../../inertia/pages/stocks.vue'))['default']>
     'tarifs': ExtractProps<(typeof import('../../inertia/pages/tarifs.vue'))['default']>
-    'admin/agenda/index': ExtractProps<(typeof import('../../inertia/pages/admin/agenda/index.vue'))['default']>
   }
 }

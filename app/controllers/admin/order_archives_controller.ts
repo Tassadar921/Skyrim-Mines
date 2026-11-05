@@ -162,7 +162,7 @@ export default class OrderArchivesController {
                 : i18n.t('messages.admin.orderArchives.create.success');
 
             session.flash('success', successMessage);
-            return response.redirect().toRoute('admin.commandes.index');
+            return response.redirect().toRoute('admin.livraisons.index');
         } catch (e) {
             logger.error({ err: e }, 'orderArchives.store failed');
             session.flash('error', i18n.t('messages.admin.orderArchives.create.error'));

@@ -1,7 +1,6 @@
 import { type HttpContext } from '@adonisjs/core/http';
 import { DateTime } from 'luxon';
 import logger from '@adonisjs/core/services/logger';
-import transmit from '@adonisjs/transmit/services/main';
 import DeliveryRepository, { type DeliveryStatValues } from '#repositories/delivery_repository';
 import ResourceRepository from '#repositories/resource_repository';
 import ResourceTypeEnum from '#types/enum/resource_type_enum';
@@ -115,6 +114,7 @@ export default class LivraisonsController {
                     requesterName: delivery.order.requesterName,
                     organizationName: delivery.order.organizationName,
                     castellanyName: delivery.castellany?.name ?? null,
+                    archivedByName: delivery.deliveredBy?.username ?? null,
                     stockDeducted: delivery.stockDeducted,
                     lines,
                     totalProfit: lines.reduce((sum, line) => sum + (line.profit ?? 0), 0),
@@ -134,9 +134,14 @@ export default class LivraisonsController {
     }
 
     public async destroy({ params, response, session, i18n }: HttpContext) {
-        await this.deliveryRepository.destroy(params.id);
-        transmit.broadcast('to-deliver', {});
-        session.flash('success', i18n.t('messages.livraisons.delete.success'));
+        try {
+            await this.deliveryRepository.destroy(params.id);
+            session.flash('success', i18n.t('messages.livraisons.delete.success'));
+        } catch (e) {
+            logger.error({ err: e }, 'livraisons.destroy failed');
+            session.flash('error', i18n.t('messages.livraisons.delete.error'));
+        }
+
         return response.redirect().back();
     }
 

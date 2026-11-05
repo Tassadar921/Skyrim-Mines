@@ -17,7 +17,6 @@ router.get('/tarifs', [controllers.Tarifs, 'index']).as('tarifs').use(middleware
 const companyOnly = middleware.admin({ roles: [UserRoleEnum.ADMIN, UserRoleEnum.AUDITOR, UserRoleEnum.STAFF] });
 router.get('/stocks', [controllers.Stocks, 'index']).as('stocks').use(middleware.auth()).use(companyOnly);
 router.get('/organigramme', [controllers.Organigramme, 'index']).as('organigramme').use(middleware.auth());
-router.post('/commandes/:orderId/livraisons', [controllers.Livraisons, 'store']).as('livraisons.store').use(middleware.auth());
 router.post('/deposits', [controllers.Deposits, 'store']).as('deposits.store').use(middleware.auth());
 router.patch('/deposits/:id', [controllers.Deposits, 'update']).as('deposits.update').use(middleware.auth());
 router
@@ -115,9 +114,6 @@ router
         router.get('/balance-history', [controllers.admin.BalanceChanges, 'index']).as('admin.balanceChanges.index').use(readOnly);
         router.post('/balance-history/:id/rollback', [controllers.admin.BalanceChanges, 'rollback']).as('admin.balanceChanges.rollback').use(adminOnly);
 
-        router.get('/commandes', [controllers.admin.Commandes, 'index']).as('admin.commandes.index').use(foremanAccess);
-        router.patch('/commandes/:id/validate', [controllers.admin.Commandes, 'validate']).as('admin.commandes.validate').use(foremanManage);
-        router.patch('/commandes/:id/cancel', [controllers.admin.Commandes, 'cancel']).as('admin.commandes.cancel').use(foremanManage);
         router.get('/commandes/archiver', [controllers.admin.OrderArchives, 'create']).as('admin.orderArchives.create').use(foremanManage);
         router.post('/commandes/archiver', [controllers.admin.OrderArchives, 'store']).as('admin.orderArchives.store').use(foremanManage);
 

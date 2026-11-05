@@ -4,6 +4,7 @@ import BaseRepository from '#repositories/base/base_repository';
 import Delivery from '#models/delivery';
 import DeliveryLine from '#models/delivery_line';
 import Order from '#models/order';
+import File from '#models/file';
 import Resource from '#models/resource';
 import ResourceRecipeLineRepository from '#repositories/resource_recipe_line_repository';
 import ResourceStockRepository from '#repositories/resource_stock_repository';
@@ -225,16 +226,21 @@ export default class DeliveryRepository extends BaseRepository<typeof Delivery> 
         return Number(result?.$extras.total ?? 0);
     }
 
+    /**
+     * Deletes a delivery together with its order: the order's lines and every other delivery of it go too (FK cascade),
+     * as well as the order's PDF file record. Stock already deducted is not restored.
+     */
     public async destroy(id: string): Promise<void> {
-        const delivery = await Delivery.findOrFail(id);
-        const orderId = delivery.orderId;
-        await delivery.delete();
+        await db.transaction(async (trx) => {
+            const delivery = await Delivery.findOrFail(id, { client: trx });
+            const order = await Order.findOrFail(delivery.orderId, { client: trx });
+            const fileId = order.fileId;
 
-        const order = await Order.findOrFail(orderId);
-        if (order.status === OrderStatusEnum.DELIVERED) {
-            order.status = OrderStatusEnum.TO_DELIVER;
-            await order.save();
-        }
+            await order.delete();
+            if (fileId) {
+                await File.query({ client: trx }).where('id', fileId).delete();
+            }
+        });
     }
 
     public async paginate(params: { page: number; perPage: number; sort: string; dir: 'asc' | 'desc'; search?: string; week?: number }) {
@@ -246,7 +252,7 @@ export default class DeliveryRepository extends BaseRepository<typeof Delivery> 
         };
         const sortColumn = allowedSorts[sort] ?? 'deliveries.delivered_at';
 
-        const q = Delivery.query().preload('order').preload('lines').preload('castellany');
+        const q = Delivery.query().preload('order').preload('lines').preload('castellany').preload('deliveredBy');
 
         if (sort === 'requesterName') {
             q.join('orders', 'orders.id', 'deliveries.order_id').select('deliveries.*');

@@ -48,12 +48,6 @@ const routes = {
     tokens: [{"old":"/organigramme","type":0,"val":"organigramme","end":""}],
     types: placeholder as Registry['organigramme']['types'],
   },
-  'livraisons.store': {
-    methods: ["POST"],
-    pattern: '/commandes/:orderId/livraisons',
-    tokens: [{"old":"/commandes/:orderId/livraisons","type":0,"val":"commandes","end":""},{"old":"/commandes/:orderId/livraisons","type":1,"val":"orderId","end":""},{"old":"/commandes/:orderId/livraisons","type":0,"val":"livraisons","end":""}],
-    types: placeholder as Registry['livraisons.store']['types'],
-  },
   'deposits.store': {
     methods: ["POST"],
     pattern: '/deposits',
@@ -431,24 +425,6 @@ const routes = {
     pattern: '/admin/balance-history/:id/rollback',
     tokens: [{"old":"/admin/balance-history/:id/rollback","type":0,"val":"admin","end":""},{"old":"/admin/balance-history/:id/rollback","type":0,"val":"balance-history","end":""},{"old":"/admin/balance-history/:id/rollback","type":1,"val":"id","end":""},{"old":"/admin/balance-history/:id/rollback","type":0,"val":"rollback","end":""}],
     types: placeholder as Registry['admin.balanceChanges.rollback']['types'],
-  },
-  'admin.commandes.index': {
-    methods: ["GET","HEAD"],
-    pattern: '/admin/commandes',
-    tokens: [{"old":"/admin/commandes","type":0,"val":"admin","end":""},{"old":"/admin/commandes","type":0,"val":"commandes","end":""}],
-    types: placeholder as Registry['admin.commandes.index']['types'],
-  },
-  'admin.commandes.validate': {
-    methods: ["PATCH"],
-    pattern: '/admin/commandes/:id/validate',
-    tokens: [{"old":"/admin/commandes/:id/validate","type":0,"val":"admin","end":""},{"old":"/admin/commandes/:id/validate","type":0,"val":"commandes","end":""},{"old":"/admin/commandes/:id/validate","type":1,"val":"id","end":""},{"old":"/admin/commandes/:id/validate","type":0,"val":"validate","end":""}],
-    types: placeholder as Registry['admin.commandes.validate']['types'],
-  },
-  'admin.commandes.cancel': {
-    methods: ["PATCH"],
-    pattern: '/admin/commandes/:id/cancel',
-    tokens: [{"old":"/admin/commandes/:id/cancel","type":0,"val":"admin","end":""},{"old":"/admin/commandes/:id/cancel","type":0,"val":"commandes","end":""},{"old":"/admin/commandes/:id/cancel","type":1,"val":"id","end":""},{"old":"/admin/commandes/:id/cancel","type":0,"val":"cancel","end":""}],
-    types: placeholder as Registry['admin.commandes.cancel']['types'],
   },
   'admin.orderArchives.create': {
     methods: ["GET","HEAD"],

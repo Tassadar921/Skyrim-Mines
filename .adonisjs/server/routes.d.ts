@@ -11,7 +11,6 @@ export type ScannedRoutes = {
     'tarifs': { paramsTuple?: []; params?: {} }
     'stocks': { paramsTuple?: []; params?: {} }
     'organigramme': { paramsTuple?: []; params?: {} }
-    'livraisons.store': { paramsTuple: [ParamValue]; params: {'orderId': ParamValue} }
     'deposits.store': { paramsTuple?: []; params?: {} }
     'deposits.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'buybacks.store': { paramsTuple?: []; params?: {} }
@@ -75,9 +74,6 @@ export type ScannedRoutes = {
     'admin.expenses.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.balanceChanges.index': { paramsTuple?: []; params?: {} }
     'admin.balanceChanges.rollback': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'admin.commandes.index': { paramsTuple?: []; params?: {} }
-    'admin.commandes.validate': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'admin.commandes.cancel': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.orderArchives.create': { paramsTuple?: []; params?: {} }
     'admin.orderArchives.store': { paramsTuple?: []; params?: {} }
     'admin.livraisons.index': { paramsTuple?: []; params?: {} }
@@ -139,7 +135,6 @@ export type ScannedRoutes = {
     'admin.buybacks.index': { paramsTuple?: []; params?: {} }
     'admin.expenses.index': { paramsTuple?: []; params?: {} }
     'admin.balanceChanges.index': { paramsTuple?: []; params?: {} }
-    'admin.commandes.index': { paramsTuple?: []; params?: {} }
     'admin.orderArchives.create': { paramsTuple?: []; params?: {} }
     'admin.livraisons.index': { paramsTuple?: []; params?: {} }
     'admin.barrelRentals.index': { paramsTuple?: []; params?: {} }
@@ -178,7 +173,6 @@ export type ScannedRoutes = {
     'admin.buybacks.index': { paramsTuple?: []; params?: {} }
     'admin.expenses.index': { paramsTuple?: []; params?: {} }
     'admin.balanceChanges.index': { paramsTuple?: []; params?: {} }
-    'admin.commandes.index': { paramsTuple?: []; params?: {} }
     'admin.orderArchives.create': { paramsTuple?: []; params?: {} }
     'admin.livraisons.index': { paramsTuple?: []; params?: {} }
     'admin.barrelRentals.index': { paramsTuple?: []; params?: {} }
@@ -191,7 +185,6 @@ export type ScannedRoutes = {
   POST: {
     'subscribe': { paramsTuple?: []; params?: {} }
     'unsubscribe': { paramsTuple?: []; params?: {} }
-    'livraisons.store': { paramsTuple: [ParamValue]; params: {'orderId': ParamValue} }
     'deposits.store': { paramsTuple?: []; params?: {} }
     'buybacks.store': { paramsTuple?: []; params?: {} }
     'organization.members.store': { paramsTuple?: []; params?: {} }
@@ -221,8 +214,6 @@ export type ScannedRoutes = {
     'admin.materials.reorder': { paramsTuple?: []; params?: {} }
     'admin.stocks.update': { paramsTuple?: []; params?: {} }
     'admin.stocks.barrel.update': { paramsTuple: [ParamValue]; params: {'resourceId': ParamValue} }
-    'admin.commandes.validate': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'admin.commandes.cancel': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.livraisons.deductStock': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.livraisons.markStockDeducted': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.barrel.update': { paramsTuple?: []; params?: {} }

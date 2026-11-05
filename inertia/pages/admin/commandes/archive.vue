@@ -193,7 +193,7 @@ function submit() {
 <template>
     <div class="space-y-4 max-w-5xl">
         <Button variant="outline" class="gap-2" as-child>
-            <Link :href="urlFor('admin.commandes.index')">
+            <Link :href="urlFor('admin.livraisons.index')">
                 <ArrowLeft class="size-4" />
                 {{ t('admin.orderArchives.create.back') }}
             </Link>
@@ -287,13 +287,13 @@ function submit() {
                     <p v-if="form.errors.deliveryWeek" class="text-sm text-destructive">{{ form.errors.deliveryWeek }}</p>
                 </div>
                 <div class="space-y-1">
-                    <Label>{{ t('home.toDeliver.castellany') }}</Label>
+                    <Label>{{ t('admin.orderArchives.create.fields.castellany') }}</Label>
                     <Select v-model="form.castellanyId">
                         <SelectTrigger>
                             <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem :value="PICKUP">{{ t('home.toDeliver.castellanyPickup') }}</SelectItem>
+                            <SelectItem :value="PICKUP">{{ t('admin.orderArchives.create.fields.castellanyPickup') }}</SelectItem>
                             <SelectItem v-for="castellany in props.castellanies" :key="castellany.id" :value="castellany.id">{{ castellany.name }}</SelectItem>
                         </SelectContent>
                     </Select>

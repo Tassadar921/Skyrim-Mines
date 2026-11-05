@@ -5,12 +5,12 @@
 
 export const controllers = {
   admin: {
+    Agenda: () => import('#controllers/admin/agenda_controller'),
     BalanceChanges: () => import('#controllers/admin/balance_changes_controller'),
     Barrel: () => import('#controllers/admin/barrel_controller'),
     BarrelRentals: () => import('#controllers/admin/barrel_rentals_controller'),
     Buybacks: () => import('#controllers/admin/buybacks_controller'),
     Castellanies: () => import('#controllers/admin/castellanies_controller'),
-    Commandes: () => import('#controllers/admin/commandes_controller'),
     CompanyExpenses: () => import('#controllers/admin/company_expenses_controller'),
     Dashboard: () => import('#controllers/admin/dashboard_controller'),
     Livraisons: () => import('#controllers/admin/livraisons_controller'),
@@ -22,13 +22,11 @@ export const controllers = {
     SiteSettings: () => import('#controllers/admin/site_settings_controller'),
     Stocks: () => import('#controllers/admin/stocks_controller'),
     Users: () => import('#controllers/admin/users_controller'),
-    Agenda: () => import('#controllers/admin/agenda_controller'),
   },
   Auth: () => import('#controllers/auth_controller'),
   Buybacks: () => import('#controllers/buybacks_controller'),
   Deposits: () => import('#controllers/deposits_controller'),
   Home: () => import('#controllers/home_controller'),
-  Livraisons: () => import('#controllers/livraisons_controller'),
   Organigramme: () => import('#controllers/organigramme_controller'),
   Organization: () => import('#controllers/organization_controller'),
   Stocks: () => import('#controllers/stocks_controller'),

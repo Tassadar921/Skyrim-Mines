@@ -10,21 +10,6 @@
         "myBarrel": {
             "title": "Mon tonneau",
             "totalValue": "Valeur totale de mon tonneau :"
-        },
-        "toDeliver": {
-            "title": "Commandes à livrer",
-            "count": "commande à livrer | commande à livrer | commandes à livrer",
-            "remaining": "Restant à livrer",
-            "quantityToDeliver": "Quantité à livrer",
-            "castellany": "Châtellerie de destination",
-            "castellanyPickup": "Retrait sur place",
-            "deliverButton": "Enregistrer la livraison",
-            "deliverConfirm": {
-                "title": "Confirmer cette livraison ?",
-                "description": "Les quantités indiquées seront enregistrées comme livrées pour la commande n° {number}.",
-                "cancel": "Retour",
-                "confirm": "Confirmer la livraison"
-            }
         }
     },
     "tarifs": {
@@ -218,7 +203,6 @@
                 "buybacks": "Historique des rachats",
                 "expenses": "Dépenses",
                 "balanceChanges": "Historique des soldes",
-                "commandes": "Commandes",
                 "livraisons": "Livraisons",
                 "castellanies": "Châtelleries"
             }
@@ -763,39 +747,10 @@
                 "confirm": "Annuler la modification"
             }
         },
-        "commandes": {
-            "title": "Commandes",
-            "table": {
-                "count": "commande | commande | commandes",
-                "search": "Rechercher un client ou une organisation…",
-                "number": "N°",
-                "date": "Date",
-                "requester": "Demandé par",
-                "organization": "Organisation",
-                "noOrganization": "Aucune",
-                "status": "Statut",
-                "allStatuses": "Tous les statuts",
-                "amount": "Montant",
-                "actions": "Actions",
-                "download": "Télécharger",
-                "empty": "Aucune commande trouvée"
-            },
-            "detail": {
-                "resource": "Ressource",
-                "quantity": "Quantité",
-                "unitPrice": "Prix unitaire",
-                "total": "Total",
-                "delivery": "Livraison"
-            },
-            "actions": {
-                "validate": "Valider"
-            },
-            "archiveLink": "Archiver une commande"
-        },
         "orderArchives": {
             "create": {
                 "title": "Archiver une commande",
-                "back": "Retour à la liste",
+                "back": "Retour aux livraisons",
                 "description": "Enregistrez une commande et sa livraison pour une semaine passée, par exemple pour archiver une commande passée avant la mise en place de l'application. La commande est immédiatement marquée comme entièrement livrée.",
                 "submit": "Archiver",
                 "fields": {
@@ -803,6 +758,8 @@
                     "recipientPlaceholder": "Sélectionner un destinataire",
                     "orderWeek": "Semaine de la commande",
                     "deliveryWeek": "Semaine de la livraison",
+                    "castellany": "Châtellerie de destination",
+                    "castellanyPickup": "Retrait sur place",
                     "deductFromStock": "Déduire les quantités du stock",
                     "deductFromStockHelp": "Prend en priorité sur le stock racheté, puis rachète le manquant sur le tonneau des mineurs si besoin. Le récapitulatif du rachat sera affiché après l'archivage."
                 }
@@ -810,6 +767,7 @@
         },
         "livraisons": {
             "title": "Livraisons",
+            "archiveLink": "Archiver une commande",
             "table": {
                 "count": "livraison | livraison | livraisons",
                 "search": "Rechercher un client ou une organisation…",
@@ -817,6 +775,7 @@
                 "order": "Commande",
                 "organization": "Organisation",
                 "noOrganization": "Aucune",
+                "archivedBy": "Archivé par",
                 "castellany": "Châtellerie",
                 "castellanyPickup": "Retrait sur place",
                 "week": "Semaine",
@@ -876,7 +835,7 @@
             "delete": {
                 "label": "Supprimer",
                 "title": "Supprimer cette livraison ?",
-                "description": "La commande n° {number} redeviendra « À livrer » si elle était marquée comme entièrement livrée. Cette action est irréversible.",
+                "description": "La commande n° {number} sera supprimée avec cette livraison, ainsi que ses éventuelles autres livraisons. Le stock déjà déduit ne sera pas restitué. Cette action est irréversible.",
                 "cancel": "Annuler",
                 "confirm": "Supprimer"
             },

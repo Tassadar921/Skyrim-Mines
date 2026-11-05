@@ -91,18 +91,6 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/organigramme_controller').default['index']>>>
     }
   }
-  'livraisons.store': {
-    methods: ["POST"]
-    pattern: '/commandes/:orderId/livraisons'
-    types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/deliveries').createDeliveryValidator)>>
-      paramsTuple: [ParamValue]
-      params: { orderId: ParamValue }
-      query: ExtractQuery<InferInput<(typeof import('#validators/deliveries').createDeliveryValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/livraisons_controller').default['store']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/livraisons_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
   'deposits.store': {
     methods: ["POST"]
     pattern: '/deposits'
@@ -857,42 +845,6 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/balance_changes_controller').default['rollback']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/balance_changes_controller').default['rollback']>>>
-    }
-  }
-  'admin.commandes.index': {
-    methods: ["GET","HEAD"]
-    pattern: '/admin/commandes'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: ExtractQueryForGet<InferInput<(typeof import('#validators/admin/orders').indexOrderValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/commandes_controller').default['index']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/commandes_controller').default['index']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
-  'admin.commandes.validate': {
-    methods: ["PATCH"]
-    pattern: '/admin/commandes/:id/validate'
-    types: {
-      body: {}
-      paramsTuple: [ParamValue]
-      params: { id: ParamValue }
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/commandes_controller').default['validate']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/commandes_controller').default['validate']>>>
-    }
-  }
-  'admin.commandes.cancel': {
-    methods: ["PATCH"]
-    pattern: '/admin/commandes/:id/cancel'
-    types: {
-      body: {}
-      paramsTuple: [ParamValue]
-      params: { id: ParamValue }
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/commandes_controller').default['cancel']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/commandes_controller').default['cancel']>>>
     }
   }
   'admin.orderArchives.create': {

@@ -5,7 +5,7 @@ import { useAdminLayout } from '~/composables/use_admin_layout';
 import { useAuth } from '~/composables/use_auth';
 import { useI18n } from 'vue-i18n';
 import { computed, ref } from 'vue';
-import { router } from '@inertiajs/vue3';
+import { Link, router } from '@inertiajs/vue3';
 import { urlFor } from '~/client';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '~/components/ui/table';
 import { Button } from '~/components/ui/button';
@@ -28,7 +28,7 @@ import {
     AlertDialogAction,
 } from '~/components/ui/alert-dialog';
 import type { AcceptableValue } from 'reka-ui';
-import { ArrowUp, ArrowDown, ArrowUpDown, ChevronDown, ChevronRight, FilterX, PackageMinus } from '@lucide/vue';
+import { ArrowUp, ArrowDown, ArrowUpDown, ChevronDown, ChevronRight, FilterX, PackageMinus, Archive } from '@lucide/vue';
 
 defineOptions({ layout: AdminLayout });
 
@@ -41,6 +41,7 @@ type DeliveryRow = {
     requesterName: string;
     organizationName: string | null;
     castellanyName: string | null;
+    archivedByName: string | null;
     stockDeducted: boolean;
     lines: DeliveryLine[];
     totalProfit: number;
@@ -211,24 +212,32 @@ const statsOreData = computed<(OreRef & { value: number })[]>(() => {
                 <div class="flex flex-wrap items-center justify-between gap-2">
                     <Badge variant="outline">{{ meta.total }} {{ t('admin.livraisons.table.count', meta.total) }}</Badge>
 
-                    <AlertDialog v-if="isManager && pendingStockDeductionCount > 0">
-                        <AlertDialogTrigger as-child>
-                            <Button variant="outline" size="sm" class="gap-2" :loading="isDeductingAll" :disabled="isDeductingAll">
-                                <PackageMinus class="size-4" />
-                                {{ t('admin.livraisons.deductStock.allButton', { count: pendingStockDeductionCount }) }}
-                            </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                            <AlertDialogHeader>
-                                <AlertDialogTitle>{{ t('admin.livraisons.deductStock.allConfirm.title') }}</AlertDialogTitle>
-                                <AlertDialogDescription>{{ t('admin.livraisons.deductStock.allConfirm.description', { count: pendingStockDeductionCount }) }}</AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                                <AlertDialogCancel>{{ t('admin.livraisons.deductStock.allConfirm.cancel') }}</AlertDialogCancel>
-                                <AlertDialogAction @click="deductStockAll">{{ t('admin.livraisons.deductStock.allConfirm.confirm') }}</AlertDialogAction>
-                            </AlertDialogFooter>
-                        </AlertDialogContent>
-                    </AlertDialog>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <AlertDialog v-if="isManager && pendingStockDeductionCount > 0">
+                            <AlertDialogTrigger as-child>
+                                <Button variant="outline" size="sm" class="gap-2" :loading="isDeductingAll" :disabled="isDeductingAll">
+                                    <PackageMinus class="size-4" />
+                                    {{ t('admin.livraisons.deductStock.allButton', { count: pendingStockDeductionCount }) }}
+                                </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>{{ t('admin.livraisons.deductStock.allConfirm.title') }}</AlertDialogTitle>
+                                    <AlertDialogDescription>{{ t('admin.livraisons.deductStock.allConfirm.description', { count: pendingStockDeductionCount }) }}</AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel>{{ t('admin.livraisons.deductStock.allConfirm.cancel') }}</AlertDialogCancel>
+                                    <AlertDialogAction @click="deductStockAll">{{ t('admin.livraisons.deductStock.allConfirm.confirm') }}</AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
+                        <Button v-if="isManager" variant="outline" class="gap-2" as-child>
+                            <Link :href="urlFor('admin.orderArchives.create')">
+                                <Archive class="size-4" />
+                                {{ t('admin.livraisons.archiveLink') }}
+                            </Link>
+                        </Button>
+                    </div>
                 </div>
 
                 <div class="rounded-md border p-3 space-y-2">
@@ -291,6 +300,7 @@ const statsOreData = computed<(OreRef & { value: number })[]>(() => {
                                 </TableHead>
                                 <TableHead>{{ t('admin.livraisons.table.order') }}</TableHead>
                                 <TableHead>{{ t('admin.livraisons.table.organization') }}</TableHead>
+                                <TableHead>{{ t('admin.livraisons.table.archivedBy') }}</TableHead>
                                 <TableHead>{{ t('admin.livraisons.table.amount') }}</TableHead>
                                 <TableHead>{{ t('admin.livraisons.table.profit') }}</TableHead>
                                 <TableHead>{{ t('admin.livraisons.deductStock.column') }}</TableHead>
@@ -314,6 +324,7 @@ const statsOreData = computed<(OreRef & { value: number })[]>(() => {
                                             <span v-if="delivery.organizationName">{{ delivery.organizationName }}</span>
                                             <span v-else class="italic">{{ t('admin.livraisons.table.noOrganization') }}</span>
                                         </TableCell>
+                                        <TableCell class="text-sm text-muted-foreground">{{ delivery.archivedByName ?? '—' }}</TableCell>
                                         <TableCell class="text-sm font-medium">{{ deliveryTotal(delivery).toFixed(2) }} s</TableCell>
                                         <TableCell class="text-sm font-medium" :class="delivery.totalProfit >= 0 ? 'text-green-600' : 'text-destructive'">
                                             {{ delivery.totalProfit.toFixed(2) }} s
@@ -373,7 +384,7 @@ const statsOreData = computed<(OreRef & { value: number })[]>(() => {
                                     </TableRow>
                                     <TableRow v-if="expanded.has(delivery.id)">
                                         <TableCell />
-                                        <TableCell :colspan="8" class="bg-muted/30 p-3">
+                                        <TableCell :colspan="9" class="bg-muted/30 p-3">
                                             <Table>
                                                 <TableHeader>
                                                     <TableRow>
@@ -402,7 +413,7 @@ const statsOreData = computed<(OreRef & { value: number })[]>(() => {
                                 </template>
                             </template>
                             <TableRow v-else>
-                                <TableCell :colspan="9" class="h-24 text-center text-muted-foreground">
+                                <TableCell :colspan="10" class="h-24 text-center text-muted-foreground">
                                     {{ t('admin.livraisons.table.empty') }}
                                 </TableCell>
                             </TableRow>
