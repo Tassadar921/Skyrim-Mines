@@ -146,6 +146,7 @@ export interface ApiDefinition {
       store: typeof routes['admin.agenda.store']
       update: typeof routes['admin.agenda.update']
       assign: typeof routes['admin.agenda.assign']
+      release: typeof routes['admin.agenda.release']
       destroy: typeof routes['admin.agenda.destroy']
     }
     organizations: {

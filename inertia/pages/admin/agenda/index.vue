@@ -6,6 +6,7 @@ import { useI18n } from 'vue-i18n';
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { router, useForm } from '@inertiajs/vue3';
 import { urlFor } from '~/client';
+import { getTransmit } from '~/lib/transmit';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Textarea } from '~/components/ui/textarea';
@@ -13,10 +14,22 @@ import { Checkbox } from '~/components/ui/checkbox';
 import { Label } from '~/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '~/components/ui/dialog';
 import DeleteButton from '~/components/ui/DeleteButton.vue';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from '~/components/ui/alert-dialog';
 import AgendaMonthGrid from '~/partials/admin/agenda/AgendaMonthGrid.vue';
 import AgendaTimeGrid from '~/partials/admin/agenda/AgendaTimeGrid.vue';
+import AgendaTakeButtons, { type AgendaTakeMode } from '~/partials/admin/agenda/AgendaTakeButtons.vue';
 import { type AgendaEvent, type AgendaView, capitalize, eventDotClass, eventsOnDay, formatDay, formatMinutes, dayOf, MINUTES_PER_DAY } from '~/lib/agenda';
-import { ChevronLeft, ChevronRight, Plus, Users, Lock, Maximize2, Minimize2, Repeat, CircleAlert, Hand } from '@lucide/vue';
+import { ChevronLeft, ChevronRight, Plus, Users, Lock, Maximize2, Minimize2, Repeat, CircleAlert } from '@lucide/vue';
 
 defineOptions({ layout: AdminLayout });
 
@@ -103,10 +116,22 @@ function onKeydown(event: KeyboardEvent) {
     if (event.key === 'Escape' && isFullscreen.value && !dialogOpen.value) isFullscreen.value = false;
 }
 
-onMounted(() => document.addEventListener('keydown', onKeydown, true));
+// Live updates: any owner's change (create, edit, take, release, delete) reloads the events of every open agenda.
+let agendaSubscription: ReturnType<ReturnType<typeof getTransmit>['subscription']> | undefined;
+
+onMounted(async () => {
+    document.addEventListener('keydown', onKeydown, true);
+
+    agendaSubscription = getTransmit().subscription('agenda');
+    await agendaSubscription.create();
+    agendaSubscription.onMessage(() => {
+        router.reload({ only: ['events', 'unassignedEvents'] });
+    });
+});
 onBeforeUnmount(() => {
     document.removeEventListener('keydown', onKeydown, true);
     document.body.style.overflow = '';
+    agendaSubscription?.delete();
 });
 
 const dialogOpen = ref(false);
@@ -179,13 +204,28 @@ function submit() {
 
 const assigningKey = ref<string | null>(null);
 
-/** "I'll handle it": personal moves the event to the taker's own agenda, shared keeps it shared but no longer to assign. */
-function assign(event: AgendaEvent, mode: 'personal' | 'shared') {
-    assigningKey.value = `${event.id}:${mode}`;
+/**
+ * "I'll handle it": personal moves the event to the taker's own agenda, shared keeps it shared but no longer to assign.
+ * A weekly series is taken for the clicked occurrence only.
+ */
+function assign(event: AgendaEvent, mode: AgendaTakeMode) {
+    assigningKey.value = `${event.occurrenceKey}:${mode}`;
     router.post(
         urlFor('admin.agenda.assign', { id: event.id }),
-        { mode },
+        { mode, occurrenceDate: event.recursWeekly ? dayOf(event.startsAt) : undefined },
         { preserveScroll: true, preserveState: true, onSuccess: () => (dialogOpen.value = false), onFinish: () => (assigningKey.value = null) },
+    );
+}
+
+const isReleasing = ref(false);
+
+/** Last-minute hitch: hands the event (or this weekly occurrence) back to the other owners. */
+function release(event: AgendaEvent) {
+    isReleasing.value = true;
+    router.post(
+        urlFor('admin.agenda.release', { id: event.id }),
+        { occurrenceDate: event.recursWeekly ? dayOf(event.startsAt) : undefined },
+        { preserveScroll: true, preserveState: true, onSuccess: () => (dialogOpen.value = false), onFinish: () => (isReleasing.value = false) },
     );
 }
 
@@ -256,15 +296,7 @@ function destroy() {
                         </div>
                         <div class="text-xs text-muted-foreground">{{ occurrenceLabel(event) }} · {{ t('admin.agenda.sharedBy', { name: event.ownerName ?? '—' }) }}</div>
                     </button>
-                    <div class="flex flex-wrap gap-1.5">
-                        <Button size="sm" class="gap-1" :loading="assigningKey === `${event.id}:personal`" :disabled="!!assigningKey" @click="assign(event, 'personal')">
-                            <Hand class="size-3.5" />
-                            {{ t('admin.agenda.unassigned.takePersonal') }}
-                        </Button>
-                        <Button size="sm" variant="outline" :loading="assigningKey === `${event.id}:shared`" :disabled="!!assigningKey" @click="assign(event, 'shared')">
-                            {{ t('admin.agenda.unassigned.takeShared') }}
-                        </Button>
-                    </div>
+                    <AgendaTakeButtons :event="event" :assigning-key="assigningKey" @take="(mode) => assign(event, mode)" />
                 </div>
             </div>
         </div>
@@ -352,16 +384,32 @@ function destroy() {
                             <CircleAlert class="size-4" />
                             {{ t('admin.agenda.unassigned.dialogTitle') }}
                         </div>
-                        <div class="flex flex-wrap gap-2">
-                            <Button size="sm" class="gap-1" :loading="assigningKey === `${editingEvent.id}:personal`" :disabled="!!assigningKey" @click="assign(editingEvent, 'personal')">
-                                <Hand class="size-3.5" />
-                                {{ t('admin.agenda.unassigned.takePersonal') }}
-                            </Button>
-                            <Button size="sm" variant="outline" :loading="assigningKey === `${editingEvent.id}:shared`" :disabled="!!assigningKey" @click="assign(editingEvent, 'shared')">
-                                {{ t('admin.agenda.unassigned.takeShared') }}
-                            </Button>
-                        </div>
-                        <p class="text-xs text-muted-foreground">{{ t('admin.agenda.unassigned.hint') }}</p>
+                        <AgendaTakeButtons :event="editingEvent" :assigning-key="assigningKey" @take="(mode) => assign(editingEvent!, mode)" />
+                        <p class="text-xs text-muted-foreground">
+                            {{
+                                editingEvent.recursWeekly
+                                    ? t('admin.agenda.unassigned.hintWeekly', { date: formatDay(dayOf(editingEvent.startsAt), { weekday: 'long', day: 'numeric', month: 'long' }) })
+                                    : t('admin.agenda.unassigned.hint')
+                            }}
+                        </p>
+                    </div>
+                    <div v-else-if="editingEvent?.canRelease" class="flex flex-wrap items-center justify-between gap-2 rounded-md border p-3">
+                        <div class="text-sm">{{ t(editingEvent.recursWeekly ? 'admin.agenda.release.youOccurrence' : 'admin.agenda.release.you') }}</div>
+                        <AlertDialog>
+                            <AlertDialogTrigger as-child>
+                                <Button size="sm" variant="outline" :loading="isReleasing" :disabled="isReleasing">{{ t('admin.agenda.release.button') }}</Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>{{ t('admin.agenda.release.confirm.title') }}</AlertDialogTitle>
+                                    <AlertDialogDescription>{{ t('admin.agenda.release.confirm.description', { title: editingEvent.title }) }}</AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel>{{ t('admin.agenda.release.confirm.cancel') }}</AlertDialogCancel>
+                                    <AlertDialogAction @click="release(editingEvent)">{{ t('admin.agenda.release.confirm.confirm') }}</AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
                     </div>
                     <p v-else-if="editingEvent?.isShared && editingEvent.assigneeName" class="text-sm text-muted-foreground">
                         {{ t('admin.agenda.unassigned.takenBy', { name: editingEvent.assigneeName }) }}

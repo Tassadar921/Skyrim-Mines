@@ -1,12 +1,45 @@
 import { type HttpContext } from '@adonisjs/core/http';
 import { DateTime } from 'luxon';
 import logger from '@adonisjs/core/services/logger';
+import transmit from '@adonisjs/transmit/services/main';
 import AgendaEventRepository from '#repositories/agenda_event_repository';
-import { assignAgendaEventValidator, indexAgendaEventValidator, storeAgendaEventValidator, type AGENDA_VIEWS } from '#validators/admin/agenda_events';
+import { assignAgendaEventValidator, releaseAgendaEventValidator, indexAgendaEventValidator, storeAgendaEventValidator, type AGENDA_VIEWS } from '#validators/admin/agenda_events';
 import { GAME_TIMEZONE } from '#helpers/game_week_helper';
 import type AgendaEvent from '#models/agenda_event';
 
 const LOCAL_DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm";
+
+/** Tells every owner's open agenda to reload: the payload is empty, each one refetches what it is allowed to see. */
+function broadcastAgendaChange(): void {
+    transmit.broadcast('agenda', {});
+}
+
+/** A "to assign" occurrence can be taken at most this many days before it starts. */
+const TAKE_AHEAD_DAYS = 7;
+
+type Occurrence = { startsAt: DateTime; endsAt: DateTime };
+
+function isTakeable(occurrence: Occurrence, now: DateTime): boolean {
+    return occurrence.startsAt <= now.plus({ days: TAKE_AHEAD_DAYS }) && occurrence.endsAt >= now;
+}
+
+/** Who handles an occurrence: per occurrence for a weekly series, for the whole event otherwise. */
+function occurrenceAssignee(event: AgendaEvent, occurrence: Occurrence): string | null {
+    if (!event.recursWeekly) return event.assignedTo?.username ?? null;
+    const day = occurrence.startsAt.toISODate();
+    return event.occurrenceAssignments?.find((assignment) => assignment.occurrenceDate.toISODate() === day)?.user?.username ?? null;
+}
+
+/** Whether the given owner took this occurrence (or this whole one-off event) over. */
+function isTakenBy(event: AgendaEvent, occurrence: Occurrence, userId: string): boolean {
+    if (!event.recursWeekly) return event.assignedToId === userId;
+    const day = occurrence.startsAt.toISODate();
+    return !!event.occurrenceAssignments?.some((assignment) => assignment.occurrenceDate.toISODate() === day && assignment.userId === userId);
+}
+
+function needsAssigneeAt(event: AgendaEvent, occurrence: Occurrence): boolean {
+    return event.isShared && event.needsAssignee && (!event.recursWeekly || occurrenceAssignee(event, occurrence) === null);
+}
 
 type AgendaView = (typeof AGENDA_VIEWS)[number];
 
@@ -63,7 +96,7 @@ function parseSchedule(data: AgendaEventInput): { schedule: ParsedSchedule } | {
  * Occurrences of an event overlapping [from, to]: the event itself, or each weekly repetition of it.
  * Weeks are added in Europe/Paris wall-clock time, so a 9:00 meeting stays at 9:00 across DST changes.
  */
-function occurrencesInRange(event: AgendaEvent, from: DateTime, to: DateTime): { startsAt: DateTime; endsAt: DateTime }[] {
+function occurrencesInRange(event: AgendaEvent, from: DateTime, to: DateTime): Occurrence[] {
     const firstStart = event.startsAt.setZone(GAME_TIMEZONE);
     const firstEnd = event.endsAt.setZone(GAME_TIMEZONE);
     if (!event.recursWeekly) return [{ startsAt: firstStart, endsAt: firstEnd }];
@@ -82,8 +115,9 @@ function occurrencesInRange(event: AgendaEvent, from: DateTime, to: DateTime): {
     return occurrences;
 }
 
-function serializeOccurrence(event: AgendaEvent, occurrence: { startsAt: DateTime; endsAt: DateTime }, userId: string) {
+function serializeOccurrence(event: AgendaEvent, occurrence: Occurrence, userId: string, now: DateTime) {
     const startsAt = occurrence.startsAt.toFormat(LOCAL_DATE_TIME_FORMAT);
+    const needsAssignee = needsAssigneeAt(event, occurrence);
     return {
         id: event.id,
         occurrenceKey: `${event.id}:${startsAt}`,
@@ -98,11 +132,24 @@ function serializeOccurrence(event: AgendaEvent, occurrence: { startsAt: DateTim
         seriesEndsAt: event.endsAt.setZone(GAME_TIMEZONE).toFormat(LOCAL_DATE_TIME_FORMAT),
         recursWeekly: event.recursWeekly,
         recurrenceEndsOn: event.recurrenceEndsOn?.toISODate() ?? null,
-        needsAssignee: event.isShared && event.needsAssignee,
-        assigneeName: event.assignedTo?.username ?? null,
+        needsAssignee,
+        canTake: needsAssignee && isTakeable(occurrence, now),
+        /** Day from which a still-too-far occurrence can be taken. */
+        takeableFrom: needsAssignee ? occurrence.startsAt.minus({ days: TAKE_AHEAD_DAYS }).toISODate()! : null,
+        assigneeName: occurrenceAssignee(event, occurrence),
+        /** The viewer took it and it is not over: they may hand it back ("to assign" again). */
+        canRelease: isTakenBy(event, occurrence, userId) && occurrence.endsAt >= now,
         ownerName: event.owner?.username ?? null,
         isOwner: event.ownerId === userId,
     };
+}
+
+/** The occurrence targeted by a take / release: the one starting on `occurrenceDate` for a weekly series, the event itself otherwise. */
+function resolveOccurrence(event: AgendaEvent, occurrenceDate?: string): Occurrence | undefined {
+    if (!event.recursWeekly) return { startsAt: event.startsAt.setZone(GAME_TIMEZONE), endsAt: event.endsAt.setZone(GAME_TIMEZONE) };
+    const day = occurrenceDate ? DateTime.fromISO(occurrenceDate, { zone: GAME_TIMEZONE }) : null;
+    if (!day?.isValid) return undefined;
+    return occurrencesInRange(event, day.startOf('day'), day.endOf('day')).find((candidate) => candidate.startsAt.toISODate() === occurrenceDate);
 }
 
 export default class AgendaController {
@@ -133,14 +180,15 @@ export default class AgendaController {
             today: now.toISODate()!,
             days,
             events: events
-                .flatMap((event) => occurrencesInRange(event, start, end).map((occurrence) => serializeOccurrence(event, occurrence, user.id)))
+                .flatMap((event) => occurrencesInRange(event, start, end).map((occurrence) => serializeOccurrence(event, occurrence, user.id, now)))
                 .sort((a, b) => a.startsAt.localeCompare(b.startsAt)),
-            // Shown whatever the period on screen, each at its next occurrence (or the ongoing one).
+            // Shown whatever the period on screen: every occurrence that can be taken right now (starting within a week).
             unassignedEvents: unassignedEvents
-                .flatMap((event) => {
-                    const [nextOccurrence] = occurrencesInRange(event, now, now.plus({ weeks: 2 }));
-                    return nextOccurrence ? [serializeOccurrence(event, nextOccurrence, user.id)] : [];
-                })
+                .flatMap((event) =>
+                    occurrencesInRange(event, now, now.plus({ days: TAKE_AHEAD_DAYS }))
+                        .filter((occurrence) => needsAssigneeAt(event, occurrence) && isTakeable(occurrence, now))
+                        .map((occurrence) => serializeOccurrence(event, occurrence, user.id, now)),
+                )
                 .sort((a, b) => a.startsAt.localeCompare(b.startsAt)),
         });
     }
@@ -164,6 +212,7 @@ export default class AgendaController {
                 needsAssignee: data.isShared && data.needsAssignee,
                 assignedToId: null,
             });
+            broadcastAgendaChange();
             session.flash('success', i18n.t('messages.admin.agenda.store.success'));
         } catch (e) {
             logger.error({ err: e }, 'agenda.store failed');
@@ -202,6 +251,7 @@ export default class AgendaController {
                 needsAssignee,
                 assignedToId: needsAssignee ? null : event.assignedToId,
             });
+            broadcastAgendaChange();
             session.flash('success', i18n.t('messages.admin.agenda.update.success'));
         } catch (e) {
             logger.error({ err: e }, 'agenda.update failed');
@@ -212,7 +262,7 @@ export default class AgendaController {
     }
 
     public async assign({ params, request, response, session, i18n, auth }: HttpContext) {
-        const { mode } = await request.validateUsing(assignAgendaEventValidator);
+        const { mode, occurrenceDate } = await request.validateUsing(assignAgendaEventValidator);
         const user = auth.user!;
         const event = await this.agendaEventRepository.findVisible(params.id, user.id);
         if (!event) {
@@ -224,12 +274,61 @@ export default class AgendaController {
             return response.redirect().back();
         }
 
+        const now = DateTime.now().setZone(GAME_TIMEZONE);
+        // Weekly series are taken one occurrence at a time, and stay shared: next week may be handled by someone else.
+        const occurrence = resolveOccurrence(event, occurrenceDate);
+        if (!occurrence) {
+            session.flash('error', i18n.t('messages.admin.agenda.notFound'));
+            return response.redirect().back();
+        }
+        if (!isTakeable(occurrence, now)) {
+            session.flash('error', i18n.t('messages.admin.agenda.assign.tooEarly', { days: TAKE_AHEAD_DAYS }));
+            return response.redirect().back();
+        }
+
         try {
-            await this.agendaEventRepository.assign(event, user, mode);
-            session.flash('success', i18n.t(`messages.admin.agenda.assign.${mode}`));
+            if (event.recursWeekly) {
+                const taken = await this.agendaEventRepository.assignOccurrence(event, occurrence.startsAt.startOf('day'), user);
+                if (taken) broadcastAgendaChange();
+                session.flash(taken ? 'success' : 'error', i18n.t(taken ? 'messages.admin.agenda.assign.occurrence' : 'messages.admin.agenda.assign.alreadyTaken'));
+            } else {
+                await this.agendaEventRepository.assign(event, user, mode);
+                broadcastAgendaChange();
+                session.flash('success', i18n.t(`messages.admin.agenda.assign.${mode}`));
+            }
         } catch (e) {
             logger.error({ err: e }, 'agenda.assign failed');
             session.flash('error', i18n.t('messages.admin.agenda.assign.error'));
+        }
+
+        return response.redirect().back();
+    }
+
+    /** Last-minute hitch: whoever took an event (or one weekly occurrence) hands it back to the other owners. */
+    public async release({ params, request, response, session, i18n, auth }: HttpContext) {
+        const { occurrenceDate } = await request.validateUsing(releaseAgendaEventValidator);
+        const user = auth.user!;
+        const event = await this.agendaEventRepository.findVisible(params.id, user.id);
+        const occurrence = event ? resolveOccurrence(event, occurrenceDate) : undefined;
+        if (!event || !occurrence) {
+            session.flash('error', i18n.t('messages.admin.agenda.notFound'));
+            return response.redirect().back();
+        }
+
+        await event.load('occurrenceAssignments');
+        const now = DateTime.now().setZone(GAME_TIMEZONE);
+        if (!isTakenBy(event, occurrence, user.id) || occurrence.endsAt < now) {
+            session.flash('error', i18n.t('messages.admin.agenda.release.notYours'));
+            return response.redirect().back();
+        }
+
+        try {
+            await (event.recursWeekly ? this.agendaEventRepository.releaseOccurrence(event, occurrence.startsAt.startOf('day')) : this.agendaEventRepository.release(event));
+            broadcastAgendaChange();
+            session.flash('success', i18n.t('messages.admin.agenda.release.success'));
+        } catch (e) {
+            logger.error({ err: e }, 'agenda.release failed');
+            session.flash('error', i18n.t('messages.admin.agenda.release.error'));
         }
 
         return response.redirect().back();
@@ -244,6 +343,7 @@ export default class AgendaController {
 
         try {
             await this.agendaEventRepository.delete(event);
+            broadcastAgendaChange();
             session.flash('success', i18n.t('messages.admin.agenda.destroy.success'));
         } catch (e) {
             logger.error({ err: e }, 'agenda.destroy failed');

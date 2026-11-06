@@ -7,6 +7,23 @@
 import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 
+export class AgendaEventOccurrenceAssignmentSchema extends BaseModel {
+  static $columns = ['agendaEventId', 'createdAt', 'id', 'occurrenceDate', 'updatedAt', 'userId'] as const
+  $columns = AgendaEventOccurrenceAssignmentSchema.$columns
+  @column()
+  declare agendaEventId: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: string
+  @column.date()
+  declare occurrenceDate: DateTime
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare userId: string
+}
+
 export class AgendaEventSchema extends BaseModel {
   static $columns = ['allDay', 'assignedToId', 'createdAt', 'description', 'endsAt', 'id', 'isShared', 'needsAssignee', 'ownerId', 'recurrenceEndsOn', 'recursWeekly', 'startsAt', 'title', 'updatedAt'] as const
   $columns = AgendaEventSchema.$columns

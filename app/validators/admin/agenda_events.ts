@@ -31,4 +31,16 @@ export const storeAgendaEventValidator = vine.create({
 
 export const assignAgendaEventValidator = vine.create({
     mode: vine.enum(['personal', 'shared']),
+    /** Start day of the occurrence taken, required for weekly events. */
+    occurrenceDate: vine
+        .string()
+        .regex(/^\d{4}-\d{2}-\d{2}$/)
+        .optional(),
+});
+
+export const releaseAgendaEventValidator = vine.create({
+    occurrenceDate: vine
+        .string()
+        .regex(/^\d{4}-\d{2}-\d{2}$/)
+        .optional(),
 });

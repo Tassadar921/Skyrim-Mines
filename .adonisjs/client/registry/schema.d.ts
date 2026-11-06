@@ -1075,6 +1075,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/agenda_controller').default['assign']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'admin.agenda.release': {
+    methods: ["POST"]
+    pattern: '/admin/agenda/:id/release'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/admin/agenda_events').releaseAgendaEventValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/admin/agenda_events').releaseAgendaEventValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/agenda_controller').default['release']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/agenda_controller').default['release']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'admin.agenda.destroy': {
     methods: ["DELETE"]
     pattern: '/admin/agenda/:id'

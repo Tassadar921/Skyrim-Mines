@@ -2,6 +2,7 @@ import { type DateTime } from 'luxon';
 import type User from '#models/user';
 import BaseRepository from '#repositories/base/base_repository';
 import AgendaEvent from '#models/agenda_event';
+import AgendaEventOccurrenceAssignment from '#models/agenda_event_occurrence_assignment';
 
 type AgendaEventPayload = {
     title: string;
@@ -40,6 +41,7 @@ export default class AgendaEventRepository extends BaseRepository<typeof AgendaE
             )
             .preload('owner')
             .preload('assignedTo')
+            .preload('occurrenceAssignments', (assignments) => assignments.preload('user'))
             .orderBy('startsAt', 'asc');
     }
 
@@ -54,13 +56,36 @@ export default class AgendaEventRepository extends BaseRepository<typeof AgendaE
                     .orWhere((series) => series.where('recursWeekly', true).where((until) => until.whereNull('recurrenceEndsOn').orWhere('recurrenceEndsOn', '>=', now.toISODate()!))),
             )
             .preload('owner')
+            .preload('occurrenceAssignments', (assignments) => assignments.preload('user'))
             .orderBy('startsAt', 'asc');
+    }
+
+    /** Takes one occurrence of a weekly series; false when someone already took it (the unique key also guards concurrent takes). */
+    public async assignOccurrence(event: AgendaEvent, occurrenceDate: DateTime, user: User): Promise<boolean> {
+        const existing = await AgendaEventOccurrenceAssignment.query().where('agendaEventId', event.id).where('occurrenceDate', occurrenceDate.toISODate()!).first();
+        if (existing) return false;
+
+        try {
+            await AgendaEventOccurrenceAssignment.create({ agendaEventId: event.id, occurrenceDate, userId: user.id });
+            return true;
+        } catch {
+            return false;
+        }
     }
 
     public async assign(event: AgendaEvent, user: User, mode: AgendaAssignMode): Promise<AgendaEvent> {
         event.merge({ needsAssignee: false, assignedToId: user.id });
         if (mode === 'personal') event.merge({ ownerId: user.id, isShared: false });
         return event.save();
+    }
+
+    /** Back to "to assign"; an event moved to the taker's personal agenda is shared again (it stays owned by them). */
+    public async release(event: AgendaEvent): Promise<AgendaEvent> {
+        return event.merge({ isShared: true, needsAssignee: true, assignedToId: null }).save();
+    }
+
+    public async releaseOccurrence(event: AgendaEvent, occurrenceDate: DateTime): Promise<void> {
+        await AgendaEventOccurrenceAssignment.query().where('agendaEventId', event.id).where('occurrenceDate', occurrenceDate.toISODate()!).delete();
     }
 
     public async findVisible(id: string, userId: string): Promise<AgendaEvent | null> {

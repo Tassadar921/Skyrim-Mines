@@ -268,8 +268,15 @@
             "assign": {
                 "personal": "C'est noté : l'événement est maintenant dans votre agenda",
                 "shared": "C'est noté : vous vous occupez de l'événement, qui reste partagé",
+                "occurrence": "C'est noté : vous vous occupez de cette occurrence. Les suivantes restent à attribuer",
+                "tooEarly": "On ne peut se positionner sur un événement qu'au plus {days} jours à l'avance",
                 "alreadyTaken": "Cet événement n'est plus à attribuer",
                 "error": "Erreur lors de la prise en charge de l'événement"
+            },
+            "release": {
+                "success": "C'est noté : l'événement est de nouveau à attribuer, les autres propriétaires le voient",
+                "notYours": "Vous ne vous occupez pas de cet événement, ou il est déjà terminé",
+                "error": "Erreur lors du désistement"
             },
             "invalidRange": "La date de fin doit être postérieure ou égale à la date de début",
             "invalidRecurrence": "Un événement hebdomadaire doit durer moins d'une semaine, et sa dernière occurrence ne peut pas précéder la première",

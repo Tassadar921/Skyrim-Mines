@@ -93,6 +93,7 @@ export type ScannedRoutes = {
     'admin.agenda.store': { paramsTuple?: []; params?: {} }
     'admin.agenda.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.agenda.assign': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.agenda.release': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.agenda.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.organizations.index': { paramsTuple?: []; params?: {} }
     'admin.organizations.create': { paramsTuple?: []; params?: {} }
@@ -204,6 +205,7 @@ export type ScannedRoutes = {
     'admin.barrelRentals.payments.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.agenda.store': { paramsTuple?: []; params?: {} }
     'admin.agenda.assign': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.agenda.release': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.organizations.store': { paramsTuple?: []; params?: {} }
     'admin.organizations.members.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }

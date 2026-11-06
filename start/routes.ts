@@ -12,6 +12,9 @@ transmit.registerRoutes((route) => {
     }
 });
 
+// Owners' agenda changes are pushed to the other owners only (same audience as the /admin/agenda routes).
+transmit.authorize('agenda', (ctx) => ctx.auth.user?.role === UserRoleEnum.ADMIN);
+
 router.get('/', [controllers.Home, 'index']).as('home').use(middleware.auth());
 router.get('/tarifs', [controllers.Tarifs, 'index']).as('tarifs').use(middleware.auth());
 const companyOnly = middleware.admin({ roles: [UserRoleEnum.ADMIN, UserRoleEnum.AUDITOR, UserRoleEnum.STAFF] });
@@ -138,6 +141,7 @@ router
         router.post('/agenda', [controllers.admin.Agenda, 'store']).as('admin.agenda.store').use(adminOnly);
         router.put('/agenda/:id', [controllers.admin.Agenda, 'update']).as('admin.agenda.update').use(adminOnly);
         router.post('/agenda/:id/assign', [controllers.admin.Agenda, 'assign']).as('admin.agenda.assign').use(adminOnly);
+        router.post('/agenda/:id/release', [controllers.admin.Agenda, 'release']).as('admin.agenda.release').use(adminOnly);
         router.delete('/agenda/:id', [controllers.admin.Agenda, 'destroy']).as('admin.agenda.destroy').use(adminOnly);
 
         router.get('/organizations', [controllers.admin.Organizations, 'index']).as('admin.organizations.index').use(foremanAccess);

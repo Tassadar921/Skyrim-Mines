@@ -18,8 +18,14 @@ export type AgendaEvent = {
     recurrenceEndsOn: string | null;
     /** Shared event waiting for an owner to say "I'll handle it". */
     needsAssignee: boolean;
+    /** Whether it can be taken now: at most a week before it starts, and not over yet. */
+    canTake: boolean;
+    /** Day from which it can be taken, while still to assign. */
+    takeableFrom: string | null;
     /** Owner who took the event over, if any. */
     assigneeName: string | null;
+    /** The viewer took it and it is not over yet: they can hand it back. */
+    canRelease: boolean;
     ownerName: string | null;
     isOwner: boolean;
 };

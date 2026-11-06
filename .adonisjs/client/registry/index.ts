@@ -540,6 +540,12 @@ const routes = {
     tokens: [{"old":"/admin/agenda/:id/assign","type":0,"val":"admin","end":""},{"old":"/admin/agenda/:id/assign","type":0,"val":"agenda","end":""},{"old":"/admin/agenda/:id/assign","type":1,"val":"id","end":""},{"old":"/admin/agenda/:id/assign","type":0,"val":"assign","end":""}],
     types: placeholder as Registry['admin.agenda.assign']['types'],
   },
+  'admin.agenda.release': {
+    methods: ["POST"],
+    pattern: '/admin/agenda/:id/release',
+    tokens: [{"old":"/admin/agenda/:id/release","type":0,"val":"admin","end":""},{"old":"/admin/agenda/:id/release","type":0,"val":"agenda","end":""},{"old":"/admin/agenda/:id/release","type":1,"val":"id","end":""},{"old":"/admin/agenda/:id/release","type":0,"val":"release","end":""}],
+    types: placeholder as Registry['admin.agenda.release']['types'],
+  },
   'admin.agenda.destroy': {
     methods: ["DELETE"],
     pattern: '/admin/agenda/:id',

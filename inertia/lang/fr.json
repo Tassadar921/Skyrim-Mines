@@ -669,8 +669,22 @@
                 "dialogTitle": "Cet événement attend que quelqu'un s'en occupe",
                 "takePersonal": "Je m'en occupe",
                 "takeShared": "Je m'en occupe, en restant partagé",
+                "takeOccurrence": "Je m'en occupe cette fois-ci",
+                "takeableFrom": "On pourra se positionner à partir du {date} (au plus 7 jours à l'avance).",
+                "hintWeekly": "Événement hebdomadaire : vous ne prenez que l'occurrence du {date}. Les suivantes restent à attribuer, pour vous ou un autre propriétaire.",
                 "hint": "« Je m'en occupe » le déplace dans votre agenda personnel. « En restant partagé » le laisse visible par tous les propriétaires, avec vous comme responsable.",
                 "takenBy": "Pris en charge par {name}"
+            },
+            "release": {
+                "you": "Vous vous occupez de cet événement.",
+                "youOccurrence": "Vous vous occupez de cette occurrence.",
+                "button": "Je ne peux plus, remettre à attribuer",
+                "confirm": {
+                    "title": "Remettre cet événement à attribuer ?",
+                    "description": "« {title} » repassera en rouge dans l'agenda partagé et apparaîtra dans le bandeau, pour qu'un autre propriétaire s'en occupe.",
+                    "cancel": "Annuler",
+                    "confirm": "Remettre à attribuer"
+                }
             },
             "submit": "Enregistrer",
             "delete": {
