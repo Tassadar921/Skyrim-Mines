@@ -120,7 +120,7 @@ function submit() {
                 </div>
                 <p class="text-xs" :class="buybackSplitMismatch ? 'text-destructive' : 'text-muted-foreground'">
                     {{ t('admin.resources.show.buybackSplit.total', { total: buybackSplitTotal.toFixed(2), buyPrice: Number(buyPrice || 0).toFixed(2) }) }}
-                    <template v-if="buybackSplitMismatch">— {{ t('admin.resources.show.buybackSplit.mismatch') }}</template>
+                    <span v-if="buybackSplitMismatch" class="block">{{ t('admin.resources.show.buybackSplit.mismatch') }}</span>
                 </p>
             </template>
         </div>

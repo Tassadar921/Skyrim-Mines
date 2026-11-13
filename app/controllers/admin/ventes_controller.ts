@@ -4,6 +4,7 @@ import logger from '@adonisjs/core/services/logger';
 import DeliveryRepository, { type DeliveryStatValues } from '#repositories/delivery_repository';
 import ResourceRepository from '#repositories/resource_repository';
 import SalesEstimateRepository from '#repositories/sales_estimate_repository';
+import SalesEstimateService from '#services/sales_estimate_service';
 import type Resource from '#models/resource';
 import ResourceTypeEnum from '#types/enum/resource_type_enum';
 import { indexDeliveryValidator } from '#validators/admin/deliveries';
@@ -24,6 +25,7 @@ export default class VentesController {
         private readonly deliveryRepository: DeliveryRepository = new DeliveryRepository(),
         private readonly resourceRepository: ResourceRepository = new ResourceRepository(),
         private readonly salesEstimateRepository: SalesEstimateRepository = new SalesEstimateRepository(),
+        private readonly salesEstimateService: SalesEstimateService = new SalesEstimateService(),
     ) {}
 
     public async index({ inertia, request }: HttpContext) {
@@ -132,31 +134,42 @@ export default class VentesController {
             filters: { search: search ?? '', sort: currentSort, dir: currentDir, week: week ?? null },
             weeklyTotals,
             pendingStockDeductionCount,
-            stats: { ores, oreTotals, weeklyOreStats, salesEstimate: await this.latestSalesEstimate(allResources) },
+            stats: { ores, oreTotals, weeklyOreStats, salesEstimates: await this.salesEstimates(allResources, currentWeek) },
         });
     }
 
-    /** Latest sales forecast (computed when a week is recorded), rows in the resources list order; null if none yet. */
-    private async latestSalesEstimate(resources: Resource[]) {
-        const rows = await this.salesEstimateRepository.latest();
-        if (!rows.length) return null;
+    /**
+     * Every sales forecast (computed when a week is recorded), most recent first: each ore's estimated total need
+     * next to the actual one (ore sold + ore in the ingots sold), in the resources list order.
+     */
+    private async salesEstimates(resources: Resource[], currentWeek: number) {
+        const rows = await this.salesEstimateRepository.allByTargetWeekDesc();
+        if (!rows.length) return [];
 
+        const weeks = [...new Set(rows.map((row) => row.targetWeekNumber))];
+        const actualNeeds = await this.salesEstimateService.actualOreNeeds(Math.min(...weeks), Math.max(...weeks));
         const position = new Map(resources.map((resource, index) => [resource.id, index]));
-        const sorted = [...rows].sort((a, b) => (position.get(a.resourceId) ?? Infinity) - (position.get(b.resourceId) ?? Infinity));
-        const toRow = (row: (typeof rows)[number]) => ({
-            resourceId: row.resourceId,
-            resourceName: row.resourceName,
-            estimatedSales: Number(row.estimatedSales),
-            estimatedOreNeed: row.estimatedOreNeed === null ? null : Number(row.estimatedOreNeed),
-        });
 
-        return {
-            targetWeekNumber: rows[0].targetWeekNumber,
-            basedOnWeekNumber: rows[0].basedOnWeekNumber,
-            historyWeeks: rows[0].historyWeeks,
-            ores: sorted.filter((row) => row.resourceType === ResourceTypeEnum.MINERAI).map(toRow),
-            ingots: sorted.filter((row) => row.resourceType === ResourceTypeEnum.LINGOT).map(toRow),
-        };
+        return weeks.map((week) => {
+            const weekRows = rows
+                .filter((row) => row.targetWeekNumber === week && row.resourceType === ResourceTypeEnum.MINERAI)
+                .sort((a, b) => (position.get(a.resourceId) ?? Infinity) - (position.get(b.resourceId) ?? Infinity));
+            const actual = actualNeeds.get(week);
+
+            return {
+                targetWeekNumber: week,
+                basedOnWeekNumber: weekRows[0]?.basedOnWeekNumber ?? week - 1,
+                historyWeeks: weekRows[0]?.historyWeeks ?? 0,
+                // Actual sales of a week still running (or to come) are partial.
+                isInProgress: week >= currentWeek,
+                ores: weekRows.map((row) => ({
+                    resourceId: row.resourceId,
+                    resourceName: row.resourceName,
+                    estimatedOreNeed: Number(row.estimatedOreNeed ?? 0),
+                    actualOreNeed: actual?.get(row.resourceId) ?? 0,
+                })),
+            };
+        });
     }
 
     public async destroy({ params, response, session, i18n }: HttpContext) {

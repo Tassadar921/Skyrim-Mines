@@ -851,16 +851,18 @@
                     "empty": "Aucune livraison sur cette période"
                 },
                 "estimate": {
-                    "title": "Estimation des ventes — semaine {week}",
+                    "title": "Estimation des ventes de la semaine {week}",
                     "titleEmpty": "Estimation des ventes",
                     "empty": "Aucune estimation pour l'instant : elle est calculée quand une semaine est enregistrée sur le tableau de bord.",
                     "methodTrimmed": "Calculée sur les semaines {from} à {to} : quantités vendues par semaine (0 si aucune vente), sans la semaine la plus basse ni la plus haute, puis moyennées.",
                     "methodMean": "Calculée sur les semaines {from} à {to} : moyenne simple des quantités vendues par semaine (0 si aucune vente), l'historique étant encore trop court pour écarter les extrêmes.",
                     "ores": "Minerais",
-                    "ingots": "Lingots",
-                    "sales": "Ventes estimées",
-                    "oreNeed": "Besoin total",
-                    "oreNeedHelp": "Besoin total : minerai vendu tel quel, plus celui nécessaire pour fabriquer les lingots estimés (d'après leurs recettes)."
+                    "oreNeed": "Besoin estimé",
+                    "oreNeedHelp": "Besoin estimé et ventes effectives sont comptés de la même façon : minerai vendu tel quel, plus le minerai nécessaire aux lingots (d'après leurs recettes actuelles).",
+                    "actual": "Ventes effectives",
+                    "inProgress": "semaine en cours",
+                    "total": "Total",
+                    "weekOption": "Semaine {week}"
                 }
             },
             "detail": {

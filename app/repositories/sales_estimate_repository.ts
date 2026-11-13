@@ -37,10 +37,8 @@ export default class SalesEstimateRepository extends BaseRepository<typeof Sales
         });
     }
 
-    /** The most recent forecast (highest target week), empty when none was computed yet. */
-    public async latest(): Promise<SalesEstimate[]> {
-        const last = await SalesEstimate.query().orderBy('targetWeekNumber', 'desc').first();
-        if (!last) return [];
-        return SalesEstimate.query().where('targetWeekNumber', last.targetWeekNumber);
+    /** Every forecast row, most recent target week first. */
+    public async allByTargetWeekDesc(): Promise<SalesEstimate[]> {
+        return SalesEstimate.query().orderBy('targetWeekNumber', 'desc');
     }
 }

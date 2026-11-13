@@ -60,7 +60,7 @@ type OreRef = { resourceId: string; resourceName: string };
 type StatValues = { quantity: number; saleValue: number; profit: number };
 type OreStat = OreRef & StatValues;
 type WeeklyOreStat = { weekNumber: number; total: StatValues; byOre: OreStat[] };
-type Stats = { ores: OreRef[]; oreTotals: OreStat[]; weeklyOreStats: WeeklyOreStat[]; salesEstimate: SalesEstimate | null };
+type Stats = { ores: OreRef[]; oreTotals: OreStat[]; weeklyOreStats: WeeklyOreStat[]; salesEstimates: SalesEstimate[] };
 type StatsMetric = keyof StatValues;
 
 const { t } = useI18n();
@@ -497,7 +497,7 @@ const statsOreData = computed<(OreRef & { value: number })[]>(() => {
                     :format-value="formatStatValue"
                 />
 
-                <SalesEstimateCard :estimate="stats.salesEstimate" />
+                <SalesEstimateCard :estimates="stats.salesEstimates" />
             </TabsContent>
         </Tabs>
     </div>

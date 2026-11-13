@@ -48,4 +48,26 @@ export default class SalesEstimateService {
             })),
         );
     }
+
+    /**
+     * What was actually needed, week by week over [fromWeek, toWeek]: per ore, the ore sold as is plus the ore
+     * that went into the ingots sold (current recipes), to compare with the forecasts.
+     */
+    public async actualOreNeeds(fromWeek: number, toWeek: number): Promise<Map<number, Map<string, number>>> {
+        const [resources, soldRows, recipes] = await Promise.all([
+            this.resourceRepository.all(),
+            this.deliveryRepository.quantitiesByWeekAndResource(fromWeek, toWeek),
+            this.resourceRecipeLineRepository.allResourceIngredients(),
+        ]);
+        const oreIds = new Set(resources.filter((resource) => resource.type === ResourceTypeEnum.MINERAI).map((resource) => resource.id));
+
+        const soldByWeek = new Map<number, Map<string, number>>();
+        for (const row of soldRows) {
+            const sold = soldByWeek.get(row.weekNumber) ?? new Map<string, number>();
+            sold.set(row.resourceId, (sold.get(row.resourceId) ?? 0) + row.quantity);
+            soldByWeek.set(row.weekNumber, sold);
+        }
+
+        return new Map([...soldByWeek].map(([week, sold]) => [week, expandToOreNeeds(sold, oreIds, recipes)]));
+    }
 }
