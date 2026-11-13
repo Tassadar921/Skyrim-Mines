@@ -2,6 +2,7 @@ import DeliveryRepository from '#repositories/delivery_repository';
 import ResourceRepository from '#repositories/resource_repository';
 import ResourceRecipeLineRepository from '#repositories/resource_recipe_line_repository';
 import SalesEstimateRepository from '#repositories/sales_estimate_repository';
+import RecurringOrderRepository from '#repositories/recurring_order_repository';
 import ResourceTypeEnum from '#types/enum/resource_type_enum';
 import { SALES_ESTIMATE_HISTORY_WEEKS, expandToOreNeeds, roundQuantity, trimmedMean } from '#helpers/sales_estimate_helper';
 
@@ -12,6 +13,7 @@ export default class SalesEstimateService {
         private readonly resourceRepository: ResourceRepository = new ResourceRepository(),
         private readonly resourceRecipeLineRepository: ResourceRecipeLineRepository = new ResourceRecipeLineRepository(),
         private readonly salesEstimateRepository: SalesEstimateRepository = new SalesEstimateRepository(),
+        private readonly recurringOrderRepository: RecurringOrderRepository = new RecurringOrderRepository(),
     ) {}
 
     /**
@@ -69,5 +71,25 @@ export default class SalesEstimateService {
         }
 
         return new Map([...soldByWeek].map(([week, sold]) => [week, expandToOreNeeds(sold, oreIds, recipes)]));
+    }
+
+    /**
+     * Ore needed every week by the fixed weekly orders alone: per ore, the ore they order as is plus the ore going
+     * into the ingots they order (current recipes). A floor for the weekly need.
+     */
+    public async recurringOrderOreNeeds(): Promise<Map<string, number>> {
+        const [resources, orders, recipes] = await Promise.all([
+            this.resourceRepository.all(),
+            this.recurringOrderRepository.allWithLines(),
+            this.resourceRecipeLineRepository.allResourceIngredients(),
+        ]);
+        const oreIds = new Set(resources.filter((resource) => resource.type === ResourceTypeEnum.MINERAI).map((resource) => resource.id));
+
+        const ordered = new Map<string, number>();
+        for (const line of orders.flatMap((order) => order.lines)) {
+            ordered.set(line.resourceId, (ordered.get(line.resourceId) ?? 0) + line.quantity);
+        }
+
+        return expandToOreNeeds(ordered, oreIds, recipes);
     }
 }

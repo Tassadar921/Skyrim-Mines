@@ -6,10 +6,10 @@ import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, Table
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select';
 
 /**
- * Per ore, the estimated total need (ore sold as is + ore going into the ingots expected to sell) and the
+ * Per ore, the floor set by the fixed weekly orders, the estimated total need (ore sold as is + ore going into the ingots expected to sell) and the
  * actual one, computed the same way from what was really sold that week.
  */
-export type SalesEstimateRow = { resourceId: string; resourceName: string; estimatedOreNeed: number; actualOreNeed: number };
+export type SalesEstimateRow = { resourceId: string; resourceName: string; minimumOreNeed: number; estimatedOreNeed: number; actualOreNeed: number };
 export type SalesEstimate = {
     targetWeekNumber: number;
     basedOnWeekNumber: number;
@@ -40,6 +40,7 @@ watch(
 const estimate = computed(() => props.estimates.find((candidate) => candidate.targetWeekNumber === selectedWeek.value) ?? null);
 
 const totals = computed(() => ({
+    minimum: estimate.value?.ores.reduce((sum, row) => sum + row.minimumOreNeed, 0) ?? 0,
     estimated: estimate.value?.ores.reduce((sum, row) => sum + row.estimatedOreNeed, 0) ?? 0,
     actual: estimate.value?.ores.reduce((sum, row) => sum + row.actualOreNeed, 0) ?? 0,
 }));
@@ -87,6 +88,7 @@ function onWeekChange(value: unknown) {
                 <TableHeader>
                     <TableRow>
                         <TableHead>{{ t('admin.ventes.stats.estimate.ores') }}</TableHead>
+                        <TableHead class="text-right">{{ t('admin.ventes.stats.estimate.minimum') }}</TableHead>
                         <TableHead class="text-right">{{ t('admin.ventes.stats.estimate.oreNeed') }}</TableHead>
                         <TableHead class="text-right">
                             {{ t('admin.ventes.stats.estimate.actual') }}
@@ -95,8 +97,9 @@ function onWeekChange(value: unknown) {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    <TableRow v-for="row in estimate.ores" :key="row.resourceId" :class="row.estimatedOreNeed || row.actualOreNeed ? '' : 'text-muted-foreground'">
+                    <TableRow v-for="row in estimate.ores" :key="row.resourceId" :class="row.minimumOreNeed || row.estimatedOreNeed || row.actualOreNeed ? '' : 'text-muted-foreground'">
                         <TableCell class="text-sm font-medium">{{ row.resourceName }}</TableCell>
+                        <TableCell class="text-right text-sm">{{ quantityFormat.format(row.minimumOreNeed) }}</TableCell>
                         <TableCell class="text-right text-sm font-medium">{{ quantityFormat.format(row.estimatedOreNeed) }}</TableCell>
                         <TableCell class="text-right text-sm">{{ quantityFormat.format(row.actualOreNeed) }}</TableCell>
                     </TableRow>
@@ -104,6 +107,7 @@ function onWeekChange(value: unknown) {
                 <TableFooter>
                     <TableRow>
                         <TableCell class="text-sm font-medium">{{ t('admin.ventes.stats.estimate.total') }}</TableCell>
+                        <TableCell class="text-right text-sm font-medium">{{ quantityFormat.format(totals.minimum) }}</TableCell>
                         <TableCell class="text-right text-sm font-medium">{{ quantityFormat.format(totals.estimated) }}</TableCell>
                         <TableCell class="text-right text-sm font-medium">{{ quantityFormat.format(totals.actual) }}</TableCell>
                     </TableRow>
@@ -111,6 +115,7 @@ function onWeekChange(value: unknown) {
             </Table>
         </div>
 
+        <p v-if="estimate" class="text-xs text-muted-foreground">{{ t('admin.ventes.stats.estimate.minimumHelp') }}</p>
         <p v-if="estimate" class="text-xs text-muted-foreground">{{ t('admin.ventes.stats.estimate.oreNeedHelp') }}</p>
     </div>
 </template>

@@ -895,6 +895,54 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/order_archives_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'admin.recurringOrders.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/admin/recurring-orders'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/recurring_orders_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/recurring_orders_controller').default['index']>>>
+    }
+  }
+  'admin.recurringOrders.store': {
+    methods: ["POST"]
+    pattern: '/admin/recurring-orders'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/admin/recurring_orders').storeRecurringOrderValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/admin/recurring_orders').storeRecurringOrderValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/recurring_orders_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/recurring_orders_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'admin.recurringOrders.update': {
+    methods: ["PUT"]
+    pattern: '/admin/recurring-orders/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/admin/recurring_orders').storeRecurringOrderValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/admin/recurring_orders').storeRecurringOrderValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/recurring_orders_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/recurring_orders_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'admin.recurringOrders.destroy': {
+    methods: ["DELETE"]
+    pattern: '/admin/recurring-orders/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/recurring_orders_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/recurring_orders_controller').default['destroy']>>>
+    }
+  }
   'admin.permanences.index': {
     methods: ["GET","HEAD"]
     pattern: '/admin/permanences'

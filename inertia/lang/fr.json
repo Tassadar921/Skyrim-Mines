@@ -195,6 +195,15 @@
             "collapse": "Réduire",
             "stats": {
                 "allOres": "Total (tous minerais)"
+            },
+            "weekdays": {
+                "1": "Lundi",
+                "2": "Mardi",
+                "3": "Mercredi",
+                "4": "Jeudi",
+                "5": "Vendredi",
+                "6": "Samedi",
+                "7": "Dimanche"
             }
         },
         "layout": {
@@ -214,6 +223,7 @@
                 "expenses": "Dépenses",
                 "balanceChanges": "Historique des soldes",
                 "ventes": "Ventes",
+                "recurringOrders": "Commandes fixes",
                 "permanences": "Permanences",
                 "castellanies": "Châtelleries"
             }
@@ -858,11 +868,13 @@
                     "methodMean": "Calculée sur les semaines {from} à {to} : moyenne simple des quantités vendues par semaine (0 si aucune vente), l'historique étant encore trop court pour écarter les extrêmes.",
                     "ores": "Minerais",
                     "oreNeed": "Besoin estimé",
-                    "oreNeedHelp": "Besoin estimé et ventes effectives sont comptés de la même façon : minerai vendu tel quel, plus le minerai nécessaire aux lingots (d'après leurs recettes actuelles).",
+                    "oreNeedHelp": "Toutes les colonnes sont comptées de la même façon : minerai vendu ou commandé tel quel, plus le minerai nécessaire aux lingots (d'après leurs recettes actuelles).",
                     "actual": "Ventes effectives",
                     "inProgress": "semaine en cours",
                     "total": "Total",
-                    "weekOption": "Semaine {week}"
+                    "weekOption": "Semaine {week}",
+                    "minimum": "Besoins minimum",
+                    "minimumHelp": "Besoins minimum : le minerai qu'il faut chaque semaine pour honorer toutes les commandes fixes actuelles."
                 }
             },
             "detail": {
@@ -905,6 +917,48 @@
                     "cancel": "Annuler",
                     "confirm": "Tout déduire"
                 }
+            }
+        },
+        "recurringOrders": {
+            "title": "Commandes fixes",
+            "description": "Commandes livrées chaque semaine au même jour et à la même heure. Chacune apparaît dans l'agenda partagé des propriétaires, avec la marchandise, les prix unitaires et le total attendu.",
+            "count": "commande fixe | commande fixe | commandes fixes",
+            "add": "Nouvelle commande fixe",
+            "edit": "Modifier la commande fixe",
+            "empty": "Aucune commande fixe",
+            "table": {
+                "label": "Libellé",
+                "delivery": "Livraison",
+                "goods": "Marchandise",
+                "total": "Total",
+                "actions": "Actions"
+            },
+            "fields": {
+                "label": "Libellé",
+                "weekday": "Jour de livraison",
+                "time": "Heure",
+                "lines": "Marchandise",
+                "resource": "Ressource",
+                "resourcePlaceholder": "Choisir…",
+                "quantity": "Quantité",
+                "unitPrice": "Prix unitaire (s)",
+                "lineTotal": "Total",
+                "addLine": "Ajouter une ressource",
+                "removeLine": "Retirer",
+                "total": "Total attendu"
+            },
+            "types": {
+                "minerai": "Minerais",
+                "lingot": "Lingots"
+            },
+            "submit": "Enregistrer",
+            "editAction": "Modifier",
+            "delete": {
+                "label": "Supprimer",
+                "title": "Supprimer cette commande fixe ?",
+                "description": "« {label} » sera supprimée. Dans l'agenda, les livraisons passées restent visibles, les suivantes disparaissent.",
+                "cancel": "Annuler",
+                "confirm": "Supprimer"
             }
         },
         "permanences": {
@@ -958,15 +1012,6 @@
                 "no": "Non",
                 "showDetail": "Voir le détail",
                 "hideDetail": "Masquer le détail"
-            },
-            "weekdays": {
-                "1": "Lundi",
-                "2": "Mardi",
-                "3": "Mercredi",
-                "4": "Jeudi",
-                "5": "Vendredi",
-                "6": "Samedi",
-                "7": "Dimanche"
             },
             "durations": {
                 "minutes": "{minutes} min",

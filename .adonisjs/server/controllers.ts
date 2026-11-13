@@ -23,6 +23,7 @@ export const controllers = {
     Stocks: () => import('#controllers/admin/stocks_controller'),
     Users: () => import('#controllers/admin/users_controller'),
     Ventes: () => import('#controllers/admin/ventes_controller'),
+    RecurringOrders: () => import('#controllers/admin/recurring_orders_controller'),
   },
   Auth: () => import('#controllers/auth_controller'),
   Buybacks: () => import('#controllers/buybacks_controller'),

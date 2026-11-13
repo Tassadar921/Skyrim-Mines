@@ -450,6 +450,30 @@ const routes = {
     tokens: [{"old":"/admin/commandes/archiver","type":0,"val":"admin","end":""},{"old":"/admin/commandes/archiver","type":0,"val":"commandes","end":""},{"old":"/admin/commandes/archiver","type":0,"val":"archiver","end":""}],
     types: placeholder as Registry['admin.orderArchives.store']['types'],
   },
+  'admin.recurringOrders.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/admin/recurring-orders',
+    tokens: [{"old":"/admin/recurring-orders","type":0,"val":"admin","end":""},{"old":"/admin/recurring-orders","type":0,"val":"recurring-orders","end":""}],
+    types: placeholder as Registry['admin.recurringOrders.index']['types'],
+  },
+  'admin.recurringOrders.store': {
+    methods: ["POST"],
+    pattern: '/admin/recurring-orders',
+    tokens: [{"old":"/admin/recurring-orders","type":0,"val":"admin","end":""},{"old":"/admin/recurring-orders","type":0,"val":"recurring-orders","end":""}],
+    types: placeholder as Registry['admin.recurringOrders.store']['types'],
+  },
+  'admin.recurringOrders.update': {
+    methods: ["PUT"],
+    pattern: '/admin/recurring-orders/:id',
+    tokens: [{"old":"/admin/recurring-orders/:id","type":0,"val":"admin","end":""},{"old":"/admin/recurring-orders/:id","type":0,"val":"recurring-orders","end":""},{"old":"/admin/recurring-orders/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['admin.recurringOrders.update']['types'],
+  },
+  'admin.recurringOrders.destroy': {
+    methods: ["DELETE"],
+    pattern: '/admin/recurring-orders/:id',
+    tokens: [{"old":"/admin/recurring-orders/:id","type":0,"val":"admin","end":""},{"old":"/admin/recurring-orders/:id","type":0,"val":"recurring-orders","end":""},{"old":"/admin/recurring-orders/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['admin.recurringOrders.destroy']['types'],
+  },
   'admin.permanences.index': {
     methods: ["GET","HEAD"],
     pattern: '/admin/permanences',

@@ -63,7 +63,7 @@ function remove(slot: PermanenceSlot) {
         <ul v-if="slots.length" class="divide-y border-t">
             <li v-for="slot in slots" :key="slot.id" class="flex items-center justify-between gap-2 px-4 py-2 text-sm">
                 <span class="min-w-0 flex-1">
-                    <span class="font-medium">{{ t(`admin.permanences.weekdays.${slot.weekday}`) }}</span>
+                    <span class="font-medium">{{ t(`admin.common.weekdays.${slot.weekday}`) }}</span>
                     · {{ slot.time }} – {{ addMinutesToTime(slot.time, slot.durationMinutes) }}
                 </span>
                 <Select :model-value="String(slot.durationMinutes)" :disabled="savingDurationId === slot.id" @update:model-value="(value) => updateDuration(slot, value)">
@@ -97,7 +97,7 @@ function remove(slot: PermanenceSlot) {
                         <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem v-for="weekday in WEEKDAYS" :key="weekday" :value="String(weekday)">{{ t(`admin.permanences.weekdays.${weekday}`) }}</SelectItem>
+                        <SelectItem v-for="weekday in WEEKDAYS" :key="weekday" :value="String(weekday)">{{ t(`admin.common.weekdays.${weekday}`) }}</SelectItem>
                     </SelectContent>
                 </Select>
             </div>

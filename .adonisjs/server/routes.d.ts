@@ -78,6 +78,10 @@ export type ScannedRoutes = {
     'admin.balanceChanges.rollback': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.orderArchives.create': { paramsTuple?: []; params?: {} }
     'admin.orderArchives.store': { paramsTuple?: []; params?: {} }
+    'admin.recurringOrders.index': { paramsTuple?: []; params?: {} }
+    'admin.recurringOrders.store': { paramsTuple?: []; params?: {} }
+    'admin.recurringOrders.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.recurringOrders.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.permanences.index': { paramsTuple?: []; params?: {} }
     'admin.permanences.settings.recruiting': { paramsTuple?: []; params?: {} }
     'admin.permanences.settings.buyback': { paramsTuple?: []; params?: {} }
@@ -147,6 +151,7 @@ export type ScannedRoutes = {
     'admin.expenses.index': { paramsTuple?: []; params?: {} }
     'admin.balanceChanges.index': { paramsTuple?: []; params?: {} }
     'admin.orderArchives.create': { paramsTuple?: []; params?: {} }
+    'admin.recurringOrders.index': { paramsTuple?: []; params?: {} }
     'admin.permanences.index': { paramsTuple?: []; params?: {} }
     'admin.ventes.index': { paramsTuple?: []; params?: {} }
     'admin.barrelRentals.index': { paramsTuple?: []; params?: {} }
@@ -186,6 +191,7 @@ export type ScannedRoutes = {
     'admin.expenses.index': { paramsTuple?: []; params?: {} }
     'admin.balanceChanges.index': { paramsTuple?: []; params?: {} }
     'admin.orderArchives.create': { paramsTuple?: []; params?: {} }
+    'admin.recurringOrders.index': { paramsTuple?: []; params?: {} }
     'admin.permanences.index': { paramsTuple?: []; params?: {} }
     'admin.ventes.index': { paramsTuple?: []; params?: {} }
     'admin.barrelRentals.index': { paramsTuple?: []; params?: {} }
@@ -213,6 +219,7 @@ export type ScannedRoutes = {
     'admin.expenses.store': { paramsTuple?: []; params?: {} }
     'admin.balanceChanges.rollback': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.orderArchives.store': { paramsTuple?: []; params?: {} }
+    'admin.recurringOrders.store': { paramsTuple?: []; params?: {} }
     'admin.permanences.settings.slots.store': { paramsTuple?: []; params?: {} }
     'admin.ventes.deductStockAll': { paramsTuple?: []; params?: {} }
     'admin.barrelRentals.store': { paramsTuple?: []; params?: {} }
@@ -235,6 +242,7 @@ export type ScannedRoutes = {
     'admin.materials.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.castellanies.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.expenses.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.recurringOrders.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.permanences.settings.slots.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.ventes.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.barrelRentals.map.destroy': { paramsTuple?: []; params?: {} }
@@ -270,6 +278,7 @@ export type ScannedRoutes = {
     'admin.resources.recipe.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.materials.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.castellanies.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.recurringOrders.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin.permanences.settings.recruiting': { paramsTuple?: []; params?: {} }
     'admin.permanences.settings.buyback': { paramsTuple?: []; params?: {} }
     'admin.permanences.settings.slots.duration': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }

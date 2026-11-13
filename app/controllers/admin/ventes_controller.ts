@@ -147,7 +147,7 @@ export default class VentesController {
         if (!rows.length) return [];
 
         const weeks = [...new Set(rows.map((row) => row.targetWeekNumber))];
-        const actualNeeds = await this.salesEstimateService.actualOreNeeds(Math.min(...weeks), Math.max(...weeks));
+        const [actualNeeds, minimumNeeds] = await Promise.all([this.salesEstimateService.actualOreNeeds(Math.min(...weeks), Math.max(...weeks)), this.salesEstimateService.recurringOrderOreNeeds()]);
         const position = new Map(resources.map((resource, index) => [resource.id, index]));
 
         return weeks.map((week) => {
@@ -165,6 +165,8 @@ export default class VentesController {
                 ores: weekRows.map((row) => ({
                     resourceId: row.resourceId,
                     resourceName: row.resourceName,
+                    // Fixed weekly orders as they stand today, the same for every week.
+                    minimumOreNeed: minimumNeeds.get(row.resourceId) ?? 0,
                     estimatedOreNeed: Number(row.estimatedOreNeed ?? 0),
                     actualOreNeed: actual?.get(row.resourceId) ?? 0,
                 })),

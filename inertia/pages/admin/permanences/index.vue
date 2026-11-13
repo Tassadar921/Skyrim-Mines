@@ -61,7 +61,7 @@ function updateRecruiting(value: boolean) {
                     <span class="text-sm">{{ t('admin.permanences.summary.slots') }}</span>
                     <div v-if="settings.slots.length" class="flex flex-wrap justify-end gap-1.5">
                         <Badge v-for="slot in settings.slots" :key="slot.id" variant="outline">
-                            {{ t(`admin.permanences.weekdays.${slot.weekday}`) }} · {{ slot.time }} – {{ addMinutesToTime(slot.time, slot.durationMinutes) }}
+                            {{ t(`admin.common.weekdays.${slot.weekday}`) }} · {{ slot.time }} – {{ addMinutesToTime(slot.time, slot.durationMinutes) }}
                         </Badge>
                     </div>
                     <span v-else class="text-sm text-muted-foreground">{{ t('admin.permanences.summary.noSlots') }}</span>

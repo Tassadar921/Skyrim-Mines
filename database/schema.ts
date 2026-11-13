@@ -390,6 +390,46 @@ export class PermanenceSlotSchema extends BaseModel {
   declare weekday: number
 }
 
+export class RecurringOrderLineSchema extends BaseModel {
+  static $columns = ['createdAt', 'id', 'quantity', 'recurringOrderId', 'resourceId', 'unitPrice', 'updatedAt'] as const
+  $columns = RecurringOrderLineSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare quantity: number
+  @column()
+  declare recurringOrderId: string
+  @column()
+  declare resourceId: string
+  @column()
+  declare unitPrice: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
+export class RecurringOrderSchema extends BaseModel {
+  static $columns = ['agendaEventId', 'createdAt', 'createdByUserId', 'id', 'label', 'time', 'updatedAt', 'weekday'] as const
+  $columns = RecurringOrderSchema.$columns
+  @column()
+  declare agendaEventId: string | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare createdByUserId: string | null
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare label: string
+  @column()
+  declare time: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare weekday: number
+}
+
 export class ResourceBarrelAdjustmentSchema extends BaseModel {
   static $columns = ['adminId', 'createdAt', 'delta', 'id', 'resourceId', 'updatedAt', 'userId'] as const
   $columns = ResourceBarrelAdjustmentSchema.$columns

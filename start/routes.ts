@@ -125,6 +125,11 @@ router
         router.get('/commandes/archiver', [controllers.admin.OrderArchives, 'create']).as('admin.orderArchives.create').use(foremanManage);
         router.post('/commandes/archiver', [controllers.admin.OrderArchives, 'store']).as('admin.orderArchives.store').use(foremanManage);
 
+        router.get('/recurring-orders', [controllers.admin.RecurringOrders, 'index']).as('admin.recurringOrders.index').use(foremanAccess);
+        router.post('/recurring-orders', [controllers.admin.RecurringOrders, 'store']).as('admin.recurringOrders.store').use(foremanManage);
+        router.put('/recurring-orders/:id', [controllers.admin.RecurringOrders, 'update']).as('admin.recurringOrders.update').use(foremanManage);
+        router.delete('/recurring-orders/:id', [controllers.admin.RecurringOrders, 'destroy']).as('admin.recurringOrders.destroy').use(foremanManage);
+
         router.get('/permanences', [controllers.admin.Permanences, 'index']).as('admin.permanences.index').use(foremanAccess);
         // Permanences settings: owners only.
         router.put('/permanences/settings/recruiting', [controllers.admin.Permanences, 'updateRecruiting']).as('admin.permanences.settings.recruiting').use(adminOnly);

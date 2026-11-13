@@ -126,6 +126,12 @@ export interface ApiDefinition {
       create: typeof routes['admin.orderArchives.create']
       store: typeof routes['admin.orderArchives.store']
     }
+    recurringOrders: {
+      index: typeof routes['admin.recurringOrders.index']
+      store: typeof routes['admin.recurringOrders.store']
+      update: typeof routes['admin.recurringOrders.update']
+      destroy: typeof routes['admin.recurringOrders.destroy']
+    }
     permanences: {
       index: typeof routes['admin.permanences.index']
       settings: {
