@@ -1,7 +1,9 @@
 # =============================================================================
 # Base
 # =============================================================================
-FROM node:24-alpine AS base
+# Node pinned: from 24.22, the URL parser rejects what jsonschema 1.5.0 (used by Ace to validate app commands)
+# builds, which crashes `node ace` as soon as the app defines a command. Keep in sync with Dockerfile.dev.
+FROM node:24.15.0-alpine AS base
 RUN npm install -g pnpm@latest
 WORKDIR /app
 

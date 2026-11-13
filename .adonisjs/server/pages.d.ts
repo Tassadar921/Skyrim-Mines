@@ -26,6 +26,7 @@ declare module '@adonisjs/inertia/types' {
     'admin/organizations/create': ExtractProps<(typeof import('../../inertia/pages/admin/organizations/create.vue'))['default']>
     'admin/organizations/index': ExtractProps<(typeof import('../../inertia/pages/admin/organizations/index.vue'))['default']>
     'admin/organizations/show': ExtractProps<(typeof import('../../inertia/pages/admin/organizations/show.vue'))['default']>
+    'admin/permanences/index': ExtractProps<(typeof import('../../inertia/pages/admin/permanences/index.vue'))['default']>
     'admin/resources/create': ExtractProps<(typeof import('../../inertia/pages/admin/resources/create.vue'))['default']>
     'admin/resources/index': ExtractProps<(typeof import('../../inertia/pages/admin/resources/index.vue'))['default']>
     'admin/resources/recipe': ExtractProps<(typeof import('../../inertia/pages/admin/resources/recipe.vue'))['default']>
@@ -35,6 +36,7 @@ declare module '@adonisjs/inertia/types' {
     'admin/users/create': ExtractProps<(typeof import('../../inertia/pages/admin/users/create.vue'))['default']>
     'admin/users/index': ExtractProps<(typeof import('../../inertia/pages/admin/users/index.vue'))['default']>
     'admin/users/show': ExtractProps<(typeof import('../../inertia/pages/admin/users/show.vue'))['default']>
+    'admin/ventes/index': ExtractProps<(typeof import('../../inertia/pages/admin/ventes/index.vue'))['default']>
     'auth/login': ExtractProps<(typeof import('../../inertia/pages/auth/login.vue'))['default']>
     'errors/not_found': ExtractProps<(typeof import('../../inertia/pages/errors/not_found.vue'))['default']>
     'errors/server_error': ExtractProps<(typeof import('../../inertia/pages/errors/server_error.vue'))['default']>
@@ -43,7 +45,5 @@ declare module '@adonisjs/inertia/types' {
     'organization/show': ExtractProps<(typeof import('../../inertia/pages/organization/show.vue'))['default']>
     'stocks': ExtractProps<(typeof import('../../inertia/pages/stocks.vue'))['default']>
     'tarifs': ExtractProps<(typeof import('../../inertia/pages/tarifs.vue'))['default']>
-    'admin/ventes/index': ExtractProps<(typeof import('../../inertia/pages/admin/ventes/index.vue'))['default']>
-    'admin/permanences/index': ExtractProps<(typeof import('../../inertia/pages/admin/permanences/index.vue'))['default']>
   }
 }

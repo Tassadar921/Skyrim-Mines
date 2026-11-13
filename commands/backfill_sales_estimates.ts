@@ -1,9 +1,6 @@
 import { DateTime } from 'luxon';
 import { BaseCommand, flags } from '@adonisjs/core/ace';
 import type { CommandOptions } from '@adonisjs/core/types/ace';
-import SalesEstimateService from '#services/sales_estimate_service';
-import { getWeekNumber } from '#helpers/game_week_helper';
-import { SALES_ESTIMATE_HISTORY_WEEKS } from '#helpers/sales_estimate_helper';
 
 /**
  * Computes the sales forecasts retroactively, as if every past week had been recorded on the dashboard:
@@ -27,6 +24,12 @@ export default class BackfillSalesEstimates extends BaseCommand {
     declare to?: number;
 
     async run() {
+        // App modules are imported here, not at the top: Ace imports every command file just to read its
+        // metadata, before the app (and its database service) is booted.
+        const { default: SalesEstimateService } = await import('#services/sales_estimate_service');
+        const { getWeekNumber } = await import('#helpers/game_week_helper');
+        const { SALES_ESTIMATE_HISTORY_WEEKS } = await import('#helpers/sales_estimate_helper');
+
         const lastCompleteWeek = getWeekNumber(DateTime.now()) - 1;
         const from = this.from ?? 1;
         const to = this.to ?? lastCompleteWeek;

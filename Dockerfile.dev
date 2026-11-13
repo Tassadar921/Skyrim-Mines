@@ -1,4 +1,5 @@
-FROM node:24
+# Node pinned, see Dockerfile.prod (keep both in sync).
+FROM node:24.15.0
 
 ARG PORT
 
