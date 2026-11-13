@@ -14,11 +14,16 @@ transmit.registerRoutes((route) => {
 
 // Owners' agenda changes are pushed to the other owners only (same audience as the /admin/agenda routes).
 transmit.authorize('agenda', (ctx) => ctx.auth.user?.role === UserRoleEnum.ADMIN);
+// Who will attend today's permanence: owners and foremen, who see it on the landing page.
+transmit.authorize('permanences', (ctx) => ctx.auth.user?.role === UserRoleEnum.ADMIN || ctx.auth.user?.role === UserRoleEnum.FOREMAN);
 
 router.get('/', [controllers.Home, 'index']).as('home').use(middleware.auth());
 router.get('/tarifs', [controllers.Tarifs, 'index']).as('tarifs').use(middleware.auth());
 const companyOnly = middleware.admin({ roles: [UserRoleEnum.ADMIN, UserRoleEnum.AUDITOR, UserRoleEnum.STAFF] });
 router.get('/stocks', [controllers.Stocks, 'index']).as('stocks').use(middleware.auth()).use(companyOnly);
+const permanenceStaff = middleware.admin({ roles: [UserRoleEnum.ADMIN, UserRoleEnum.FOREMAN] });
+router.post('/permanences/:slotId/attendance', [controllers.PermanenceAttendances, 'store']).as('permanences.attendance.store').use(middleware.auth()).use(permanenceStaff);
+router.delete('/permanences/:slotId/attendance', [controllers.PermanenceAttendances, 'destroy']).as('permanences.attendance.destroy').use(middleware.auth()).use(permanenceStaff);
 router.get('/organigramme', [controllers.Organigramme, 'index']).as('organigramme').use(middleware.auth());
 router.post('/deposits', [controllers.Deposits, 'store']).as('deposits.store').use(middleware.auth());
 router.patch('/deposits/:id', [controllers.Deposits, 'update']).as('deposits.update').use(middleware.auth());
@@ -46,7 +51,7 @@ router.delete('/logout', [controllers.Auth, 'logout']).as('auth.logout').use(mid
 const readOnly = middleware.admin({ roles: [UserRoleEnum.ADMIN, UserRoleEnum.AUDITOR] });
 
 // Sections the foreman DOES get, with full read/write access (same level as admin) — dashboard,
-// users, organizations, stocks, barrel rentals, expenses, commandes, livraisons.
+// users, organizations, stocks, barrel rentals, expenses, ventes.
 const foremanAccess = middleware.admin({ roles: [UserRoleEnum.ADMIN, UserRoleEnum.AUDITOR, UserRoleEnum.FOREMAN] });
 const foremanManage = middleware.admin({ roles: [UserRoleEnum.ADMIN, UserRoleEnum.FOREMAN] });
 const adminOnly = middleware.admin({ roles: [UserRoleEnum.ADMIN] });
@@ -120,16 +125,29 @@ router
         router.get('/commandes/archiver', [controllers.admin.OrderArchives, 'create']).as('admin.orderArchives.create').use(foremanManage);
         router.post('/commandes/archiver', [controllers.admin.OrderArchives, 'store']).as('admin.orderArchives.store').use(foremanManage);
 
-        router.get('/livraisons', [controllers.admin.Livraisons, 'index']).as('admin.livraisons.index').use(foremanAccess);
-        router.delete('/livraisons/:id', [controllers.admin.Livraisons, 'destroy']).as('admin.livraisons.destroy').use(foremanManage);
-        router.patch('/livraisons/:id/deduct-stock', [controllers.admin.Livraisons, 'deductStock']).as('admin.livraisons.deductStock').use(foremanManage);
-        router.patch('/livraisons/:id/mark-stock-deducted', [controllers.admin.Livraisons, 'markStockDeducted']).as('admin.livraisons.markStockDeducted').use(foremanManage);
-        router.post('/livraisons/deduct-stock-all', [controllers.admin.Livraisons, 'deductStockAll']).as('admin.livraisons.deductStockAll').use(foremanManage);
+        router.get('/permanences', [controllers.admin.Permanences, 'index']).as('admin.permanences.index').use(foremanAccess);
+        // Permanences settings: owners only.
+        router.put('/permanences/settings/recruiting', [controllers.admin.Permanences, 'updateRecruiting']).as('admin.permanences.settings.recruiting').use(adminOnly);
+        router.put('/permanences/settings/buyback', [controllers.admin.Permanences, 'updateBuyback']).as('admin.permanences.settings.buyback').use(adminOnly);
+        router.put('/permanences/settings/slots/:id/duration', [controllers.admin.Permanences, 'updateSlotDuration']).as('admin.permanences.settings.slots.duration').use(adminOnly);
+        router.post('/permanences/settings/slots', [controllers.admin.Permanences, 'storeSlot']).as('admin.permanences.settings.slots.store').use(adminOnly);
+        router.delete('/permanences/settings/slots/:id', [controllers.admin.Permanences, 'destroySlot']).as('admin.permanences.settings.slots.destroy').use(adminOnly);
+
+        router.get('/ventes', [controllers.admin.Ventes, 'index']).as('admin.ventes.index').use(foremanAccess);
+        // Former URL of the sales page, kept so existing bookmarks still work.
+        router.get('/livraisons', ({ response }) => response.redirect().toRoute('admin.ventes.index')).use(foremanAccess);
+        router.delete('/ventes/:id', [controllers.admin.Ventes, 'destroy']).as('admin.ventes.destroy').use(foremanManage);
+        router.patch('/ventes/:id/deduct-stock', [controllers.admin.Ventes, 'deductStock']).as('admin.ventes.deductStock').use(foremanManage);
+        router.patch('/ventes/:id/mark-stock-deducted', [controllers.admin.Ventes, 'markStockDeducted']).as('admin.ventes.markStockDeducted').use(foremanManage);
+        router.post('/ventes/deduct-stock-all', [controllers.admin.Ventes, 'deductStockAll']).as('admin.ventes.deductStockAll').use(foremanManage);
 
         router.patch('/barrel', [controllers.admin.Barrel, 'update']).as('admin.barrel.update').use(middleware.admin());
 
         router.get('/barrel-rentals', [controllers.admin.BarrelRentals, 'index']).as('admin.barrelRentals.index').use(foremanAccess);
         router.post('/barrel-rentals', [controllers.admin.BarrelRentals, 'store']).as('admin.barrelRentals.store').use(foremanManage);
+        // Mine map with the numbered barrels; registered before the "/:id" routes so "map" is not taken for an id.
+        router.post('/barrel-rentals/map', [controllers.admin.BarrelRentals, 'updateMap']).as('admin.barrelRentals.map.update').use(foremanManage);
+        router.delete('/barrel-rentals/map', [controllers.admin.BarrelRentals, 'destroyMap']).as('admin.barrelRentals.map.destroy').use(foremanManage);
         router.get('/barrel-rentals/:id', [controllers.admin.BarrelRentals, 'show']).as('admin.barrelRentals.show').use(foremanAccess);
         router.put('/barrel-rentals/:id', [controllers.admin.BarrelRentals, 'update']).as('admin.barrelRentals.update').use(foremanManage);
         router.delete('/barrel-rentals/:id', [controllers.admin.BarrelRentals, 'destroy']).as('admin.barrelRentals.destroy').use(foremanManage);

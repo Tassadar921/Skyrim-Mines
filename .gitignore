@@ -20,6 +20,7 @@ public/uploads/paragraphs
 public/uploads/avatars
 public/uploads/devis
 public/uploads/commandes
+public/uploads/barrel-map
 
 # Build tools specific
 npm-debug.log

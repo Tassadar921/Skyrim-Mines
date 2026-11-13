@@ -306,6 +306,20 @@ export default class DeliveryRepository extends BaseRepository<typeof Delivery> 
         return result;
     }
 
+    /** Quantity sold per week and resource over [fromWeek, toWeek]; weeks or resources without sales are absent. */
+    public async quantitiesByWeekAndResource(fromWeek: number, toWeek: number): Promise<{ weekNumber: number; resourceId: string; quantity: number }[]> {
+        const rows = await db
+            .from('deliveries')
+            .join('delivery_lines', 'delivery_lines.delivery_id', 'deliveries.id')
+            .whereBetween('deliveries.delivered_week_number', [fromWeek, toWeek])
+            .whereNotNull('delivery_lines.resource_id')
+            .select('deliveries.delivered_week_number as weekNumber', 'delivery_lines.resource_id as resourceId')
+            .sum('delivery_lines.quantity as quantity')
+            .groupBy('deliveries.delivered_week_number', 'delivery_lines.resource_id');
+
+        return rows.map((row) => ({ weekNumber: Number(row.weekNumber), resourceId: row.resourceId, quantity: Number(row.quantity) }));
+    }
+
     public async getWeeklyTotals(): Promise<{ weekNumber: number; deliveryCount: number; totalAmount: number; totalProfit: number }[]> {
         const rows = await db
             .from('deliveries')

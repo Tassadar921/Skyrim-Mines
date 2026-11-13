@@ -8,6 +8,12 @@ export interface ApiDefinition {
   home: typeof routes['home']
   tarifs: typeof routes['tarifs']
   stocks: typeof routes['stocks']
+  permanences: {
+    attendance: {
+      store: typeof routes['permanences.attendance.store']
+      destroy: typeof routes['permanences.attendance.destroy']
+    }
+  }
   organigramme: typeof routes['organigramme']
   deposits: {
     store: typeof routes['deposits.store']
@@ -120,12 +126,24 @@ export interface ApiDefinition {
       create: typeof routes['admin.orderArchives.create']
       store: typeof routes['admin.orderArchives.store']
     }
-    livraisons: {
-      index: typeof routes['admin.livraisons.index']
-      destroy: typeof routes['admin.livraisons.destroy']
-      deductStock: typeof routes['admin.livraisons.deductStock']
-      markStockDeducted: typeof routes['admin.livraisons.markStockDeducted']
-      deductStockAll: typeof routes['admin.livraisons.deductStockAll']
+    permanences: {
+      index: typeof routes['admin.permanences.index']
+      settings: {
+        recruiting: typeof routes['admin.permanences.settings.recruiting']
+        buyback: typeof routes['admin.permanences.settings.buyback']
+        slots: {
+          duration: typeof routes['admin.permanences.settings.slots.duration']
+          store: typeof routes['admin.permanences.settings.slots.store']
+          destroy: typeof routes['admin.permanences.settings.slots.destroy']
+        }
+      }
+    }
+    ventes: {
+      index: typeof routes['admin.ventes.index']
+      destroy: typeof routes['admin.ventes.destroy']
+      deductStock: typeof routes['admin.ventes.deductStock']
+      markStockDeducted: typeof routes['admin.ventes.markStockDeducted']
+      deductStockAll: typeof routes['admin.ventes.deductStockAll']
     }
     barrel: {
       update: typeof routes['admin.barrel.update']
@@ -133,6 +151,10 @@ export interface ApiDefinition {
     barrelRentals: {
       index: typeof routes['admin.barrelRentals.index']
       store: typeof routes['admin.barrelRentals.store']
+      map: {
+        update: typeof routes['admin.barrelRentals.map.update']
+        destroy: typeof routes['admin.barrelRentals.map.destroy']
+      }
       show: typeof routes['admin.barrelRentals.show']
       update: typeof routes['admin.barrelRentals.update']
       destroy: typeof routes['admin.barrelRentals.destroy']

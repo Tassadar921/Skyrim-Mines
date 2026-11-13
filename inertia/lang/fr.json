@@ -10,6 +10,16 @@
         "myBarrel": {
             "title": "Mon tonneau",
             "totalValue": "Valeur totale de mon tonneau :"
+        },
+        "permanence": {
+            "title": "Jour de permanence",
+            "attendees": "Présents",
+            "noAttendees": "Personne ne s'est encore positionné",
+            "attend": "J'y serai",
+            "leave": "Je n'y serai plus",
+            "attending": "Vous y serez",
+            "owner": "Propriétaire",
+            "foreman": "Contremaître"
         }
     },
     "tarifs": {
@@ -203,7 +213,8 @@
                 "buybacks": "Historique des rachats",
                 "expenses": "Dépenses",
                 "balanceChanges": "Historique des soldes",
-                "livraisons": "Livraisons",
+                "ventes": "Ventes",
+                "permanences": "Permanences",
                 "castellanies": "Châtelleries"
             }
         },
@@ -656,6 +667,8 @@
                 "endsAt": "Fin",
                 "recursWeekly": "Répéter chaque semaine",
                 "recurrenceEndsOn": "Jusqu'au (facultatif)",
+                "recurrenceNoEnd": "Sans fin",
+                "recurrenceClear": "Effacer",
                 "recurrenceHint": "Sans date de fin, l'événement se répète indéfiniment. Modifier ou supprimer une occurrence s'applique à toute la série.",
                 "isShared": "Agenda partagé entre propriétaires",
                 "isSharedHint": "Visible et modifiable par tous les propriétaires. Sinon, seul vous le voyez.",
@@ -764,14 +777,14 @@
         "orderArchives": {
             "create": {
                 "title": "Archiver une commande",
-                "back": "Retour aux livraisons",
+                "back": "Retour aux ventes",
                 "description": "Enregistrez une commande et sa livraison pour une semaine passée, par exemple pour archiver une commande passée avant la mise en place de l'application. La commande est immédiatement marquée comme entièrement livrée.",
                 "submit": "Archiver",
                 "fields": {
                     "recipient": "Client ou organisation",
                     "recipientPlaceholder": "Sélectionner un destinataire",
                     "orderWeek": "Semaine de la commande",
-                    "deliveryWeek": "Semaine de la livraison",
+                    "orderWeekHelp": "La livraison est enregistrée sur la même semaine.",
                     "castellany": "Châtellerie de destination",
                     "castellanyPickup": "Retrait sur place",
                     "deductFromStock": "Déduire les quantités du stock",
@@ -779,8 +792,8 @@
                 }
             }
         },
-        "livraisons": {
-            "title": "Livraisons",
+        "ventes": {
+            "title": "Ventes",
             "archiveLink": "Archiver une commande",
             "table": {
                 "count": "livraison | livraison | livraisons",
@@ -807,7 +820,7 @@
                 "deliveries": "livraison | livraison | livraisons"
             },
             "tabs": {
-                "deliveries": "Livraisons",
+                "sales": "Ventes",
                 "stats": "Statistiques"
             },
             "stats": {
@@ -836,6 +849,18 @@
                 "distribution": {
                     "allWeeks": "Toutes les semaines (total)",
                     "empty": "Aucune livraison sur cette période"
+                },
+                "estimate": {
+                    "title": "Estimation des ventes — semaine {week}",
+                    "titleEmpty": "Estimation des ventes",
+                    "empty": "Aucune estimation pour l'instant : elle est calculée quand une semaine est enregistrée sur le tableau de bord.",
+                    "methodTrimmed": "Calculée sur les semaines {from} à {to} : quantités vendues par semaine (0 si aucune vente), sans la semaine la plus basse ni la plus haute, puis moyennées.",
+                    "methodMean": "Calculée sur les semaines {from} à {to} : moyenne simple des quantités vendues par semaine (0 si aucune vente), l'historique étant encore trop court pour écarter les extrêmes.",
+                    "ores": "Minerais",
+                    "ingots": "Lingots",
+                    "sales": "Ventes estimées",
+                    "oreNeed": "Besoin total",
+                    "oreNeedHelp": "Besoin total : minerai vendu tel quel, plus celui nécessaire pour fabriquer les lingots estimés (d'après leurs recettes)."
                 }
             },
             "detail": {
@@ -878,6 +903,73 @@
                     "cancel": "Annuler",
                     "confirm": "Tout déduire"
                 }
+            }
+        },
+        "permanences": {
+            "title": "Permanences",
+            "tabs": {
+                "permanences": "Permanences",
+                "settings": "Paramètres"
+            },
+            "settings": {
+                "recruiting": {
+                    "label": "Recrutement ouvert",
+                    "description": "Indique si la compagnie recrute en ce moment."
+                },
+                "buyback": {
+                    "buyback": "Rachat",
+                    "all": "Tous",
+                    "count": "{count} / {total} rachetés",
+                    "ores": {
+                        "title": "Rachat des minerais",
+                        "description": "Minerais rachetés pendant les permanences.",
+                        "resource": "Minerais",
+                        "empty": "Aucun minerai"
+                    },
+                    "ingots": {
+                        "title": "Rachat des lingots",
+                        "description": "Lingots rachetés pendant les permanences.",
+                        "resource": "Lingots",
+                        "empty": "Aucun lingot"
+                    }
+                },
+                "slots": {
+                    "title": "Créneaux de permanence",
+                    "description": "Jours et heures fixes, chaque semaine, chacun avec sa durée (de 30 min à 2 h).",
+                    "weekday": "Jour",
+                    "time": "Heure",
+                    "add": "Ajouter",
+                    "empty": "Aucun créneau",
+                    "delete": "Supprimer le créneau",
+                    "duration": "Durée"
+                }
+            },
+            "summary": {
+                "slots": "Créneaux",
+                "noSlots": "Aucun créneau défini",
+                "recruiting": "Recrutement",
+                "recruitingOpen": "Ouvert",
+                "recruitingClosed": "Fermé",
+                "oresBuyback": "Rachat de minerais",
+                "ingotsBuyback": "Rachat de lingots",
+                "yes": "Oui",
+                "no": "Non",
+                "showDetail": "Voir le détail",
+                "hideDetail": "Masquer le détail"
+            },
+            "weekdays": {
+                "1": "Lundi",
+                "2": "Mardi",
+                "3": "Mercredi",
+                "4": "Jeudi",
+                "5": "Vendredi",
+                "6": "Samedi",
+                "7": "Dimanche"
+            },
+            "durations": {
+                "minutes": "{minutes} min",
+                "hours": "{hours} h",
+                "hoursMinutes": "{hours} h {minutes}"
             }
         },
         "barrel": {
@@ -951,6 +1043,21 @@
                     "label": "Supprimer",
                     "title": "Supprimer ce paiement ?",
                     "description": "Cette action est irréversible et supprimera définitivement le paiement de la semaine {week}.",
+                    "cancel": "Annuler",
+                    "confirm": "Supprimer"
+                }
+            },
+            "map": {
+                "title": "Plan de la mine",
+                "upload": "Ajouter le plan",
+                "replace": "Remplacer le plan",
+                "empty": "Aucun plan pour l'instant. Ajoutez une image du plan de la mine avec les tonneaux numérotés.",
+                "hint": "Image JPG, PNG ou WebP, 10 Mo maximum.",
+                "openFull": "Ouvrir en taille réelle",
+                "delete": {
+                    "label": "Supprimer",
+                    "title": "Supprimer le plan de la mine ?",
+                    "description": "L'image sera définitivement supprimée. Vous pourrez en ajouter une nouvelle à tout moment.",
                     "cancel": "Annuler",
                     "confirm": "Supprimer"
                 }

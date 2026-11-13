@@ -14,6 +14,12 @@ export default class ResourceRecipeLineRepository extends BaseRepository<typeof 
         return ResourceRecipeLine.query().where('resourceId', resourceId);
     }
 
+    /** Every recipe line made of another resource (ore or ingot), materials left out. */
+    public async allResourceIngredients(): Promise<{ resourceId: string; ingredientResourceId: string; quantity: number }[]> {
+        const lines = await ResourceRecipeLine.query().whereNotNull('ingredientResourceId');
+        return lines.map((line) => ({ resourceId: line.resourceId, ingredientResourceId: line.ingredientResourceId!, quantity: Number(line.quantity) }));
+    }
+
     public async replaceLines(resourceId: string, lines: RecipeLineInput[], trx?: TransactionClientContract): Promise<void> {
         const run = async (client: TransactionClientContract) => {
             await ResourceRecipeLine.query({ client }).where('resourceId', resourceId).delete();

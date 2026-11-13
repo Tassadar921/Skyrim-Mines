@@ -9,6 +9,7 @@ import UserRepository from '#repositories/user_repository';
 import SiteSettingRepository from '#repositories/site_setting_repository';
 import TaxBracketRepository from '#repositories/tax_bracket_repository';
 import TaxTierRepository from '#repositories/tax_tier_repository';
+import SalesEstimateService from '#services/sales_estimate_service';
 import UserRoleEnum from '#types/enum/user_role_enum';
 import TaxSystemEnum from '#types/enum/tax_system_enum';
 import { getWeekNumber, getWeekRange } from '#helpers/game_week_helper';
@@ -77,6 +78,7 @@ export default class DashboardController {
         private readonly siteSettingRepository: SiteSettingRepository = new SiteSettingRepository(),
         private readonly taxBracketRepository: TaxBracketRepository = new TaxBracketRepository(),
         private readonly taxTierRepository: TaxTierRepository = new TaxTierRepository(),
+        private readonly salesEstimateService: SalesEstimateService = new SalesEstimateService(),
     ) {}
 
     public async index({ inertia }: HttpContext) {
@@ -244,6 +246,14 @@ export default class DashboardController {
                 privilegeReduction: reductions.privilege,
             });
             session.flash('success', i18n.t('messages.admin.dashboard.capitalSnapshot.store.success'));
+
+            // Closing a week forecasts the next one's sales (shown in Ventes > Statistiques); a failure here
+            // must not undo the recorded week.
+            try {
+                await this.salesEstimateService.computeAfterClosingWeek(weekNumber);
+            } catch (e) {
+                logger.error({ err: e }, 'dashboard.storeCapitalSnapshot sales estimate failed');
+            }
         } catch (e) {
             logger.error({ err: e }, 'dashboard.storeCapitalSnapshot failed');
             session.flash('error', i18n.t('messages.admin.dashboard.capitalSnapshot.store.error'));

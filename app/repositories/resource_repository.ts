@@ -26,6 +26,15 @@ export default class ResourceRepository extends BaseRepository<typeof Resource> 
         return q.paginate(page, perPage);
     }
 
+    public async allOfType(type: ResourceTypeEnum): Promise<Resource[]> {
+        return Resource.query().where('type', type).orderBy('order', 'asc');
+    }
+
+    /** Permanences setting: turns buyback on/off for the given resources (ores and ingots) at once. */
+    public async setPermanenceBuyback(ids: string[], enabled: boolean): Promise<void> {
+        await Resource.query().whereIn('id', ids).update({ permanenceBuyback: enabled });
+    }
+
     public async findOrFail(id: string): Promise<Resource> {
         return Resource.findOrFail(id);
     }

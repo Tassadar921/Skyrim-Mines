@@ -113,17 +113,46 @@
                 "success": "Commande archivée avec succès",
                 "error": "Erreur lors de l'archivage de la commande",
                 "invalidOrderWeek": "La semaine de la commande doit être comprise entre la semaine dernière et la semaine prochaine",
-                "invalidDeliveryWeek": "La semaine de livraison doit être postérieure ou égale à la semaine de la commande, et ne peut pas dépasser la semaine prochaine",
                 "buybackSummary": "Racheté sur le tonneau pour compléter le stock : {details}."
             }
         },
-        "livraisons": {
+        "ventes": {
             "deductStock": {
                 "success": "Quantités déduites du stock avec succès",
                 "markedSuccess": "Livraison notée comme déduite avec succès",
                 "allSuccess": "Quantités déduites du stock pour {count} livraison(s)",
                 "error": "Erreur lors de la déduction du stock",
                 "alreadyDeducted": "Le stock a déjà été déduit pour cette livraison"
+            },
+            "delete": {
+                "success": "Livraison et commande associée supprimées avec succès",
+                "error": "Erreur lors de la suppression de la livraison"
+            }
+        },
+        "permanences": {
+            "recruiting": {
+                "opened": "Recrutement ouvert",
+                "closed": "Recrutement fermé",
+                "error": "Erreur lors de la mise à jour du recrutement"
+            },
+            "buyback": {
+                "success": "Rachat mis à jour",
+                "error": "Erreur lors de la mise à jour du rachat"
+            },
+            "slots": {
+                "store": {
+                    "success": "Créneau ajouté",
+                    "error": "Erreur lors de l'ajout du créneau"
+                },
+                "destroy": {
+                    "success": "Créneau supprimé",
+                    "error": "Erreur lors de la suppression du créneau"
+                },
+                "alreadyExists": "Ce créneau existe déjà",
+                "duration": {
+                    "success": "Durée du créneau mise à jour",
+                    "error": "Erreur lors de la mise à jour de la durée du créneau"
+                }
             }
         },
         "barrel": {
@@ -250,6 +279,16 @@
                     "success": "Paiement supprimé avec succès",
                     "error": "Erreur lors de la suppression du paiement"
                 }
+            },
+            "map": {
+                "update": {
+                    "success": "Plan de la mine enregistré",
+                    "error": "Erreur lors de l'envoi du plan de la mine"
+                },
+                "destroy": {
+                    "success": "Plan de la mine supprimé",
+                    "error": "Erreur lors de la suppression du plan de la mine"
+                }
             }
         },
         "agenda": {
@@ -320,12 +359,6 @@
             "error": "Erreur lors du rachat"
         }
     },
-    "livraisons": {
-        "delete": {
-            "success": "Livraison et commande associée supprimées avec succès",
-            "error": "Erreur lors de la suppression de la livraison"
-        }
-    },
     "organization": {
         "members": {
             "create": {
@@ -358,6 +391,16 @@
         },
         "logout": {
             "success": "Vous avez été déconnecté"
+        }
+    },
+    "permanences": {
+        "attendance": {
+            "joined": "C'est noté, vous serez à la permanence",
+            "joinedWithAgenda": "C'est noté, vous serez à la permanence : elle a été ajoutée à votre agenda",
+            "left": "C'est noté, vous ne serez plus à la permanence",
+            "notAvailable": "Cette permanence n'a pas lieu aujourd'hui ou est déjà terminée",
+            "error": "Erreur lors de l'enregistrement de votre présence",
+            "agendaTitle": "Permanence"
         }
     }
 }

@@ -15,3 +15,7 @@ export const storeBarrelRentalValidator = vine.create({
 });
 
 export const updateBarrelRentalValidator = storeBarrelRentalValidator;
+
+export const updateBarrelMapValidator = vine.create({
+    map: vine.file({ size: '10mb', extnames: ['jpg', 'jpeg', 'png', 'webp'] }),
+});

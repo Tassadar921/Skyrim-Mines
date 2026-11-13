@@ -13,7 +13,6 @@ export const createOrderArchiveValidator = vine.create({
     recipientOrganizationId: vine.string().uuid().optional(),
     recipientScope: vine.enum(['organization', 'personal']).optional(),
     orderWeek: vine.number().min(1),
-    deliveryWeek: vine.number().min(1),
     castellanyId: vine.string().uuid().nullable().optional(),
     deductFromStock: vine.boolean().optional(),
 });

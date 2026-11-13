@@ -124,7 +124,6 @@ const totalAmount = computed(() => props.resources.reduce((sum, resource) => sum
 
 const form = useForm({
     orderWeek: props.currentWeek,
-    deliveryWeek: props.currentWeek,
     recipientClientId: '',
     recipientOrganizationId: '',
     castellanyId: PICKUP,
@@ -140,30 +139,16 @@ watch(effectiveOrganizationId, (organizationId) => {
 const minWeek = computed(() => Math.max(1, props.currentWeek - 1));
 const maxWeek = computed(() => props.currentWeek + 1);
 const orderWeekValid = computed(() => Number.isInteger(form.orderWeek) && form.orderWeek >= minWeek.value && form.orderWeek <= maxWeek.value);
-const deliveryWeekValid = computed(() => Number.isInteger(form.deliveryWeek) && form.deliveryWeek >= form.orderWeek && form.deliveryWeek <= maxWeek.value);
-
-const deliveryWeekOptions = computed(() => props.availableWeeks.filter((week) => week.weekNumber >= form.orderWeek));
 
 const orderWeekModel = computed({
     get: () => String(form.orderWeek),
     set: (value: string) => (form.orderWeek = Number(value)),
 });
-const deliveryWeekModel = computed({
-    get: () => String(form.deliveryWeek),
-    set: (value: string) => (form.deliveryWeek = Number(value)),
-});
-
-watch(
-    () => form.orderWeek,
-    (orderWeek) => {
-        if (form.deliveryWeek < orderWeek) form.deliveryWeek = orderWeek;
-    },
-);
 
 const canSubmit = computed(() => {
     if (!hasSelection.value) return false;
     if (selectedRecipientType.value !== 'client' && selectedRecipientType.value !== 'organization') return false;
-    return orderWeekValid.value && deliveryWeekValid.value;
+    return orderWeekValid.value;
 });
 
 function submit() {
@@ -193,7 +178,7 @@ function submit() {
 <template>
     <div class="space-y-4 max-w-5xl">
         <Button variant="outline" class="gap-2" as-child>
-            <Link :href="urlFor('admin.livraisons.index')">
+            <Link :href="urlFor('admin.ventes.index')">
                 <ArrowLeft class="size-4" />
                 {{ t('admin.orderArchives.create.back') }}
             </Link>
@@ -268,23 +253,8 @@ function submit() {
                             </SelectItem>
                         </SelectContent>
                     </Select>
+                    <p class="text-xs text-muted-foreground">{{ t('admin.orderArchives.create.fields.orderWeekHelp') }}</p>
                     <p v-if="form.errors.orderWeek" class="text-sm text-destructive">{{ form.errors.orderWeek }}</p>
-                </div>
-                <div class="space-y-1">
-                    <Label>{{ t('admin.orderArchives.create.fields.deliveryWeek') }}</Label>
-                    <Select v-model="deliveryWeekModel">
-                        <SelectTrigger>
-                            <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem v-for="week in deliveryWeekOptions" :key="week.weekNumber" :value="String(week.weekNumber)">
-                                {{ formatWeekRange(week) }}
-                                <span v-if="week.weekNumber === currentWeek" class="text-muted-foreground">({{ t('admin.common.weekly.current') }})</span>
-                                <span v-else-if="week.weekNumber === currentWeek + 1" class="text-muted-foreground">({{ t('admin.common.weekly.next') }})</span>
-                            </SelectItem>
-                        </SelectContent>
-                    </Select>
-                    <p v-if="form.errors.deliveryWeek" class="text-sm text-destructive">{{ form.errors.deliveryWeek }}</p>
                 </div>
                 <div class="space-y-1">
                     <Label>{{ t('admin.orderArchives.create.fields.castellany') }}</Label>

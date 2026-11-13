@@ -16,6 +16,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '~/components/ui/tabs';
 import DeleteButton from '~/components/ui/DeleteButton.vue';
 import OreEvolutionChart from '~/partials/stats/OreEvolutionChart.vue';
 import OreDistributionChart from '~/partials/stats/OreDistributionChart.vue';
+import SalesEstimateCard, { type SalesEstimate } from '~/partials/stats/SalesEstimateCard.vue';
 import {
     AlertDialog,
     AlertDialogTrigger,
@@ -59,13 +60,13 @@ type OreRef = { resourceId: string; resourceName: string };
 type StatValues = { quantity: number; saleValue: number; profit: number };
 type OreStat = OreRef & StatValues;
 type WeeklyOreStat = { weekNumber: number; total: StatValues; byOre: OreStat[] };
-type Stats = { ores: OreRef[]; oreTotals: OreStat[]; weeklyOreStats: WeeklyOreStat[] };
+type Stats = { ores: OreRef[]; oreTotals: OreStat[]; weeklyOreStats: WeeklyOreStat[]; salesEstimate: SalesEstimate | null };
 type StatsMetric = keyof StatValues;
 
 const { t } = useI18n();
 const { pageTitle } = useAdminLayout();
 const { isManager } = useAuth();
-pageTitle.value = t('admin.livraisons.title');
+pageTitle.value = t('admin.ventes.title');
 
 const props = defineProps<{
     deliveries: DeliveryRow[];
@@ -110,7 +111,7 @@ function navigate(overrides: Record<string, string | number | undefined>) {
     for (const [k, v] of Object.entries(params)) {
         if (v !== undefined && v !== '') clean[k] = v;
     }
-    router.get(urlFor('admin.livraisons.index'), clean, { preserveState: true, preserveScroll: true });
+    router.get(urlFor('admin.ventes.index'), clean, { preserveState: true, preserveScroll: true });
 }
 
 function onWeekFilterChange(value: AcceptableValue) {
@@ -144,33 +145,33 @@ function sortIcon(column: string) {
 }
 
 function deleteDelivery(delivery: DeliveryRow) {
-    router.delete(urlFor('admin.livraisons.destroy', { id: delivery.id }), { preserveScroll: true });
+    router.delete(urlFor('admin.ventes.destroy', { id: delivery.id }), { preserveScroll: true });
 }
 
 const deductingId = ref<string | null>(null);
 
 function deductStock(delivery: DeliveryRow) {
     deductingId.value = delivery.id;
-    router.patch(urlFor('admin.livraisons.deductStock', { id: delivery.id }), {}, { preserveScroll: true, preserveState: true, onFinish: () => (deductingId.value = null) });
+    router.patch(urlFor('admin.ventes.deductStock', { id: delivery.id }), {}, { preserveScroll: true, preserveState: true, onFinish: () => (deductingId.value = null) });
 }
 
 function markStockDeducted(delivery: DeliveryRow) {
     deductingId.value = delivery.id;
-    router.patch(urlFor('admin.livraisons.markStockDeducted', { id: delivery.id }), {}, { preserveScroll: true, preserveState: true, onFinish: () => (deductingId.value = null) });
+    router.patch(urlFor('admin.ventes.markStockDeducted', { id: delivery.id }), {}, { preserveScroll: true, preserveState: true, onFinish: () => (deductingId.value = null) });
 }
 
 const isDeductingAll = ref(false);
 
 function deductStockAll() {
     isDeductingAll.value = true;
-    router.post(urlFor('admin.livraisons.deductStockAll'), {}, { preserveScroll: true, preserveState: true, onFinish: () => (isDeductingAll.value = false) });
+    router.post(urlFor('admin.ventes.deductStockAll'), {}, { preserveScroll: true, preserveState: true, onFinish: () => (isDeductingAll.value = false) });
 }
 
 const hasActiveFilters = computed(() => !!props.filters.search || !!props.filters.sort || props.filters.week !== null || props.meta.currentPage !== 1);
 
 function resetFilters() {
     searchValue.value = '';
-    router.get(urlFor('admin.livraisons.index'), {}, { preserveState: true, preserveScroll: true });
+    router.get(urlFor('admin.ventes.index'), {}, { preserveState: true, preserveScroll: true });
 }
 
 // Statistics tab — single week filter shared by the ore totals table and the distribution pie
@@ -202,46 +203,46 @@ const statsOreData = computed<(OreRef & { value: number })[]>(() => {
 
 <template>
     <div class="space-y-4">
-        <Tabs default-value="livraisons">
+        <Tabs default-value="ventes">
             <TabsList>
-                <TabsTrigger value="livraisons">{{ t('admin.livraisons.tabs.deliveries') }}</TabsTrigger>
-                <TabsTrigger value="stats">{{ t('admin.livraisons.tabs.stats') }}</TabsTrigger>
+                <TabsTrigger value="ventes">{{ t('admin.ventes.tabs.sales') }}</TabsTrigger>
+                <TabsTrigger value="stats">{{ t('admin.ventes.tabs.stats') }}</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="livraisons" class="space-y-4">
+            <TabsContent value="ventes" class="space-y-4">
                 <div class="flex flex-wrap items-center justify-between gap-2">
-                    <Badge variant="outline">{{ meta.total }} {{ t('admin.livraisons.table.count', meta.total) }}</Badge>
+                    <Badge variant="outline">{{ meta.total }} {{ t('admin.ventes.table.count', meta.total) }}</Badge>
 
                     <div class="flex flex-wrap items-center gap-2">
                         <AlertDialog v-if="isManager && pendingStockDeductionCount > 0">
                             <AlertDialogTrigger as-child>
                                 <Button variant="outline" size="sm" class="gap-2" :loading="isDeductingAll" :disabled="isDeductingAll">
                                     <PackageMinus class="size-4" />
-                                    {{ t('admin.livraisons.deductStock.allButton', { count: pendingStockDeductionCount }) }}
+                                    {{ t('admin.ventes.deductStock.allButton', { count: pendingStockDeductionCount }) }}
                                 </Button>
                             </AlertDialogTrigger>
                             <AlertDialogContent>
                                 <AlertDialogHeader>
-                                    <AlertDialogTitle>{{ t('admin.livraisons.deductStock.allConfirm.title') }}</AlertDialogTitle>
-                                    <AlertDialogDescription>{{ t('admin.livraisons.deductStock.allConfirm.description', { count: pendingStockDeductionCount }) }}</AlertDialogDescription>
+                                    <AlertDialogTitle>{{ t('admin.ventes.deductStock.allConfirm.title') }}</AlertDialogTitle>
+                                    <AlertDialogDescription>{{ t('admin.ventes.deductStock.allConfirm.description', { count: pendingStockDeductionCount }) }}</AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
-                                    <AlertDialogCancel>{{ t('admin.livraisons.deductStock.allConfirm.cancel') }}</AlertDialogCancel>
-                                    <AlertDialogAction @click="deductStockAll">{{ t('admin.livraisons.deductStock.allConfirm.confirm') }}</AlertDialogAction>
+                                    <AlertDialogCancel>{{ t('admin.ventes.deductStock.allConfirm.cancel') }}</AlertDialogCancel>
+                                    <AlertDialogAction @click="deductStockAll">{{ t('admin.ventes.deductStock.allConfirm.confirm') }}</AlertDialogAction>
                                 </AlertDialogFooter>
                             </AlertDialogContent>
                         </AlertDialog>
                         <Button v-if="isManager" variant="outline" class="gap-2" as-child>
                             <Link :href="urlFor('admin.orderArchives.create')">
                                 <Archive class="size-4" />
-                                {{ t('admin.livraisons.archiveLink') }}
+                                {{ t('admin.ventes.archiveLink') }}
                             </Link>
                         </Button>
                     </div>
                 </div>
 
                 <div class="rounded-md border p-3 space-y-2">
-                    <div class="text-sm font-medium text-muted-foreground">{{ t('admin.livraisons.weekly.title') }}</div>
+                    <div class="text-sm font-medium text-muted-foreground">{{ t('admin.ventes.weekly.title') }}</div>
                     <div class="flex gap-2 overflow-x-auto pb-1">
                         <button
                             v-for="(weeklyTotal, index) in weeklyTotals"
@@ -252,26 +253,26 @@ const statsOreData = computed<(OreRef & { value: number })[]>(() => {
                             @click="navigate({ week: filters.week === weeklyTotal.weekNumber ? undefined : weeklyTotal.weekNumber, page: 1 })"
                         >
                             <div class="flex items-center justify-between gap-2">
-                                <span class="text-sm font-medium">{{ t('admin.livraisons.table.weekBadge', { week: weeklyTotal.weekNumber }) }}</span>
+                                <span class="text-sm font-medium">{{ t('admin.ventes.table.weekBadge', { week: weeklyTotal.weekNumber }) }}</span>
                                 <Badge v-if="index === 0" variant="outline" class="text-xs">{{ t('admin.common.weekly.current') }}</Badge>
                             </div>
                             <div class="text-xs text-muted-foreground">{{ formatWeekRange(weeklyTotal) }}</div>
                             <div class="mt-1 text-sm font-medium">{{ weeklyTotal.totalAmount.toFixed(2) }} s</div>
-                            <div class="text-xs text-muted-foreground">{{ weeklyTotal.deliveryCount }} {{ t('admin.livraisons.weekly.deliveries', weeklyTotal.deliveryCount) }}</div>
+                            <div class="text-xs text-muted-foreground">{{ weeklyTotal.deliveryCount }} {{ t('admin.ventes.weekly.deliveries', weeklyTotal.deliveryCount) }}</div>
                         </button>
                     </div>
                 </div>
 
                 <div class="flex flex-col gap-2 lg:flex-row lg:items-center">
-                    <Input :placeholder="t('admin.livraisons.table.search')" :model-value="searchValue" class="w-full lg:max-w-sm" @update:model-value="onSearchInput" />
+                    <Input :placeholder="t('admin.ventes.table.search')" :model-value="searchValue" class="w-full lg:max-w-sm" @update:model-value="onSearchInput" />
                     <Select :model-value="filters.week ? String(filters.week) : 'all'" @update:model-value="onWeekFilterChange">
                         <SelectTrigger class="w-full lg:w-56">
                             <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="all">{{ t('admin.livraisons.table.allWeeks') }}</SelectItem>
+                            <SelectItem value="all">{{ t('admin.ventes.table.allWeeks') }}</SelectItem>
                             <SelectItem v-for="weeklyTotal in weeklyTotals" :key="weeklyTotal.weekNumber" :value="String(weeklyTotal.weekNumber)">
-                                {{ t('admin.livraisons.table.weekBadge', { week: weeklyTotal.weekNumber }) }} ({{ formatWeekRange(weeklyTotal) }})
+                                {{ t('admin.ventes.table.weekBadge', { week: weeklyTotal.weekNumber }) }} ({{ formatWeekRange(weeklyTotal) }})
                             </SelectItem>
                         </SelectContent>
                     </Select>
@@ -288,23 +289,23 @@ const statsOreData = computed<(OreRef & { value: number })[]>(() => {
                                 <TableHead class="w-8" />
                                 <TableHead>
                                     <Button variant="ghost" class="gap-1 px-2" @click="onSort('deliveredAt')">
-                                        {{ t('admin.livraisons.table.date') }}
+                                        {{ t('admin.ventes.table.date') }}
                                         <component :is="sortIcon('deliveredAt')" class="size-4" />
                                     </Button>
                                 </TableHead>
                                 <TableHead>
                                     <Button variant="ghost" class="gap-1 px-2" @click="onSort('week')">
-                                        {{ t('admin.livraisons.table.week') }}
+                                        {{ t('admin.ventes.table.week') }}
                                         <component :is="sortIcon('week')" class="size-4" />
                                     </Button>
                                 </TableHead>
-                                <TableHead>{{ t('admin.livraisons.table.order') }}</TableHead>
-                                <TableHead>{{ t('admin.livraisons.table.organization') }}</TableHead>
-                                <TableHead>{{ t('admin.livraisons.table.archivedBy') }}</TableHead>
-                                <TableHead>{{ t('admin.livraisons.table.amount') }}</TableHead>
-                                <TableHead>{{ t('admin.livraisons.table.profit') }}</TableHead>
-                                <TableHead>{{ t('admin.livraisons.deductStock.column') }}</TableHead>
-                                <TableHead>{{ t('admin.livraisons.table.actions') }}</TableHead>
+                                <TableHead>{{ t('admin.ventes.table.order') }}</TableHead>
+                                <TableHead>{{ t('admin.ventes.table.organization') }}</TableHead>
+                                <TableHead>{{ t('admin.ventes.table.archivedBy') }}</TableHead>
+                                <TableHead>{{ t('admin.ventes.table.amount') }}</TableHead>
+                                <TableHead>{{ t('admin.ventes.table.profit') }}</TableHead>
+                                <TableHead>{{ t('admin.ventes.deductStock.column') }}</TableHead>
+                                <TableHead>{{ t('admin.ventes.table.actions') }}</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -317,12 +318,12 @@ const statsOreData = computed<(OreRef & { value: number })[]>(() => {
                                         </TableCell>
                                         <TableCell class="text-sm text-muted-foreground">{{ formatDateTime(delivery.deliveredAt) }}</TableCell>
                                         <TableCell class="text-sm text-muted-foreground">
-                                            <Badge variant="secondary">{{ t('admin.livraisons.table.weekBadge', { week: delivery.weekNumber }) }}</Badge>
+                                            <Badge variant="secondary">{{ t('admin.ventes.table.weekBadge', { week: delivery.weekNumber }) }}</Badge>
                                         </TableCell>
                                         <TableCell class="text-sm font-medium">{{ formatOrderNumber(delivery.orderNumber) }}</TableCell>
                                         <TableCell class="text-sm text-muted-foreground">
                                             <span v-if="delivery.organizationName">{{ delivery.organizationName }}</span>
-                                            <span v-else class="italic">{{ t('admin.livraisons.table.noOrganization') }}</span>
+                                            <span v-else class="italic">{{ t('admin.ventes.table.noOrganization') }}</span>
                                         </TableCell>
                                         <TableCell class="text-sm text-muted-foreground">{{ delivery.archivedByName ?? '—' }}</TableCell>
                                         <TableCell class="text-sm font-medium">{{ deliveryTotal(delivery).toFixed(2) }} s</TableCell>
@@ -330,54 +331,54 @@ const statsOreData = computed<(OreRef & { value: number })[]>(() => {
                                             {{ delivery.totalProfit.toFixed(2) }} s
                                         </TableCell>
                                         <TableCell @click.stop>
-                                            <Badge v-if="delivery.stockDeducted" variant="outline">{{ t('admin.livraisons.deductStock.deducted') }}</Badge>
+                                            <Badge v-if="delivery.stockDeducted" variant="outline">{{ t('admin.ventes.deductStock.deducted') }}</Badge>
                                             <div v-else-if="isManager" class="flex items-center gap-1">
                                                 <AlertDialog>
                                                     <AlertDialogTrigger as-child>
                                                         <Button variant="outline" size="sm" class="gap-1" :loading="deductingId === delivery.id" :disabled="deductingId === delivery.id">
                                                             <PackageMinus class="size-4" />
-                                                            {{ t('admin.livraisons.deductStock.action') }}
+                                                            {{ t('admin.ventes.deductStock.action') }}
                                                         </Button>
                                                     </AlertDialogTrigger>
                                                     <AlertDialogContent>
                                                         <AlertDialogHeader>
-                                                            <AlertDialogTitle>{{ t('admin.livraisons.deductStock.confirm.title') }}</AlertDialogTitle>
-                                                            <AlertDialogDescription>{{ t('admin.livraisons.deductStock.confirm.description') }}</AlertDialogDescription>
+                                                            <AlertDialogTitle>{{ t('admin.ventes.deductStock.confirm.title') }}</AlertDialogTitle>
+                                                            <AlertDialogDescription>{{ t('admin.ventes.deductStock.confirm.description') }}</AlertDialogDescription>
                                                         </AlertDialogHeader>
                                                         <AlertDialogFooter>
-                                                            <AlertDialogCancel>{{ t('admin.livraisons.deductStock.confirm.cancel') }}</AlertDialogCancel>
-                                                            <AlertDialogAction @click="deductStock(delivery)">{{ t('admin.livraisons.deductStock.confirm.confirm') }}</AlertDialogAction>
+                                                            <AlertDialogCancel>{{ t('admin.ventes.deductStock.confirm.cancel') }}</AlertDialogCancel>
+                                                            <AlertDialogAction @click="deductStock(delivery)">{{ t('admin.ventes.deductStock.confirm.confirm') }}</AlertDialogAction>
                                                         </AlertDialogFooter>
                                                     </AlertDialogContent>
                                                 </AlertDialog>
                                                 <AlertDialog>
                                                     <AlertDialogTrigger as-child>
                                                         <Button variant="ghost" size="sm" class="gap-1" :loading="deductingId === delivery.id" :disabled="deductingId === delivery.id">
-                                                            {{ t('admin.livraisons.deductStock.markAction') }}
+                                                            {{ t('admin.ventes.deductStock.markAction') }}
                                                         </Button>
                                                     </AlertDialogTrigger>
                                                     <AlertDialogContent>
                                                         <AlertDialogHeader>
-                                                            <AlertDialogTitle>{{ t('admin.livraisons.deductStock.markConfirm.title') }}</AlertDialogTitle>
-                                                            <AlertDialogDescription>{{ t('admin.livraisons.deductStock.markConfirm.description') }}</AlertDialogDescription>
+                                                            <AlertDialogTitle>{{ t('admin.ventes.deductStock.markConfirm.title') }}</AlertDialogTitle>
+                                                            <AlertDialogDescription>{{ t('admin.ventes.deductStock.markConfirm.description') }}</AlertDialogDescription>
                                                         </AlertDialogHeader>
                                                         <AlertDialogFooter>
-                                                            <AlertDialogCancel>{{ t('admin.livraisons.deductStock.markConfirm.cancel') }}</AlertDialogCancel>
-                                                            <AlertDialogAction @click="markStockDeducted(delivery)">{{ t('admin.livraisons.deductStock.markConfirm.confirm') }}</AlertDialogAction>
+                                                            <AlertDialogCancel>{{ t('admin.ventes.deductStock.markConfirm.cancel') }}</AlertDialogCancel>
+                                                            <AlertDialogAction @click="markStockDeducted(delivery)">{{ t('admin.ventes.deductStock.markConfirm.confirm') }}</AlertDialogAction>
                                                         </AlertDialogFooter>
                                                     </AlertDialogContent>
                                                 </AlertDialog>
                                             </div>
-                                            <Badge v-else variant="secondary">{{ t('admin.livraisons.deductStock.notDeducted') }}</Badge>
+                                            <Badge v-else variant="secondary">{{ t('admin.ventes.deductStock.notDeducted') }}</Badge>
                                         </TableCell>
                                         <TableCell @click.stop>
                                             <DeleteButton
                                                 v-if="isManager"
-                                                :label="t('admin.livraisons.delete.label')"
-                                                :title="t('admin.livraisons.delete.title')"
-                                                :description="t('admin.livraisons.delete.description', { number: formatOrderNumber(delivery.orderNumber) })"
-                                                :cancel-label="t('admin.livraisons.delete.cancel')"
-                                                :confirm-label="t('admin.livraisons.delete.confirm')"
+                                                :label="t('admin.ventes.delete.label')"
+                                                :title="t('admin.ventes.delete.title')"
+                                                :description="t('admin.ventes.delete.description', { number: formatOrderNumber(delivery.orderNumber) })"
+                                                :cancel-label="t('admin.ventes.delete.cancel')"
+                                                :confirm-label="t('admin.ventes.delete.confirm')"
                                                 @confirm="deleteDelivery(delivery)"
                                             />
                                         </TableCell>
@@ -388,11 +389,11 @@ const statsOreData = computed<(OreRef & { value: number })[]>(() => {
                                             <Table>
                                                 <TableHeader>
                                                     <TableRow>
-                                                        <TableHead>{{ t('admin.livraisons.detail.resource') }}</TableHead>
-                                                        <TableHead>{{ t('admin.livraisons.detail.quantity') }}</TableHead>
-                                                        <TableHead>{{ t('admin.livraisons.detail.unitPrice') }}</TableHead>
-                                                        <TableHead>{{ t('admin.livraisons.detail.total') }}</TableHead>
-                                                        <TableHead>{{ t('admin.livraisons.detail.profit') }}</TableHead>
+                                                        <TableHead>{{ t('admin.ventes.detail.resource') }}</TableHead>
+                                                        <TableHead>{{ t('admin.ventes.detail.quantity') }}</TableHead>
+                                                        <TableHead>{{ t('admin.ventes.detail.unitPrice') }}</TableHead>
+                                                        <TableHead>{{ t('admin.ventes.detail.total') }}</TableHead>
+                                                        <TableHead>{{ t('admin.ventes.detail.profit') }}</TableHead>
                                                     </TableRow>
                                                 </TableHeader>
                                                 <TableBody>
@@ -402,7 +403,7 @@ const statsOreData = computed<(OreRef & { value: number })[]>(() => {
                                                         <TableCell class="text-sm text-muted-foreground">{{ line.unitPrice.toFixed(2) }} s</TableCell>
                                                         <TableCell class="text-sm font-medium">{{ line.totalPrice.toFixed(2) }} s</TableCell>
                                                         <TableCell class="text-sm font-medium">
-                                                            <span v-if="line.profit === null" class="text-muted-foreground italic">{{ t('admin.livraisons.detail.profitUnknown') }}</span>
+                                                            <span v-if="line.profit === null" class="text-muted-foreground italic">{{ t('admin.ventes.detail.profitUnknown') }}</span>
                                                             <span v-else :class="line.profit >= 0 ? 'text-green-600' : 'text-destructive'">{{ line.profit.toFixed(2) }} s</span>
                                                         </TableCell>
                                                     </TableRow>
@@ -414,7 +415,7 @@ const statsOreData = computed<(OreRef & { value: number })[]>(() => {
                             </template>
                             <TableRow v-else>
                                 <TableCell :colspan="10" class="h-24 text-center text-muted-foreground">
-                                    {{ t('admin.livraisons.table.empty') }}
+                                    {{ t('admin.ventes.table.empty') }}
                                 </TableCell>
                             </TableRow>
                         </TableBody>
@@ -430,14 +431,14 @@ const statsOreData = computed<(OreRef & { value: number })[]>(() => {
 
             <TabsContent value="stats" class="space-y-4">
                 <div class="flex flex-wrap items-center justify-between gap-4">
-                    <div class="text-sm font-medium">{{ t(`admin.livraisons.stats.oreTotals.title.${statsMetric}`) }}</div>
+                    <div class="text-sm font-medium">{{ t(`admin.ventes.stats.oreTotals.title.${statsMetric}`) }}</div>
                     <div class="flex flex-wrap items-center gap-2">
                         <Select :model-value="statsMetric" @update:model-value="onStatsMetricChange">
                             <SelectTrigger class="w-44 max-w-full">
                                 <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem v-for="metric in STATS_METRICS" :key="metric" :value="metric">{{ t(`admin.livraisons.stats.metrics.${metric}`) }}</SelectItem>
+                                <SelectItem v-for="metric in STATS_METRICS" :key="metric" :value="metric">{{ t(`admin.ventes.stats.metrics.${metric}`) }}</SelectItem>
                             </SelectContent>
                         </Select>
                         <Select :model-value="statsWeekFilter" @update:model-value="onStatsWeekFilterChange">
@@ -445,9 +446,9 @@ const statsOreData = computed<(OreRef & { value: number })[]>(() => {
                                 <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="all">{{ t('admin.livraisons.stats.distribution.allWeeks') }}</SelectItem>
+                                <SelectItem value="all">{{ t('admin.ventes.stats.distribution.allWeeks') }}</SelectItem>
                                 <SelectItem v-for="weeklyTotal in weeklyTotals" :key="weeklyTotal.weekNumber" :value="String(weeklyTotal.weekNumber)">
-                                    {{ t('admin.livraisons.table.weekBadge', { week: weeklyTotal.weekNumber }) }}
+                                    {{ t('admin.ventes.table.weekBadge', { week: weeklyTotal.weekNumber }) }}
                                 </SelectItem>
                             </SelectContent>
                         </Select>
@@ -459,8 +460,8 @@ const statsOreData = computed<(OreRef & { value: number })[]>(() => {
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead>{{ t('admin.livraisons.stats.oreTotals.resource') }}</TableHead>
-                                    <TableHead>{{ t(`admin.livraisons.stats.metrics.${statsMetric}`) }}</TableHead>
+                                    <TableHead>{{ t('admin.ventes.stats.oreTotals.resource') }}</TableHead>
+                                    <TableHead>{{ t(`admin.ventes.stats.metrics.${statsMetric}`) }}</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -470,13 +471,13 @@ const statsOreData = computed<(OreRef & { value: number })[]>(() => {
                                         <TableCell class="text-sm text-muted-foreground">{{ formatStatValue(ore.value) }}</TableCell>
                                     </TableRow>
                                     <TableRow>
-                                        <TableCell class="text-sm font-medium">{{ t('admin.livraisons.stats.oreTotals.total') }}</TableCell>
+                                        <TableCell class="text-sm font-medium">{{ t('admin.ventes.stats.oreTotals.total') }}</TableCell>
                                         <TableCell class="text-sm font-medium">{{ formatStatValue(statsOreData.reduce((sum, ore) => sum + ore.value, 0)) }}</TableCell>
                                     </TableRow>
                                 </template>
                                 <TableRow v-else>
                                     <TableCell :colspan="2" class="h-24 text-center text-muted-foreground">
-                                        {{ t('admin.livraisons.stats.oreTotals.empty') }}
+                                        {{ t('admin.ventes.stats.oreTotals.empty') }}
                                     </TableCell>
                                 </TableRow>
                             </TableBody>
@@ -484,7 +485,7 @@ const statsOreData = computed<(OreRef & { value: number })[]>(() => {
                     </div>
 
                     <div class="rounded-md border p-4">
-                        <OreDistributionChart :data="statsOreData" :format-value="formatStatValue" :empty-label="t('admin.livraisons.stats.distribution.empty')" />
+                        <OreDistributionChart :data="statsOreData" :format-value="formatStatValue" :empty-label="t('admin.ventes.stats.distribution.empty')" />
                     </div>
                 </div>
 
@@ -492,9 +493,11 @@ const statsOreData = computed<(OreRef & { value: number })[]>(() => {
                     :weekly-ore-stats="stats.weeklyOreStats"
                     :ores="stats.ores"
                     :metric="statsMetric"
-                    :title="t(`admin.livraisons.stats.evolution.title.${statsMetric}`)"
+                    :title="t(`admin.ventes.stats.evolution.title.${statsMetric}`)"
                     :format-value="formatStatValue"
                 />
+
+                <SalesEstimateCard :estimate="stats.salesEstimate" />
             </TabsContent>
         </Tabs>
     </div>

@@ -1,7 +1,7 @@
 import type { Component } from 'vue';
 import type { useI18n } from 'vue-i18n';
 import type { urlFor } from '~/client';
-import { BarChart2, Home, Users, Pickaxe, Package, HandCoins, History, Building2, Truck, Landmark, Boxes, Receipt, Settings, Wallet, CalendarDays } from '@lucide/vue';
+import { BarChart2, Home, Users, Pickaxe, Package, HandCoins, History, Building2, Truck, Landmark, Boxes, Receipt, Settings, Wallet, CalendarDays, CalendarClock } from '@lucide/vue';
 
 type RouteName = Parameters<typeof urlFor>[0];
 
@@ -32,7 +32,8 @@ export const getItems = (t: ReturnType<typeof useI18n>['t'], role: string | unde
         { title: t('admin.layout.menu.buybacks'), route: 'admin.buybacks.index', icon: History, hiddenForRoles: FOREMAN_RESTRICTED },
         { title: t('admin.layout.menu.expenses'), route: 'admin.expenses.index', icon: Receipt },
         { title: t('admin.layout.menu.balanceChanges'), route: 'admin.balanceChanges.index', icon: Wallet, hiddenForRoles: FOREMAN_RESTRICTED },
-        { title: t('admin.layout.menu.livraisons'), route: 'admin.livraisons.index', icon: Truck },
+        { title: t('admin.layout.menu.ventes'), route: 'admin.ventes.index', icon: Truck },
+        { title: t('admin.layout.menu.permanences'), route: 'admin.permanences.index', icon: CalendarClock },
         { title: t('admin.layout.menu.castellanies'), route: 'admin.castellanies.index', icon: Landmark, hiddenForRoles: FOREMAN_RESTRICTED },
     ];
 

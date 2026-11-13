@@ -18,6 +18,7 @@ import { Link } from '@adonisjs/inertia/vue';
 import type { AcceptableValue } from 'reka-ui';
 import { ArrowUp, ArrowDown, ArrowUpDown, Plus, Eye, FilterX } from '@lucide/vue';
 import type { Data } from '@generated/data';
+import BarrelMap from '~/partials/admin/barrel-rentals/BarrelMap.vue';
 
 defineOptions({ layout: AdminLayout });
 
@@ -45,6 +46,7 @@ type EligibleUser = Data.User;
 type WeeklyTotal = { weekNumber: number; startDate: string; endDate: string; totalAmount: number; paymentCount: number };
 
 const props = defineProps<{
+    barrelMapUrl: string | null;
     rentals: RentalRow[];
     meta: { total: number; currentPage: number; lastPage: number; perPage: number };
     filters: { search: string; sort: string; dir: string; status: string };
@@ -154,6 +156,8 @@ function resetFilters() {
                 </div>
             </div>
         </div>
+
+        <BarrelMap :url="barrelMapUrl" :can-manage="isManager" />
 
         <div class="space-y-3">
             <div class="flex flex-wrap items-center justify-between gap-2">

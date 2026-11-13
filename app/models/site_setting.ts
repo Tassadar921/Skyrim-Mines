@@ -6,4 +6,7 @@ import File from '#models/file';
 export default class SiteSetting extends SiteSettingSchema {
     @belongsTo(() => File, { foreignKey: 'logoFileId' })
     declare logoFile: BelongsTo<typeof File>;
+
+    @belongsTo(() => File, { foreignKey: 'barrelMapFileId' })
+    declare barrelMapFile: BelongsTo<typeof File>;
 }

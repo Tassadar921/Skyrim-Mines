@@ -19,6 +19,19 @@ export default class SiteSettingRepository extends BaseRepository<typeof SiteSet
         return setting;
     }
 
+    public async getWithBarrelMap(): Promise<SiteSetting> {
+        const setting = await this.get();
+        await setting.load('barrelMapFile');
+        return setting;
+    }
+
+    public async updateBarrelMap(barrelMapFileId: string | null): Promise<SiteSetting> {
+        const setting = await this.get();
+        setting.barrelMapFileId = barrelMapFileId;
+        await setting.save();
+        return setting;
+    }
+
     public async updateLogo(logoFileId: string | null): Promise<SiteSetting> {
         const setting = await this.get();
         setting.logoFileId = logoFileId;
@@ -29,6 +42,13 @@ export default class SiteSettingRepository extends BaseRepository<typeof SiteSet
     public async updateSubtitle(subtitle: string | null): Promise<SiteSetting> {
         const setting = await this.get();
         setting.subtitle = subtitle;
+        await setting.save();
+        return setting;
+    }
+
+    public async updateIsRecruiting(isRecruiting: boolean): Promise<SiteSetting> {
+        const setting = await this.get();
+        setting.isRecruiting = isRecruiting;
         await setting.save();
         return setting;
     }

@@ -79,6 +79,30 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/stocks_controller').default['index']>>>
     }
   }
+  'permanences.attendance.store': {
+    methods: ["POST"]
+    pattern: '/permanences/:slotId/attendance'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { slotId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/permanence_attendances_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/permanence_attendances_controller').default['store']>>>
+    }
+  }
+  'permanences.attendance.destroy': {
+    methods: ["DELETE"]
+    pattern: '/permanences/:slotId/attendance'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { slotId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/permanence_attendances_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/permanence_attendances_controller').default['destroy']>>>
+    }
+  }
   'organigramme': {
     methods: ["GET","HEAD"]
     pattern: '/organigramme'
@@ -871,64 +895,136 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/order_archives_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
-  'admin.livraisons.index': {
+  'admin.permanences.index': {
     methods: ["GET","HEAD"]
-    pattern: '/admin/livraisons'
+    pattern: '/admin/permanences'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/permanences_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/permanences_controller').default['index']>>>
+    }
+  }
+  'admin.permanences.settings.recruiting': {
+    methods: ["PUT"]
+    pattern: '/admin/permanences/settings/recruiting'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/admin/permanences').updateRecruitingValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/admin/permanences').updateRecruitingValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/permanences_controller').default['updateRecruiting']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/permanences_controller').default['updateRecruiting']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'admin.permanences.settings.buyback': {
+    methods: ["PUT"]
+    pattern: '/admin/permanences/settings/buyback'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/admin/permanences').updateBuybackValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/admin/permanences').updateBuybackValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/permanences_controller').default['updateBuyback']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/permanences_controller').default['updateBuyback']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'admin.permanences.settings.slots.duration': {
+    methods: ["PUT"]
+    pattern: '/admin/permanences/settings/slots/:id/duration'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/admin/permanences').updateSlotDurationValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/admin/permanences').updateSlotDurationValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/permanences_controller').default['updateSlotDuration']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/permanences_controller').default['updateSlotDuration']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'admin.permanences.settings.slots.store': {
+    methods: ["POST"]
+    pattern: '/admin/permanences/settings/slots'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/admin/permanences').storeSlotValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/admin/permanences').storeSlotValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/permanences_controller').default['storeSlot']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/permanences_controller').default['storeSlot']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'admin.permanences.settings.slots.destroy': {
+    methods: ["DELETE"]
+    pattern: '/admin/permanences/settings/slots/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/permanences_controller').default['destroySlot']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/permanences_controller').default['destroySlot']>>>
+    }
+  }
+  'admin.ventes.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/admin/ventes'
     types: {
       body: {}
       paramsTuple: []
       params: {}
       query: ExtractQueryForGet<InferInput<(typeof import('#validators/admin/deliveries').indexDeliveryValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/livraisons_controller').default['index']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/livraisons_controller').default['index']>>> | { status: 422; response: { errors: SimpleError[] } }
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/ventes_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/ventes_controller').default['index']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
-  'admin.livraisons.destroy': {
+  'admin.ventes.destroy': {
     methods: ["DELETE"]
-    pattern: '/admin/livraisons/:id'
+    pattern: '/admin/ventes/:id'
     types: {
       body: {}
       paramsTuple: [ParamValue]
       params: { id: ParamValue }
       query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/livraisons_controller').default['destroy']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/livraisons_controller').default['destroy']>>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/ventes_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/ventes_controller').default['destroy']>>>
     }
   }
-  'admin.livraisons.deductStock': {
+  'admin.ventes.deductStock': {
     methods: ["PATCH"]
-    pattern: '/admin/livraisons/:id/deduct-stock'
+    pattern: '/admin/ventes/:id/deduct-stock'
     types: {
       body: {}
       paramsTuple: [ParamValue]
       params: { id: ParamValue }
       query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/livraisons_controller').default['deductStock']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/livraisons_controller').default['deductStock']>>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/ventes_controller').default['deductStock']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/ventes_controller').default['deductStock']>>>
     }
   }
-  'admin.livraisons.markStockDeducted': {
+  'admin.ventes.markStockDeducted': {
     methods: ["PATCH"]
-    pattern: '/admin/livraisons/:id/mark-stock-deducted'
+    pattern: '/admin/ventes/:id/mark-stock-deducted'
     types: {
       body: {}
       paramsTuple: [ParamValue]
       params: { id: ParamValue }
       query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/livraisons_controller').default['markStockDeducted']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/livraisons_controller').default['markStockDeducted']>>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/ventes_controller').default['markStockDeducted']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/ventes_controller').default['markStockDeducted']>>>
     }
   }
-  'admin.livraisons.deductStockAll': {
+  'admin.ventes.deductStockAll': {
     methods: ["POST"]
-    pattern: '/admin/livraisons/deduct-stock-all'
+    pattern: '/admin/ventes/deduct-stock-all'
     types: {
       body: {}
       paramsTuple: []
       params: {}
       query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/livraisons_controller').default['deductStockAll']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/livraisons_controller').default['deductStockAll']>>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/ventes_controller').default['deductStockAll']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/ventes_controller').default['deductStockAll']>>>
     }
   }
   'admin.barrel.update': {
@@ -965,6 +1061,30 @@ export interface Registry {
       query: ExtractQuery<InferInput<(typeof import('#validators/admin/barrel_rentals').storeBarrelRentalValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/barrel_rentals_controller').default['store']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/barrel_rentals_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'admin.barrelRentals.map.update': {
+    methods: ["POST"]
+    pattern: '/admin/barrel-rentals/map'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/admin/barrel_rentals').updateBarrelMapValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/admin/barrel_rentals').updateBarrelMapValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/barrel_rentals_controller').default['updateMap']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/barrel_rentals_controller').default['updateMap']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'admin.barrelRentals.map.destroy': {
+    methods: ["DELETE"]
+    pattern: '/admin/barrel-rentals/map'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/barrel_rentals_controller').default['destroyMap']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/barrel_rentals_controller').default['destroyMap']>>>
     }
   }
   'admin.barrelRentals.show': {

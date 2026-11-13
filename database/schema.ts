@@ -354,6 +354,42 @@ export class OrganizationSchema extends BaseModel {
   declare updatedAt: DateTime | null
 }
 
+export class PermanenceAttendanceSchema extends BaseModel {
+  static $columns = ['agendaEventId', 'createdAt', 'date', 'id', 'permanenceSlotId', 'updatedAt', 'userId'] as const
+  $columns = PermanenceAttendanceSchema.$columns
+  @column()
+  declare agendaEventId: string | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column.date()
+  declare date: DateTime
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare permanenceSlotId: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare userId: string
+}
+
+export class PermanenceSlotSchema extends BaseModel {
+  static $columns = ['createdAt', 'durationMinutes', 'id', 'time', 'updatedAt', 'weekday'] as const
+  $columns = PermanenceSlotSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare durationMinutes: number
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare time: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare weekday: number
+}
+
 export class ResourceBarrelAdjustmentSchema extends BaseModel {
   static $columns = ['adminId', 'createdAt', 'delta', 'id', 'resourceId', 'updatedAt', 'userId'] as const
   $columns = ResourceBarrelAdjustmentSchema.$columns
@@ -478,7 +514,7 @@ export class ResourceStockSchema extends BaseModel {
 }
 
 export class ResourceSchema extends BaseModel {
-  static $columns = ['buyPrice', 'buybackSplitEnabled', 'createdAt', 'id', 'minerShare', 'name', 'order', 'sellPrice', 'sharedShare', 'type', 'updatedAt'] as const
+  static $columns = ['buyPrice', 'buybackSplitEnabled', 'createdAt', 'id', 'minerShare', 'name', 'order', 'permanenceBuyback', 'sellPrice', 'sharedShare', 'type', 'updatedAt'] as const
   $columns = ResourceSchema.$columns
   @column()
   declare buyPrice: string
@@ -495,6 +531,8 @@ export class ResourceSchema extends BaseModel {
   @column()
   declare order: number
   @column()
+  declare permanenceBuyback: boolean
+  @column()
   declare sellPrice: string
   @column()
   declare sharedShare: string | null
@@ -504,13 +542,44 @@ export class ResourceSchema extends BaseModel {
   declare updatedAt: DateTime | null
 }
 
+export class SalesEstimateSchema extends BaseModel {
+  static $columns = ['basedOnWeekNumber', 'createdAt', 'estimatedOreNeed', 'estimatedSales', 'historyWeeks', 'id', 'resourceId', 'resourceName', 'resourceType', 'targetWeekNumber', 'updatedAt'] as const
+  $columns = SalesEstimateSchema.$columns
+  @column()
+  declare basedOnWeekNumber: number
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare estimatedOreNeed: string | null
+  @column()
+  declare estimatedSales: string
+  @column()
+  declare historyWeeks: number
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare resourceId: string
+  @column()
+  declare resourceName: string
+  @column()
+  declare resourceType: string
+  @column()
+  declare targetWeekNumber: number
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class SiteSettingSchema extends BaseModel {
-  static $columns = ['createdAt', 'id', 'logoFileId', 'subtitle', 'taxSystem', 'updatedAt', 'weekOneStart'] as const
+  static $columns = ['barrelMapFileId', 'createdAt', 'id', 'isRecruiting', 'logoFileId', 'subtitle', 'taxSystem', 'updatedAt', 'weekOneStart'] as const
   $columns = SiteSettingSchema.$columns
+  @column()
+  declare barrelMapFileId: string | null
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
   @column({ isPrimary: true })
   declare id: string
+  @column()
+  declare isRecruiting: boolean
   @column()
   declare logoFileId: string | null
   @column()

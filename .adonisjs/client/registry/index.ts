@@ -42,6 +42,18 @@ const routes = {
     tokens: [{"old":"/stocks","type":0,"val":"stocks","end":""}],
     types: placeholder as Registry['stocks']['types'],
   },
+  'permanences.attendance.store': {
+    methods: ["POST"],
+    pattern: '/permanences/:slotId/attendance',
+    tokens: [{"old":"/permanences/:slotId/attendance","type":0,"val":"permanences","end":""},{"old":"/permanences/:slotId/attendance","type":1,"val":"slotId","end":""},{"old":"/permanences/:slotId/attendance","type":0,"val":"attendance","end":""}],
+    types: placeholder as Registry['permanences.attendance.store']['types'],
+  },
+  'permanences.attendance.destroy': {
+    methods: ["DELETE"],
+    pattern: '/permanences/:slotId/attendance',
+    tokens: [{"old":"/permanences/:slotId/attendance","type":0,"val":"permanences","end":""},{"old":"/permanences/:slotId/attendance","type":1,"val":"slotId","end":""},{"old":"/permanences/:slotId/attendance","type":0,"val":"attendance","end":""}],
+    types: placeholder as Registry['permanences.attendance.destroy']['types'],
+  },
   'organigramme': {
     methods: ["GET","HEAD"],
     pattern: '/organigramme',
@@ -438,35 +450,71 @@ const routes = {
     tokens: [{"old":"/admin/commandes/archiver","type":0,"val":"admin","end":""},{"old":"/admin/commandes/archiver","type":0,"val":"commandes","end":""},{"old":"/admin/commandes/archiver","type":0,"val":"archiver","end":""}],
     types: placeholder as Registry['admin.orderArchives.store']['types'],
   },
-  'admin.livraisons.index': {
+  'admin.permanences.index': {
     methods: ["GET","HEAD"],
-    pattern: '/admin/livraisons',
-    tokens: [{"old":"/admin/livraisons","type":0,"val":"admin","end":""},{"old":"/admin/livraisons","type":0,"val":"livraisons","end":""}],
-    types: placeholder as Registry['admin.livraisons.index']['types'],
+    pattern: '/admin/permanences',
+    tokens: [{"old":"/admin/permanences","type":0,"val":"admin","end":""},{"old":"/admin/permanences","type":0,"val":"permanences","end":""}],
+    types: placeholder as Registry['admin.permanences.index']['types'],
   },
-  'admin.livraisons.destroy': {
-    methods: ["DELETE"],
-    pattern: '/admin/livraisons/:id',
-    tokens: [{"old":"/admin/livraisons/:id","type":0,"val":"admin","end":""},{"old":"/admin/livraisons/:id","type":0,"val":"livraisons","end":""},{"old":"/admin/livraisons/:id","type":1,"val":"id","end":""}],
-    types: placeholder as Registry['admin.livraisons.destroy']['types'],
+  'admin.permanences.settings.recruiting': {
+    methods: ["PUT"],
+    pattern: '/admin/permanences/settings/recruiting',
+    tokens: [{"old":"/admin/permanences/settings/recruiting","type":0,"val":"admin","end":""},{"old":"/admin/permanences/settings/recruiting","type":0,"val":"permanences","end":""},{"old":"/admin/permanences/settings/recruiting","type":0,"val":"settings","end":""},{"old":"/admin/permanences/settings/recruiting","type":0,"val":"recruiting","end":""}],
+    types: placeholder as Registry['admin.permanences.settings.recruiting']['types'],
   },
-  'admin.livraisons.deductStock': {
-    methods: ["PATCH"],
-    pattern: '/admin/livraisons/:id/deduct-stock',
-    tokens: [{"old":"/admin/livraisons/:id/deduct-stock","type":0,"val":"admin","end":""},{"old":"/admin/livraisons/:id/deduct-stock","type":0,"val":"livraisons","end":""},{"old":"/admin/livraisons/:id/deduct-stock","type":1,"val":"id","end":""},{"old":"/admin/livraisons/:id/deduct-stock","type":0,"val":"deduct-stock","end":""}],
-    types: placeholder as Registry['admin.livraisons.deductStock']['types'],
+  'admin.permanences.settings.buyback': {
+    methods: ["PUT"],
+    pattern: '/admin/permanences/settings/buyback',
+    tokens: [{"old":"/admin/permanences/settings/buyback","type":0,"val":"admin","end":""},{"old":"/admin/permanences/settings/buyback","type":0,"val":"permanences","end":""},{"old":"/admin/permanences/settings/buyback","type":0,"val":"settings","end":""},{"old":"/admin/permanences/settings/buyback","type":0,"val":"buyback","end":""}],
+    types: placeholder as Registry['admin.permanences.settings.buyback']['types'],
   },
-  'admin.livraisons.markStockDeducted': {
-    methods: ["PATCH"],
-    pattern: '/admin/livraisons/:id/mark-stock-deducted',
-    tokens: [{"old":"/admin/livraisons/:id/mark-stock-deducted","type":0,"val":"admin","end":""},{"old":"/admin/livraisons/:id/mark-stock-deducted","type":0,"val":"livraisons","end":""},{"old":"/admin/livraisons/:id/mark-stock-deducted","type":1,"val":"id","end":""},{"old":"/admin/livraisons/:id/mark-stock-deducted","type":0,"val":"mark-stock-deducted","end":""}],
-    types: placeholder as Registry['admin.livraisons.markStockDeducted']['types'],
+  'admin.permanences.settings.slots.duration': {
+    methods: ["PUT"],
+    pattern: '/admin/permanences/settings/slots/:id/duration',
+    tokens: [{"old":"/admin/permanences/settings/slots/:id/duration","type":0,"val":"admin","end":""},{"old":"/admin/permanences/settings/slots/:id/duration","type":0,"val":"permanences","end":""},{"old":"/admin/permanences/settings/slots/:id/duration","type":0,"val":"settings","end":""},{"old":"/admin/permanences/settings/slots/:id/duration","type":0,"val":"slots","end":""},{"old":"/admin/permanences/settings/slots/:id/duration","type":1,"val":"id","end":""},{"old":"/admin/permanences/settings/slots/:id/duration","type":0,"val":"duration","end":""}],
+    types: placeholder as Registry['admin.permanences.settings.slots.duration']['types'],
   },
-  'admin.livraisons.deductStockAll': {
+  'admin.permanences.settings.slots.store': {
     methods: ["POST"],
-    pattern: '/admin/livraisons/deduct-stock-all',
-    tokens: [{"old":"/admin/livraisons/deduct-stock-all","type":0,"val":"admin","end":""},{"old":"/admin/livraisons/deduct-stock-all","type":0,"val":"livraisons","end":""},{"old":"/admin/livraisons/deduct-stock-all","type":0,"val":"deduct-stock-all","end":""}],
-    types: placeholder as Registry['admin.livraisons.deductStockAll']['types'],
+    pattern: '/admin/permanences/settings/slots',
+    tokens: [{"old":"/admin/permanences/settings/slots","type":0,"val":"admin","end":""},{"old":"/admin/permanences/settings/slots","type":0,"val":"permanences","end":""},{"old":"/admin/permanences/settings/slots","type":0,"val":"settings","end":""},{"old":"/admin/permanences/settings/slots","type":0,"val":"slots","end":""}],
+    types: placeholder as Registry['admin.permanences.settings.slots.store']['types'],
+  },
+  'admin.permanences.settings.slots.destroy': {
+    methods: ["DELETE"],
+    pattern: '/admin/permanences/settings/slots/:id',
+    tokens: [{"old":"/admin/permanences/settings/slots/:id","type":0,"val":"admin","end":""},{"old":"/admin/permanences/settings/slots/:id","type":0,"val":"permanences","end":""},{"old":"/admin/permanences/settings/slots/:id","type":0,"val":"settings","end":""},{"old":"/admin/permanences/settings/slots/:id","type":0,"val":"slots","end":""},{"old":"/admin/permanences/settings/slots/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['admin.permanences.settings.slots.destroy']['types'],
+  },
+  'admin.ventes.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/admin/ventes',
+    tokens: [{"old":"/admin/ventes","type":0,"val":"admin","end":""},{"old":"/admin/ventes","type":0,"val":"ventes","end":""}],
+    types: placeholder as Registry['admin.ventes.index']['types'],
+  },
+  'admin.ventes.destroy': {
+    methods: ["DELETE"],
+    pattern: '/admin/ventes/:id',
+    tokens: [{"old":"/admin/ventes/:id","type":0,"val":"admin","end":""},{"old":"/admin/ventes/:id","type":0,"val":"ventes","end":""},{"old":"/admin/ventes/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['admin.ventes.destroy']['types'],
+  },
+  'admin.ventes.deductStock': {
+    methods: ["PATCH"],
+    pattern: '/admin/ventes/:id/deduct-stock',
+    tokens: [{"old":"/admin/ventes/:id/deduct-stock","type":0,"val":"admin","end":""},{"old":"/admin/ventes/:id/deduct-stock","type":0,"val":"ventes","end":""},{"old":"/admin/ventes/:id/deduct-stock","type":1,"val":"id","end":""},{"old":"/admin/ventes/:id/deduct-stock","type":0,"val":"deduct-stock","end":""}],
+    types: placeholder as Registry['admin.ventes.deductStock']['types'],
+  },
+  'admin.ventes.markStockDeducted': {
+    methods: ["PATCH"],
+    pattern: '/admin/ventes/:id/mark-stock-deducted',
+    tokens: [{"old":"/admin/ventes/:id/mark-stock-deducted","type":0,"val":"admin","end":""},{"old":"/admin/ventes/:id/mark-stock-deducted","type":0,"val":"ventes","end":""},{"old":"/admin/ventes/:id/mark-stock-deducted","type":1,"val":"id","end":""},{"old":"/admin/ventes/:id/mark-stock-deducted","type":0,"val":"mark-stock-deducted","end":""}],
+    types: placeholder as Registry['admin.ventes.markStockDeducted']['types'],
+  },
+  'admin.ventes.deductStockAll': {
+    methods: ["POST"],
+    pattern: '/admin/ventes/deduct-stock-all',
+    tokens: [{"old":"/admin/ventes/deduct-stock-all","type":0,"val":"admin","end":""},{"old":"/admin/ventes/deduct-stock-all","type":0,"val":"ventes","end":""},{"old":"/admin/ventes/deduct-stock-all","type":0,"val":"deduct-stock-all","end":""}],
+    types: placeholder as Registry['admin.ventes.deductStockAll']['types'],
   },
   'admin.barrel.update': {
     methods: ["PATCH"],
@@ -485,6 +533,18 @@ const routes = {
     pattern: '/admin/barrel-rentals',
     tokens: [{"old":"/admin/barrel-rentals","type":0,"val":"admin","end":""},{"old":"/admin/barrel-rentals","type":0,"val":"barrel-rentals","end":""}],
     types: placeholder as Registry['admin.barrelRentals.store']['types'],
+  },
+  'admin.barrelRentals.map.update': {
+    methods: ["POST"],
+    pattern: '/admin/barrel-rentals/map',
+    tokens: [{"old":"/admin/barrel-rentals/map","type":0,"val":"admin","end":""},{"old":"/admin/barrel-rentals/map","type":0,"val":"barrel-rentals","end":""},{"old":"/admin/barrel-rentals/map","type":0,"val":"map","end":""}],
+    types: placeholder as Registry['admin.barrelRentals.map.update']['types'],
+  },
+  'admin.barrelRentals.map.destroy': {
+    methods: ["DELETE"],
+    pattern: '/admin/barrel-rentals/map',
+    tokens: [{"old":"/admin/barrel-rentals/map","type":0,"val":"admin","end":""},{"old":"/admin/barrel-rentals/map","type":0,"val":"barrel-rentals","end":""},{"old":"/admin/barrel-rentals/map","type":0,"val":"map","end":""}],
+    types: placeholder as Registry['admin.barrelRentals.map.destroy']['types'],
   },
   'admin.barrelRentals.show': {
     methods: ["GET","HEAD"],

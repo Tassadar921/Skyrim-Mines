@@ -66,7 +66,7 @@ export default class OrderArchivesController {
     }
 
     public async store({ request, auth, response, session, i18n }: HttpContext) {
-        const { items, orderWeek, deliveryWeek, castellanyId, deductFromStock, ...recipientData } = await request.validateUsing(createOrderArchiveValidator);
+        const { items, orderWeek, castellanyId, deductFromStock, ...recipientData } = await request.validateUsing(createOrderArchiveValidator);
         const requestedItems = items.filter((item) => item.quantity > 0);
 
         if (!requestedItems.length) {
@@ -80,11 +80,6 @@ export default class OrderArchivesController {
 
         if (orderWeek < minWeek || orderWeek > maxWeek) {
             session.flash('error', i18n.t('messages.admin.orderArchives.create.invalidOrderWeek'));
-            return response.redirect().back();
-        }
-
-        if (deliveryWeek < orderWeek || deliveryWeek > maxWeek) {
-            session.flash('error', i18n.t('messages.admin.orderArchives.create.invalidDeliveryWeek'));
             return response.redirect().back();
         }
 
@@ -145,6 +140,8 @@ export default class OrderArchivesController {
             const remaining = await this.deliveryRepository.remainingQuantities(order.id);
             const deliveryLines = remaining.map((line) => ({ orderLineId: line.orderLineId, quantity: line.remainingQuantity }));
             // Current week: archived as delivered right now. Past or next week: Monday 00:01 (game time) of that week.
+            // The delivery is always recorded on the order's week.
+            const deliveryWeek = orderWeek;
             const deliveredAt = deliveryWeek === currentWeek ? DateTime.now() : DateTime.fromISO(getWeekRange(deliveryWeek).start.toISODate()!, { zone: GAME_TIMEZONE }).set({ minute: 1 });
 
             const delivery = await this.deliveryRepository.createForOrder(order.id, admin.id, deliveryLines, { deliveredAt, castellanyId: castellanyId ?? null });
@@ -162,7 +159,7 @@ export default class OrderArchivesController {
                 : i18n.t('messages.admin.orderArchives.create.success');
 
             session.flash('success', successMessage);
-            return response.redirect().toRoute('admin.livraisons.index');
+            return response.redirect().toRoute('admin.ventes.index');
         } catch (e) {
             logger.error({ err: e }, 'orderArchives.store failed');
             session.flash('error', i18n.t('messages.admin.orderArchives.create.error'));

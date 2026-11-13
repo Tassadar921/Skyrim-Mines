@@ -3,6 +3,8 @@ import { DateTime } from 'luxon';
 import logger from '@adonisjs/core/services/logger';
 import DeliveryRepository, { type DeliveryStatValues } from '#repositories/delivery_repository';
 import ResourceRepository from '#repositories/resource_repository';
+import SalesEstimateRepository from '#repositories/sales_estimate_repository';
+import type Resource from '#models/resource';
 import ResourceTypeEnum from '#types/enum/resource_type_enum';
 import { indexDeliveryValidator } from '#validators/admin/deliveries';
 import { getWeekNumber, getWeekRange } from '#helpers/game_week_helper';
@@ -17,10 +19,11 @@ function formatBuybackSuccessMessage(i18n: HttpContext['i18n'], baseMessage: str
 
 const PER_PAGE = 20;
 
-export default class LivraisonsController {
+export default class VentesController {
     constructor(
         private readonly deliveryRepository: DeliveryRepository = new DeliveryRepository(),
         private readonly resourceRepository: ResourceRepository = new ResourceRepository(),
+        private readonly salesEstimateRepository: SalesEstimateRepository = new SalesEstimateRepository(),
     ) {}
 
     public async index({ inertia, request }: HttpContext) {
@@ -91,7 +94,7 @@ export default class LivraisonsController {
             return totals;
         });
 
-        return inertia.render('admin/livraisons/index', {
+        return inertia.render('admin/ventes/index', {
             deliveries: deliveries.all().map((delivery) => {
                 const lines = delivery.lines.map((line) => {
                     const unitPrice = Number(line.unitPrice);
@@ -129,17 +132,40 @@ export default class LivraisonsController {
             filters: { search: search ?? '', sort: currentSort, dir: currentDir, week: week ?? null },
             weeklyTotals,
             pendingStockDeductionCount,
-            stats: { ores, oreTotals, weeklyOreStats },
+            stats: { ores, oreTotals, weeklyOreStats, salesEstimate: await this.latestSalesEstimate(allResources) },
         });
+    }
+
+    /** Latest sales forecast (computed when a week is recorded), rows in the resources list order; null if none yet. */
+    private async latestSalesEstimate(resources: Resource[]) {
+        const rows = await this.salesEstimateRepository.latest();
+        if (!rows.length) return null;
+
+        const position = new Map(resources.map((resource, index) => [resource.id, index]));
+        const sorted = [...rows].sort((a, b) => (position.get(a.resourceId) ?? Infinity) - (position.get(b.resourceId) ?? Infinity));
+        const toRow = (row: (typeof rows)[number]) => ({
+            resourceId: row.resourceId,
+            resourceName: row.resourceName,
+            estimatedSales: Number(row.estimatedSales),
+            estimatedOreNeed: row.estimatedOreNeed === null ? null : Number(row.estimatedOreNeed),
+        });
+
+        return {
+            targetWeekNumber: rows[0].targetWeekNumber,
+            basedOnWeekNumber: rows[0].basedOnWeekNumber,
+            historyWeeks: rows[0].historyWeeks,
+            ores: sorted.filter((row) => row.resourceType === ResourceTypeEnum.MINERAI).map(toRow),
+            ingots: sorted.filter((row) => row.resourceType === ResourceTypeEnum.LINGOT).map(toRow),
+        };
     }
 
     public async destroy({ params, response, session, i18n }: HttpContext) {
         try {
             await this.deliveryRepository.destroy(params.id);
-            session.flash('success', i18n.t('messages.livraisons.delete.success'));
+            session.flash('success', i18n.t('messages.admin.ventes.delete.success'));
         } catch (e) {
-            logger.error({ err: e }, 'livraisons.destroy failed');
-            session.flash('error', i18n.t('messages.livraisons.delete.error'));
+            logger.error({ err: e }, 'ventes.destroy failed');
+            session.flash('error', i18n.t('messages.admin.ventes.delete.error'));
         }
 
         return response.redirect().back();
@@ -149,14 +175,14 @@ export default class LivraisonsController {
         try {
             const { alreadyDeducted, buybackSummary } = await this.deliveryRepository.deductStockForDelivery(params.id);
             if (alreadyDeducted) {
-                session.flash('error', i18n.t('messages.admin.livraisons.deductStock.alreadyDeducted'));
+                session.flash('error', i18n.t('messages.admin.ventes.deductStock.alreadyDeducted'));
                 return response.redirect().back();
             }
 
-            session.flash('success', formatBuybackSuccessMessage(i18n, i18n.t('messages.admin.livraisons.deductStock.success'), buybackSummary));
+            session.flash('success', formatBuybackSuccessMessage(i18n, i18n.t('messages.admin.ventes.deductStock.success'), buybackSummary));
         } catch (e) {
-            logger.error({ err: e }, 'livraisons.deductStock failed');
-            session.flash('error', i18n.t('messages.admin.livraisons.deductStock.error'));
+            logger.error({ err: e }, 'ventes.deductStock failed');
+            session.flash('error', i18n.t('messages.admin.ventes.deductStock.error'));
         }
 
         return response.redirect().back();
@@ -166,14 +192,14 @@ export default class LivraisonsController {
         try {
             const { alreadyDeducted } = await this.deliveryRepository.markStockDeducted(params.id);
             if (alreadyDeducted) {
-                session.flash('error', i18n.t('messages.admin.livraisons.deductStock.alreadyDeducted'));
+                session.flash('error', i18n.t('messages.admin.ventes.deductStock.alreadyDeducted'));
                 return response.redirect().back();
             }
 
-            session.flash('success', i18n.t('messages.admin.livraisons.deductStock.markedSuccess'));
+            session.flash('success', i18n.t('messages.admin.ventes.deductStock.markedSuccess'));
         } catch (e) {
-            logger.error({ err: e }, 'livraisons.markStockDeducted failed');
-            session.flash('error', i18n.t('messages.admin.livraisons.deductStock.error'));
+            logger.error({ err: e }, 'ventes.markStockDeducted failed');
+            session.flash('error', i18n.t('messages.admin.ventes.deductStock.error'));
         }
 
         return response.redirect().back();
@@ -191,13 +217,13 @@ export default class LivraisonsController {
                 }
             }
 
-            const baseMessage = i18n.t('messages.admin.livraisons.deductStock.allSuccess', { count: deliveries.length });
+            const baseMessage = i18n.t('messages.admin.ventes.deductStock.allSuccess', { count: deliveries.length });
             const combinedSummary = [...combinedByResource.entries()].map(([resourceName, quantity]) => ({ resourceName, quantity }));
 
             session.flash('success', formatBuybackSuccessMessage(i18n, baseMessage, combinedSummary));
         } catch (e) {
-            logger.error({ err: e }, 'livraisons.deductStockAll failed');
-            session.flash('error', i18n.t('messages.admin.livraisons.deductStock.error'));
+            logger.error({ err: e }, 'ventes.deductStockAll failed');
+            session.flash('error', i18n.t('messages.admin.ventes.deductStock.error'));
         }
 
         return response.redirect().back();

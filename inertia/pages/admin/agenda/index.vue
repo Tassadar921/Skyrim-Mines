@@ -9,6 +9,8 @@ import { urlFor } from '~/client';
 import { getTransmit } from '~/lib/transmit';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
+import { DatePicker } from '~/components/ui/date-picker';
+import { TimeInput } from '~/components/ui/time-input';
 import { Textarea } from '~/components/ui/textarea';
 import { Checkbox } from '~/components/ui/checkbox';
 import { Label } from '~/components/ui/label';
@@ -180,6 +182,15 @@ function openEdit(event: AgendaEvent) {
     form.recurrenceEndsOn = event.recurrenceEndsOn ?? '';
     form.needsAssignee = event.needsAssignee;
     dialogOpen.value = true;
+}
+
+/** Form bounds are "YYYY-MM-DD" (all-day) or "YYYY-MM-DDTHH:mm"; date and time are edited by separate French-format pickers. */
+function setBoundDate(bound: 'startsAt' | 'endsAt', date: string) {
+    form[bound] = form.allDay ? date : `${date}T${form[bound].slice(11, 16) || '09:00'}`;
+}
+
+function setBoundTime(bound: 'startsAt' | 'endsAt', time: string) {
+    form[bound] = `${dayOf(form[bound])}T${time}`;
 }
 
 function onAllDayChange(allDay: boolean) {
@@ -429,8 +440,14 @@ function destroy() {
                     </div>
 
                     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                        <Input v-model="form.startsAt" :type="form.allDay ? 'date' : 'datetime-local'" :label="t('admin.agenda.fields.startsAt')" :error="form.errors.startsAt" />
-                        <Input v-model="form.endsAt" :type="form.allDay ? 'date' : 'datetime-local'" :label="t('admin.agenda.fields.endsAt')" :error="form.errors.endsAt" />
+                        <div v-for="bound in ['startsAt', 'endsAt'] as const" :key="bound" class="space-y-1">
+                            <Label>{{ t(`admin.agenda.fields.${bound}`) }}</Label>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <DatePicker :model-value="dayOf(form[bound]) || null" class="w-40" @update:model-value="(date) => setBoundDate(bound, date)" />
+                                <TimeInput v-if="!form.allDay" :model-value="form[bound].slice(11, 16)" @update:model-value="(time) => setBoundTime(bound, time)" />
+                            </div>
+                            <p v-if="form.errors[bound]" class="text-sm text-destructive">{{ form.errors[bound] }}</p>
+                        </div>
                     </div>
 
                     <div class="space-y-2">
@@ -439,7 +456,16 @@ function destroy() {
                             <Label for="agendaRecursWeekly" class="cursor-pointer">{{ t('admin.agenda.fields.recursWeekly') }}</Label>
                         </div>
                         <template v-if="form.recursWeekly">
-                            <Input v-model="form.recurrenceEndsOn" type="date" :label="t('admin.agenda.fields.recurrenceEndsOn')" :error="form.errors.recurrenceEndsOn" />
+                            <div class="space-y-1">
+                                <Label>{{ t('admin.agenda.fields.recurrenceEndsOn') }}</Label>
+                                <div class="flex items-center gap-2">
+                                    <DatePicker v-model="form.recurrenceEndsOn" class="w-40" :placeholder="t('admin.agenda.fields.recurrenceNoEnd')" />
+                                    <Button v-if="form.recurrenceEndsOn" type="button" variant="ghost" size="sm" @click="form.recurrenceEndsOn = ''">
+                                        {{ t('admin.agenda.fields.recurrenceClear') }}
+                                    </Button>
+                                </div>
+                                <p v-if="form.errors.recurrenceEndsOn" class="text-sm text-destructive">{{ form.errors.recurrenceEndsOn }}</p>
+                            </div>
                             <p class="text-xs text-muted-foreground">{{ t('admin.agenda.fields.recurrenceHint') }}</p>
                         </template>
                     </div>

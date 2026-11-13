@@ -13,7 +13,6 @@ export const controllers = {
     Castellanies: () => import('#controllers/admin/castellanies_controller'),
     CompanyExpenses: () => import('#controllers/admin/company_expenses_controller'),
     Dashboard: () => import('#controllers/admin/dashboard_controller'),
-    Livraisons: () => import('#controllers/admin/livraisons_controller'),
     Materials: () => import('#controllers/admin/materials_controller'),
     OrderArchives: () => import('#controllers/admin/order_archives_controller'),
     Organizations: () => import('#controllers/admin/organizations_controller'),
@@ -22,6 +21,8 @@ export const controllers = {
     SiteSettings: () => import('#controllers/admin/site_settings_controller'),
     Stocks: () => import('#controllers/admin/stocks_controller'),
     Users: () => import('#controllers/admin/users_controller'),
+    Ventes: () => import('#controllers/admin/ventes_controller'),
+    Permanences: () => import('#controllers/admin/permanences_controller'),
   },
   Auth: () => import('#controllers/auth_controller'),
   Buybacks: () => import('#controllers/buybacks_controller'),
@@ -31,4 +32,5 @@ export const controllers = {
   Organization: () => import('#controllers/organization_controller'),
   Stocks: () => import('#controllers/stocks_controller'),
   Tarifs: () => import('#controllers/tarifs_controller'),
+  PermanenceAttendances: () => import('#controllers/permanence_attendances_controller'),
 }

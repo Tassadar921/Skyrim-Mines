@@ -7,6 +7,7 @@ import { getTransmit } from '~/lib/transmit';
 import { canHaveBalance } from '~/lib/user_balance';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '~/components/ui/table';
 import DepositModal from '~/partials/deposit/DepositModal.vue';
+import PermanenceTodayCard, { type PermanenceToday } from '~/partials/permanences/PermanenceTodayCard.vue';
 import BuybackModal from '~/partials/buyback/BuybackModal.vue';
 import type { Data } from '@generated/data';
 
@@ -21,6 +22,8 @@ type MyDeposit = { id: string; resourceId: string; quantity: number; createdAt: 
 const props = defineProps<{
     resources: ResourceWithBarrel[];
     myDeposits: MyDeposit[];
+    /** Owners and foremen only: today's permanences still to come; null for everyone else. */
+    permanencesToday: PermanenceToday[] | null;
 }>();
 
 const minerais = computed(() => props.resources.filter((r) => r.type === 'minerai' && r.quantityBarrel > 0));
@@ -36,6 +39,7 @@ const totalMyBarrelValue = computed(() => props.resources.reduce((sum, resource)
 const canSeeCompanyBarrel = page.props.user?.role === 'admin' || page.props.user?.role === 'auditor' || page.props.user?.role === 'staff' || page.props.user?.role === 'foreman';
 
 let barrelSubscription: ReturnType<ReturnType<typeof getTransmit>['subscription']> | undefined;
+let permanencesSubscription: ReturnType<ReturnType<typeof getTransmit>['subscription']> | undefined;
 
 onMounted(async () => {
     barrelSubscription = getTransmit().subscription('barrel');
@@ -43,10 +47,20 @@ onMounted(async () => {
     barrelSubscription.onMessage(() => {
         router.reload({ only: ['resources'] });
     });
+
+    // Someone said "I'll be there" (or withdrew): refresh the attendee lists live.
+    if (props.permanencesToday) {
+        permanencesSubscription = getTransmit().subscription('permanences');
+        await permanencesSubscription.create();
+        permanencesSubscription.onMessage(() => {
+            router.reload({ only: ['permanencesToday'] });
+        });
+    }
 });
 
 onUnmounted(() => {
     barrelSubscription?.delete();
+    permanencesSubscription?.delete();
 });
 </script>
 
@@ -64,6 +78,8 @@ onUnmounted(() => {
                 <BuybackModal v-if="isAdmin" :resources="resources" />
             </div>
         </div>
+
+        <PermanenceTodayCard v-if="permanencesToday?.length" :permanences="permanencesToday" />
 
         <div v-if="myMinerais.length || myLingots.length" class="max-w-3xl mx-auto space-y-10">
             <h2 class="font-serif text-2xl font-light text-slate-800 dark:text-slate-100 text-center">{{ t('home.myBarrel.title') }}</h2>

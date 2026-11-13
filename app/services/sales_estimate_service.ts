@@ -1,0 +1,51 @@
+import DeliveryRepository from '#repositories/delivery_repository';
+import ResourceRepository from '#repositories/resource_repository';
+import ResourceRecipeLineRepository from '#repositories/resource_recipe_line_repository';
+import SalesEstimateRepository from '#repositories/sales_estimate_repository';
+import ResourceTypeEnum from '#types/enum/resource_type_enum';
+import { SALES_ESTIMATE_HISTORY_WEEKS, expandToOreNeeds, roundQuantity, trimmedMean } from '#helpers/sales_estimate_helper';
+
+/** Forecasts next week's sales once a week is recorded (closed) on the dashboard. */
+export default class SalesEstimateService {
+    constructor(
+        private readonly deliveryRepository: DeliveryRepository = new DeliveryRepository(),
+        private readonly resourceRepository: ResourceRepository = new ResourceRepository(),
+        private readonly resourceRecipeLineRepository: ResourceRecipeLineRepository = new ResourceRecipeLineRepository(),
+        private readonly salesEstimateRepository: SalesEstimateRepository = new SalesEstimateRepository(),
+    ) {}
+
+    /**
+     * Estimates week `closedWeek + 1` from the last complete weeks up to `closedWeek`: per resource, the
+     * quantities sold each week (0 when none), trimmed of the lowest and highest week, then averaged.
+     * Ores also get their total need, including the ore that goes into the ingots expected to sell.
+     */
+    public async computeAfterClosingWeek(closedWeek: number): Promise<void> {
+        const fromWeek = Math.max(1, closedWeek - SALES_ESTIMATE_HISTORY_WEEKS + 1);
+        const weeks = Array.from({ length: closedWeek - fromWeek + 1 }, (_, index) => fromWeek + index);
+
+        const [resources, soldRows, recipes] = await Promise.all([
+            this.resourceRepository.all(),
+            this.deliveryRepository.quantitiesByWeekAndResource(fromWeek, closedWeek),
+            this.resourceRecipeLineRepository.allResourceIngredients(),
+        ]);
+
+        const sold = new Map(soldRows.map((row) => [`${row.weekNumber}:${row.resourceId}`, row.quantity]));
+        const estimatedSales = new Map(resources.map((resource) => [resource.id, trimmedMean(weeks.map((week) => sold.get(`${week}:${resource.id}`) ?? 0))]));
+
+        const oreIds = new Set(resources.filter((resource) => resource.type === ResourceTypeEnum.MINERAI).map((resource) => resource.id));
+        const oreNeeds = expandToOreNeeds(estimatedSales, oreIds, recipes);
+
+        await this.salesEstimateRepository.replaceForWeek(
+            closedWeek + 1,
+            closedWeek,
+            weeks.length,
+            resources.map((resource) => ({
+                resourceId: resource.id,
+                resourceName: resource.name,
+                resourceType: resource.type,
+                estimatedSales: roundQuantity(estimatedSales.get(resource.id) ?? 0),
+                estimatedOreNeed: oreIds.has(resource.id) ? roundQuantity(oreNeeds.get(resource.id) ?? 0) : null,
+            })),
+        );
+    }
+}

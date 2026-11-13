@@ -4,8 +4,11 @@ import logger from '@adonisjs/core/services/logger';
 import BarrelRentalRepository from '#repositories/barrel_rental_repository';
 import BarrelRentalPaymentRepository from '#repositories/barrel_rental_payment_repository';
 import UserRepository from '#repositories/user_repository';
+import SiteSettingRepository from '#repositories/site_setting_repository';
+import FileRepository from '#repositories/file_repository';
 import UserTransformer from '#transformers/user_transformer';
-import { indexBarrelRentalValidator, storeBarrelRentalValidator, updateBarrelRentalValidator } from '#validators/admin/barrel_rentals';
+import { indexBarrelRentalValidator, storeBarrelRentalValidator, updateBarrelMapValidator, updateBarrelRentalValidator } from '#validators/admin/barrel_rentals';
+import { storeUploadedFile, deleteStoredFile } from '#helpers/file_storage_helper';
 import { storeBarrelRentalPaymentValidator } from '#validators/admin/barrel_rental_payments';
 import { getWeekNumber, getWeekRange } from '#helpers/game_week_helper';
 
@@ -14,6 +17,8 @@ export default class BarrelRentalsController {
         private readonly barrelRentalRepository: BarrelRentalRepository = new BarrelRentalRepository(),
         private readonly barrelRentalPaymentRepository: BarrelRentalPaymentRepository = new BarrelRentalPaymentRepository(),
         private readonly userRepository: UserRepository = new UserRepository(),
+        private readonly siteSettingRepository: SiteSettingRepository = new SiteSettingRepository(),
+        private readonly fileRepository: FileRepository = new FileRepository(),
     ) {}
 
     public async index({ inertia, request }: HttpContext) {
@@ -53,7 +58,10 @@ export default class BarrelRentalsController {
             });
         }
 
+        const siteSetting = await this.siteSettingRepository.getWithBarrelMap();
+
         return inertia.render('admin/barrel-rentals/index', {
+            barrelMapUrl: siteSetting.barrelMapFile?.path ?? null,
             rentals,
             meta: { total, currentPage, lastPage: Math.max(1, Math.ceil(total / perPage)), perPage },
             filters: { search: search ?? '', sort: currentSort, dir: currentDir, status: status ?? '' },
@@ -165,5 +173,52 @@ export default class BarrelRentalsController {
         }
 
         return response.redirect().back();
+    }
+
+    /** Uploads (or replaces) the mine map with the numbered barrels; the previous image is deleted. */
+    public async updateMap({ request, response, session, i18n }: HttpContext) {
+        const { map } = await request.validateUsing(updateBarrelMapValidator);
+
+        try {
+            const siteSetting = await this.siteSettingRepository.get();
+            const previousMapFileId = siteSetting.barrelMapFileId;
+
+            const path = await storeUploadedFile(map, 'uploads/barrel-map');
+            const file = await this.fileRepository.create({ path, originalName: map.clientName, mimeType: `${map.type}/${map.subtype}`, size: map.size });
+            await this.siteSettingRepository.updateBarrelMap(file.id);
+
+            if (previousMapFileId) await this.deleteMapFile(previousMapFileId);
+
+            session.flash('success', i18n.t('messages.admin.barrelRentals.map.update.success'));
+        } catch (e) {
+            logger.error({ err: e }, 'barrelRentals.updateMap failed');
+            session.flash('error', i18n.t('messages.admin.barrelRentals.map.update.error'));
+        }
+
+        return response.redirect().back();
+    }
+
+    public async destroyMap({ response, session, i18n }: HttpContext) {
+        try {
+            const siteSetting = await this.siteSettingRepository.get();
+            const mapFileId = siteSetting.barrelMapFileId;
+            if (mapFileId) {
+                await this.siteSettingRepository.updateBarrelMap(null);
+                await this.deleteMapFile(mapFileId);
+            }
+
+            session.flash('success', i18n.t('messages.admin.barrelRentals.map.destroy.success'));
+        } catch (e) {
+            logger.error({ err: e }, 'barrelRentals.destroyMap failed');
+            session.flash('error', i18n.t('messages.admin.barrelRentals.map.destroy.error'));
+        }
+
+        return response.redirect().back();
+    }
+
+    private async deleteMapFile(fileId: string): Promise<void> {
+        const file = await this.fileRepository.findOrFail(fileId);
+        await deleteStoredFile(file.path);
+        await this.fileRepository.delete(file.id);
     }
 }
